@@ -1,0 +1,362 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}.hl-back{position:fixed;right:max(12px,env(safe-area-inset-right,0px));bottom:max(12px,env(safe-area-inset-bottom,0px));z-index:99;font:600 12px system-ui,sans-serif;color:#F4F4F2;background:rgba(11,11,12,.85);border:1px solid #444;border-radius:999px;padding:8px 14px;text-decoration:none}.hl-back:hover{border-color:#D7262E}</style></head><body><title>HoopLife Ninja Figure</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+  /* Layout: a dark toy-photography stage with the live 3D figure, look and move controls under it, then a short spec. Single deliberate dark look. */
+  :root {
+    --bg: #0E0E10;
+    --stage-a: #2A2A30;
+    --stage-b: #0B0B0C;
+    --line: #2C2C31;
+    --fg: #F4F4F2;
+    --muted: #9A9AA1;
+    --red: #D7262E;
+    --body: "Archivo", "Segoe UI", system-ui, sans-serif;
+    --mono: "JetBrains Mono", Consolas, monospace;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+  .in { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .label { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  header .in { padding-block: 40px 20px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px 24px; }
+  h1 { font-size: clamp(30px, 5vw, 48px); font-weight: 800; letter-spacing: -.02em; line-height: 1; margin: 6px 0 0; }
+  .stage { position: relative; height: min(80vh, 760px); min-height: 480px; background: radial-gradient(70% 70% at 50% 40%, var(--stage-a), var(--stage-b)); border-block: 1px solid var(--line); overflow: hidden; }
+  .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+  .hint { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); font: 500 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); pointer-events: none; background: rgba(0,0,0,.35); padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+  .fallback { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 24px; color: var(--muted); }
+  .controls .in { padding-block: 20px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 18px 32px; }
+  .group { display: grid; gap: 8px; align-content: start; }
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pills button { font: 500 13px var(--body); color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 9px 16px; cursor: pointer; }
+  .pills button[aria-pressed="true"] { border-color: var(--red); }
+  .pills button:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+  .specs .in { padding-block: 24px 72px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px 32px; border-top: 1px solid var(--line); }
+  .specs div { display: grid; gap: 4px; align-content: start; }
+  .specs b { font-weight: 700; }
+  .specs span { color: var(--muted); font-size: 14px; }
+</style>
+
+<header><div class="in">
+  <div><div class="label">Mascot · Draft 3 · For Lawrance</div><h1>HoopLife Ninja Figure</h1></div>
+  <div class="label">Designer vinyl toy · ninja hooper · 4 moves</div>
+</div></header>
+
+<section class="stage" id="stage" aria-label="3D ninja figure">
+  <div class="hint" id="hint">Drag to turn · Scroll or pinch to zoom</div>
+</section>
+
+<section class="controls"><div class="in">
+  <div class="group"><span class="label">Mask</span>
+    <div class="pills" role="group" aria-label="Look">
+      <button type="button" id="l-black" data-look="black" aria-pressed="true">Black mask</button>
+      <button type="button" id="l-red" data-look="red" aria-pressed="false">Red mask (Lawrance)</button>
+    </div>
+  </div>
+  <div class="group"><span class="label">Move</span>
+    <div class="pills" role="group" aria-label="Move">
+      <button type="button" id="m-stand" data-move="stand" aria-pressed="true">Stance</button>
+      <button type="button" id="m-idle" data-move="idle" aria-pressed="false">Ball spin</button>
+      <button type="button" id="m-dribble" data-move="dribble" aria-pressed="false">Dribble</button>
+      <button type="button" id="m-shot" data-move="shot" aria-pressed="false">Jump shot</button>
+      <button type="button" id="m-vanish" data-move="vanish" aria-pressed="false">Ninja vanish</button>
+    </div>
+  </div>
+</div></section>
+
+<section class="specs"><div class="in">
+  <div><b>Who it is</b><span>Lawrance as a collectible hooper-ninja: pointed hood, cowl mask (black, or red like his own), fierce brows, the B1 ball always in hand.</span></div>
+  <div><b>Outfit</b><span>Short-sleeve ninja top with a crossover wrap, grey sash with a knot and pouch, wide wrist and ankle wraps, baggy ninja pants, black boots. HoopLife touches: the B1 ball, a red line on the sash and a small 01 on the back.</span></div>
+  <div><b>Original design</b><span>Your reference guides the mood only. No web pattern and no existing character: this ninja is made for HoopLife.</span></div>
+  <div><b>Next</b><span>Pick a look, then it goes into the intro, stickers, tees and the keychain range.</span></div>
+</div></section>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/environments/RoomEnvironment.js"></script>
+<script>
+(function () {
+  var stage = document.getElementById("stage");
+  if (!window.THREE || !THREE.OrbitControls) { stage.insertAdjacentHTML("beforeend", '<div class="fallback"><p>The 3D preview could not start on this device.</p></div>'); return; }
+  var renderer;
+  try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true }); } catch (e) { stage.insertAdjacentHTML("beforeend", '<div class="fallback"><p>The 3D preview could not start on this device.</p></div>'); return; }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.85;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  stage.insertBefore(renderer.domElement, stage.firstChild);
+  var scene = new THREE.Scene();
+  scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new THREE.RoomEnvironment(), 0.04).texture;
+  var camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100); camera.position.set(1.6, 1.9, 7.4);
+  var controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.target.set(0, 1.25, 0); controls.enableDamping = true; controls.enablePan = false; controls.minDistance = 3; controls.maxDistance = 14;
+  var key = new THREE.DirectionalLight(0xffffff, 1.1); key.position.set(3, 6, 4); key.castShadow = true; key.shadow.mapSize.set(1024, 1024);
+  key.shadow.camera.left = key.shadow.camera.bottom = -4; key.shadow.camera.right = key.shadow.camera.top = 4; scene.add(key);
+  var rim = new THREE.DirectionalLight(0xffb08a, 0.6); rim.position.set(-4, 3, -4); scene.add(rim);
+  // Display plinth
+  var floor = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.6, 0.14, 64), new THREE.MeshPhysicalMaterial({ color: 0x0c0c0e, roughness: 0.6, clearcoat: 0.3, envMapIntensity: 0.3 }));
+  floor.position.y = -0.07; floor.receiveShadow = true; scene.add(floor);
+  var plinthRing = new THREE.Mesh(new THREE.TorusGeometry(1.52, 0.012, 8, 120), new THREE.MeshBasicMaterial({ color: 0xd7262e })); plinthRing.rotation.x = Math.PI / 2; plinthRing.position.y = 0.002; scene.add(plinthRing);
+
+  // ---------- Materials (glossy vinyl) ----------
+  function vinyl(c, o) { return new THREE.MeshPhysicalMaterial(Object.assign({ color: c, roughness: 0.5, clearcoat: 0.35, clearcoatRoughness: 0.45, envMapIntensity: 0.35 }, o || {})); }
+  var M = {
+    hood: vinyl(0x0f0f12), cloth: vinyl(0x0a0a0c, { roughness: 0.7, clearcoat: 0.1 }), skin: vinyl(0x3f2519, { roughness: 0.6, envMapIntensity: 0.25 }),
+    red: vinyl(0xb3121a), gold: vinyl(0xc9a24a, { metalness: 0.7, roughness: 0.3, envMapIntensity: 0.8 }), white: vinyl(0xe9e6df), eye: vinyl(0xffffff, { roughness: 0.15, clearcoat: 1, envMapIntensity: 0.6 }),
+    pupil: vinyl(0x0b0b0c, { roughness: 0.15, clearcoat: 1 }), sole: vinyl(0xc9a24a), shoe: vinyl(0x141416)
+  };
+
+  // ---------- Textures: jersey, headband, ball ----------
+  function canvas(w, h) { var c = document.createElement("canvas"); c.width = w; c.height = h; return c; }
+  function tex(c) { var t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.anisotropy = 8; return t; }
+  var GL = [[0, "M0,0 V100 M52,0 V100 M0,50 H52"], [80, "M42,0 A42,50 0 1 0 42.01,0"], [192, "M42,0 A42,50 0 1 0 42.01,0"], [304, "M0,100 V0 H26 A26,26 0 0 1 26,52 H0"], [384, "M0,0 V100 H46"], [458, "M0,0 V100"], [486, "M46,0 H0 V100 M0,50 H38"], [560, "M46,0 H0 V100 H46 M0,50 H38"]];
+  function wordmark(g, x, y, width, ink, lw) { g.save(); var k = width / 606; g.translate(x, y); g.scale(k, k); g.strokeStyle = ink; g.lineWidth = lw; g.lineCap = g.lineJoin = "round"; GL.forEach(function (q) { g.save(); g.translate(q[0], 0); g.stroke(new Path2D(q[1])); g.restore(); }); g.restore(); }
+  var jerseyC = canvas(1024, 512);
+  (function () {
+    var g = jerseyC.getContext("2d"); g.fillStyle = "#121214"; g.fillRect(0, 0, 1024, 512);
+    g.fillStyle = "#C81D25"; g.fillRect(0, 0, 1024, 22); g.fillRect(0, 490, 1024, 22); g.fillRect(250, 0, 26, 512); g.fillRect(748, 0, 26, 512);  // trim + side panels
+    g.fillStyle = "#C9A24A"; g.fillRect(0, 22, 1024, 5);
+    wordmark(g, 512 - 120, 92, 240, "#F4F4F2", 18);
+    function num(x) { g.font = "900 200px Archivo, 'Arial Black', sans-serif"; g.textAlign = "center"; g.lineWidth = 14; g.strokeStyle = "#C81D25"; g.strokeText("01", x, 380); g.fillStyle = "#F4F4F2"; g.fillText("01", x, 380); }
+    num(512); g.save(); g.beginPath(); g.rect(0, 0, 1024, 512); g.clip(); num(0); num(1024); g.restore();
+  })();
+  var jerseyT = tex(jerseyC);
+  var bandC = canvas(1024, 64);
+  (function () {
+    var g = bandC.getContext("2d"); g.fillStyle = "#C81D25"; g.fillRect(0, 0, 1024, 64);
+    g.strokeStyle = "#F4F4F2"; g.lineWidth = 6; g.lineCap = g.lineJoin = "round"; g.beginPath();
+    [[380, 32], [470, 32], [492, 12], [520, 52], [540, 32], [644, 32]].forEach(function (p, i) { g[i ? "lineTo" : "moveTo"](p[0], p[1]); }); g.stroke();
+  })();
+  var bandT = tex(bandC);
+  // B1 ball: same logo-to-sphere mapping as the keychain.
+  var ballC = canvas(1024, 512);
+  (function () {
+    var N = 512, S = N / 200;
+    function mask(front) { var c = canvas(N, N), g = c.getContext("2d"); g.fillStyle = "#000"; g.fillRect(0, 0, N, N); g.strokeStyle = "#fff"; g.lineCap = "round"; g.lineWidth = 7 * S; g.beginPath();
+      [[42, 42, 64, 76, 64, 124, 42, 158], [158, 42, 136, 76, 136, 124, 158, 158]].forEach(function (q) { g.moveTo(q[0] * S, q[1] * S); g.bezierCurveTo(q[2] * S, q[3] * S, q[4] * S, q[5] * S, q[6] * S, q[7] * S); });
+      if (front) { g.moveTo(16 * S, 100 * S); g.lineTo(58 * S, 100 * S); g.moveTo(142 * S, 100 * S); g.lineTo(184 * S, 100 * S); g.moveTo(100 * S, 16 * S); g.lineTo(100 * S, 60 * S); g.moveTo(100 * S, 140 * S); g.lineTo(100 * S, 184 * S); }
+      else { g.moveTo(8 * S, 100 * S); g.lineTo(192 * S, 100 * S); g.moveTo(100 * S, 8 * S); g.lineTo(100 * S, 192 * S); }
+      g.stroke(); return g.getImageData(0, 0, N, N).data; }
+    function pmask() { var c = canvas(N, N), g = c.getContext("2d"); g.fillStyle = "#000"; g.fillRect(0, 0, N, N); g.strokeStyle = "#fff"; g.lineCap = g.lineJoin = "round"; g.lineWidth = 9 * S; g.beginPath();
+      [[58, 100], [81, 100], [90, 72], [100, 128], [110, 100], [142, 100]].forEach(function (p, i) { g[i ? "lineTo" : "moveTo"](p[0] * S, p[1] * S); }); g.stroke(); return g.getImageData(0, 0, N, N).data; }
+    var F = mask(true), B = mask(false), P = pmask(), g = ballC.getContext("2d"), im = g.createImageData(1024, 512), d = im.data;
+    for (var j = 0; j < 512; j++) for (var i = 0; i < 1024; i++) {
+      var th = (j + 0.5) / 512 * Math.PI, ph = (i + 0.5) / 1024 * 2 * Math.PI, x = -Math.cos(ph) * Math.sin(th), y = Math.cos(th), z = Math.sin(ph) * Math.sin(th);
+      var fr = z >= 0, ang = Math.acos(Math.min(1, Math.abs(z))), rho = Math.hypot(x, y) || 1e-6, r = 84 * (0.7 * Math.sin(ang) + 0.3 * ang / (Math.PI / 2));
+      var px = Math.max(0, Math.min(N - 1, Math.round((100 + r * (fr ? x : -x) / rho) * S))), py = Math.max(0, Math.min(N - 1, Math.round((100 - r * y / rho) * S))), o = (py * N + px) * 4;
+      var s = (fr ? F : B)[o] / 255, p = fr ? P[o] / 255 : 0, k = (j * 1024 + i) * 4, n = 0.94 + 0.08 * Math.sin(i * 1.7) * Math.cos(j * 2.3);
+      var col = [200 * n, 88 * n, 31 * n]; col = col.map(function (v, c) { return v + ([27, 20, 17][c] - v) * s; }); col = col.map(function (v) { return v + (255 - v) * p; });
+      d[k] = col[0]; d[k + 1] = col[1]; d[k + 2] = col[2]; d[k + 3] = 255;
+    }
+    g.putImageData(im, 0, 0);
+  })();
+  var ballT = tex(ballC);
+
+  // ---------- The figure: athletic chibi ninja hooper ----------
+  function mesh(geo, mat, parent, x, y, z) { var m = new THREE.Mesh(geo, mat); m.position.set(x || 0, y || 0, z || 0); m.castShadow = true; if (parent) parent.add(m); return m; }
+  function joint(parent, x, y, z) { var g = new THREE.Group(); g.position.set(x, y, z); parent.add(g); return g; }
+  function lathe(pts, segs, phiStart) { return new THREE.LatheGeometry(pts.map(function (p) { return new THREE.Vector2(p[0], p[1]); }), segs || 48, phiStart || 0, Math.PI * 2); }
+  var maskMat = vinyl(0x101012, { roughness: 0.8, clearcoat: 0.05 }), innerHood = vinyl(0x030304, { side: THREE.BackSide, roughness: 0.9, clearcoat: 0 });
+  var browMat = vinyl(0x22150f, { roughness: 0.7 }), sash = vinyl(0x3b3731, { roughness: 0.9, clearcoat: 0, envMapIntensity: 0.25 });
+  var fig = new THREE.Group(); scene.add(fig);
+  var hips = joint(fig, 0, 0.9, 0);
+  // waist: baggy basketball shorts top + red sash with a knot and two tails
+  mesh(new THREE.CylinderGeometry(0.37, 0.42, 0.22, 40), M.cloth, hips, 0, -0.05, 0);                         // pants seat
+  var belt = mesh(new THREE.CylinderGeometry(0.385, 0.4, 0.13, 48, 1, true), sash, hips, 0, 0.06, 0); belt.material.side = THREE.DoubleSide;
+  mesh(new THREE.TorusGeometry(0.392, 0.009, 6, 64), M.red, hips, 0, 0.065, 0).rotation.x = Math.PI / 2;      // HoopLife red line on the sash
+  mesh(new THREE.SphereGeometry(0.085, 16, 12), sash, hips, 0.03, 0.05, 0.39).scale.set(1.3, 0.85, 0.7);      // knot
+  mesh(new THREE.BoxGeometry(0.12, 0.11, 0.06), vinyl(0x3a352f, { roughness: 0.8 }), hips, 0.33, 0.04, 0.2).rotation.y = 0.9;   // side pouch
+  var sashTails = [joint(hips, 0.0, 0.01, 0.42), joint(hips, 0.07, 0.01, 0.41)];
+  sashTails.forEach(function (j, i) { mesh(new THREE.BoxGeometry(0.085, 0.36 - i * 0.07, 0.025), sash, j, 0, -0.18 + i * 0.035, 0); });
+  var chest = joint(hips, 0, 0.1, 0);
+  // V-shaped athletic torso; the HoopLife jersey wraps it (front of the texture faces forward)
+  var topC = canvas(1024, 512); (function () { var g = topC.getContext("2d"); g.fillStyle = "#1a1a1e"; g.fillRect(0, 0, 1024, 512);
+    for (var y = 0; y < 512; y += 3) { g.fillStyle = "rgba(255,255,255," + (0.015 + 0.015 * Math.sin(y * 0.9)) + ")"; g.fillRect(0, y, 1024, 1); }
+    g.font = "900 70px Archivo, 'Arial Black', sans-serif"; g.textAlign = "center"; g.fillStyle = "#9E1018";   // small 01 on the back
+    g.save(); g.beginPath(); g.rect(0, 0, 1024, 512); g.clip(); g.fillText("01", 0, 200); g.fillText("01", 1024, 200); g.restore(); })();
+  var torso = mesh(lathe([[0.001, 0], [0.34, 0], [0.37, 0.14], [0.44, 0.4], [0.47, 0.52], [0.37, 0.64], [0.2, 0.69], [0.001, 0.7]], 64, Math.PI), new THREE.MeshPhysicalMaterial({ map: tex(topC), roughness: 0.85, clearcoat: 0.05, envMapIntensity: 0.3 }), chest);
+  // diagonal crossover wrap of the ninja top, from the left shoulder to the right hip
+  var lap = mesh(new THREE.BoxGeometry(0.1, 0.62, 0.035), vinyl(0x2a2a2f, { roughness: 0.9, clearcoat: 0, envMapIntensity: 0.25 }), chest, 0.02, 0.34, 0.415); lap.rotation.set(-0.12, 0, 0.62);
+  var neck = joint(chest, 0, 0.7, 0);
+  // cowl: the mask cloth drapes from the face onto the shoulders
+  var cowl = mesh(lathe([[0.24, 0.16], [0.38, 0.04], [0.5, -0.06], [0.56, -0.15], [0.5, -0.2], [0.28, -0.12]], 48), maskMat, neck, 0, 0.0, 0.02); cowl.scale.set(1, 1, 1.08);
+  var head = joint(neck, 0, 0.46, 0);
+  mesh(new THREE.SphereGeometry(0.47, 48, 32), M.skin, head);
+  // lower mask over nose, mouth and chin, wrapping all the way round
+  mesh(new THREE.SphereGeometry(0.485, 48, 24, 0, Math.PI * 2, Math.PI * 0.53, Math.PI * 0.47), maskMat, head);
+  mesh(new THREE.TorusGeometry(0.47, 0.022, 8, 64), maskMat, head, 0, -0.04, 0).rotation.x = Math.PI / 2 + 0.06;   // folded top edge of the mask
+  // pointed hood: a shell whose back-top is pulled out into a point, plus a floppy tip
+  (function () {
+    var g = new THREE.SphereGeometry(0.58, 72, 48, Math.PI * 0.5 + 0.82, Math.PI * 2 - 1.64, 0, Math.PI * 0.8);
+    var tipDir = new THREE.Vector3(0.5, 0.66, -0.56).normalize(), v = new THREE.Vector3(), pos = g.attributes.position;
+    for (var i = 0; i < pos.count; i++) {
+      v.fromBufferAttribute(pos, i); var d = v.clone().normalize().dot(tipDir);
+      if (d > 0.55) { var k = (d - 0.55) / 0.45; v.addScaledVector(tipDir, k * k * 0.42); }
+      pos.setXYZ(i, v.x, v.y, v.z);
+    }
+    g.computeVertexNormals();
+    var hood = mesh(g, M.hood, head, 0, 0.06, -0.04); hood.scale.set(1.04, 1.02, 1.04);
+    var inner = new THREE.Mesh(g, innerHood); hood.add(inner);
+    // hood front comes down over the forehead to just above the brows, so the face sits in a tight shadowed opening
+    var brow = new THREE.SphereGeometry(0.58, 48, 16, Math.PI * 0.5 - 0.82, 1.64, 0, Math.PI * 0.4);
+    var front = mesh(brow, M.hood, head, 0, 0.06, -0.04); front.scale.set(1.04, 1.02, 1.04); front.add(new THREE.Mesh(brow, innerHood));
+    // floppy tip at the point
+    var tipBase = tipDir.clone().multiplyScalar(0.58 + 0.42).add(new THREE.Vector3(0, 0.06, -0.04));
+    var tipJ = joint(head, tipBase.x, tipBase.y, tipBase.z); tipJ.rotation.set(-0.5, 0.3, -1.25);
+    var tip = mesh(new THREE.ConeGeometry(0.17, 0.52, 24), M.hood, tipJ, 0, 0.22, 0); tip.scale.set(1, 1, 0.5);
+    head.userData.tip = tipJ;
+  })();
+  // fierce eyes: white almonds, dark irises, heavy lids and sharp brows
+  var lids = [];
+  [-1, 1].forEach(function (s) {
+    var e = joint(head, s * 0.16, 0.07, 0.41); e.rotation.y = s * 0.36; e.rotation.z = s * -0.12;
+    var w = mesh(new THREE.SphereGeometry(0.1, 24, 16), M.eye, e); w.scale.set(1.25, 0.72, 0.45);
+    var iris = mesh(new THREE.SphereGeometry(0.058, 20, 12), vinyl(0x3a2418, { roughness: 0.2, clearcoat: 1 }), e, s * -0.018, -0.008, 0.03); iris.scale.set(1, 1, 0.5);
+    mesh(new THREE.SphereGeometry(0.03, 12, 8), M.pupil, e, s * -0.02, -0.008, 0.052);
+    mesh(new THREE.SphereGeometry(0.012, 8, 6), M.eye, e, s * -0.04, 0.02, 0.06);
+    var lid = joint(e, 0, 0.05, 0.01); mesh(new THREE.BoxGeometry(0.27, 0.1, 0.09), M.skin, lid, 0, 0.04, 0); lid.rotation.z = s * 0.28; lids.push(lid);
+    var brow = mesh(new THREE.BoxGeometry(0.22, 0.05, 0.06), browMat, head, s * 0.15, 0.17, 0.43); brow.rotation.z = s * 0.5; brow.rotation.y = s * 0.35;
+  });
+  // Arms: short black sleeve, bare forearm, wrist wrap with a red stripe, fist
+  function arm(side) {
+    var sh = joint(chest, side * 0.5, 0.55, 0);
+    mesh(new THREE.SphereGeometry(0.15, 24, 16), M.hood, sh);
+    mesh(new THREE.CylinderGeometry(0.15, 0.13, 0.2, 20), M.hood, sh, 0, -0.1, 0);                 // sleeve
+    mesh(new THREE.CapsuleGeometry(0.105, 0.14, 8, 16), M.skin, sh, 0, -0.24, 0);                  // bicep
+    var el = joint(sh, 0, -0.36, 0);
+    mesh(new THREE.CapsuleGeometry(0.1, 0.18, 8, 16), M.skin, el, 0, -0.14, 0);
+    mesh(new THREE.CylinderGeometry(0.118, 0.125, 0.17, 20), vinyl(0x26262b, { roughness: 0.9, clearcoat: 0 }), el, 0, -0.25, 0);   // wrist wrap
+    var hand = joint(el, 0, -0.36, 0);
+    mesh(new THREE.SphereGeometry(0.115, 24, 16), M.skin, hand).scale.set(1, 1.05, 0.9);
+    var finger = joint(hand, side * -0.03, -0.06, 0.06);
+    mesh(new THREE.CapsuleGeometry(0.03, 0.08, 4, 8), M.skin, finger, 0, -0.06, 0);
+    return { sh: sh, el: el, hand: hand, finger: finger };
+  }
+  var R = arm(-1), L = arm(1);
+  // Legs: baggy shorts to the knee, black leg sleeve, white crew sock, chunky high-top
+  function leg(side) {
+    var hp = joint(hips, side * 0.18, -0.1, 0);
+    mesh(new THREE.CylinderGeometry(0.2, 0.22, 0.42, 24), M.cloth, hp, 0, -0.18, 0);                          // baggy thigh
+    var kn = joint(hp, 0, -0.38, 0);
+    mesh(new THREE.CylinderGeometry(0.2, 0.15, 0.3, 24), M.cloth, kn, 0, -0.12, 0);                           // baggy calf
+    mesh(new THREE.CylinderGeometry(0.135, 0.13, 0.08, 20), vinyl(0x26262b, { roughness: 0.9, clearcoat: 0 }), kn, 0, -0.28, 0);   // ankle wrap
+    var ft = joint(kn, 0, -0.34, 0.02);
+    var boot = vinyl(0x0c0c0e, { roughness: 0.45, clearcoat: 0.5 });
+    mesh(new THREE.CylinderGeometry(0.135, 0.145, 0.14, 24), boot, ft, 0, 0.05, 0);
+    var shoe = mesh(new THREE.CapsuleGeometry(0.14, 0.22, 8, 16), boot, ft, 0, -0.02, 0.08); shoe.rotation.x = Math.PI / 2; shoe.scale.set(1.08, 1, 0.75);
+    mesh(new THREE.BoxGeometry(0.29, 0.05, 0.46), vinyl(0x2a2a2e, { roughness: 0.8 }), ft, 0, -0.11, 0.08);  // grey sole
+    mesh(new THREE.BoxGeometry(0.12, 0.012, 0.18), vinyl(0x3a3a40), ft, 0, 0.1, 0.12).rotation.x = -0.5;       // laces
+    return { hp: hp, kn: kn, ft: ft };
+  }
+  var RL = leg(-1), LL = leg(1);
+  // Ball
+  var ball = mesh(new THREE.SphereGeometry(0.26, 48, 32), new THREE.MeshPhysicalMaterial({ map: ballT, roughness: 0.7, clearcoat: 0.2 }), scene);
+  // Hoop for the jump shot
+  var hoop = new THREE.Group(); hoop.position.set(3.4, 0, -0.4); hoop.rotation.y = -0.5; scene.add(hoop); hoop.visible = false;
+  mesh(new THREE.CylinderGeometry(0.05, 0.06, 3.2, 16), M.shoe, hoop, 0.5, 1.6, 0);
+  mesh(new THREE.BoxGeometry(1.1, 0.7, 0.05), new THREE.MeshPhysicalMaterial({ color: 0xffffff, transparent: true, opacity: 0.35, roughness: 0.1 }), hoop, 0.0, 3.25, 0.05);
+  var rimRing = mesh(new THREE.TorusGeometry(0.24, 0.02, 8, 32), M.red, hoop, 0, 3.0, 0.32); rimRing.rotation.x = Math.PI / 2;
+  var rimWorld = new THREE.Vector3();
+  // Smoke puffs for the vanish
+  var smoke = new THREE.Group(); scene.add(smoke);
+  var puffMat = new THREE.MeshStandardMaterial({ color: 0x9a9aa1, transparent: true, opacity: 0, roughness: 1 });
+  var puffs = []; for (var p = 0; p < 18; p++) { var pm = mesh(new THREE.SphereGeometry(0.22, 16, 12), puffMat.clone(), smoke); pm.castShadow = false; puffs.push({ m: pm, a: p / 18 * Math.PI * 2, y: 0.3 + (p % 6) * 0.35, r: 0.5 + (p % 3) * 0.2 }); }
+
+  // ---------- Animation ----------
+  var look = "black", move = "stand", t0 = performance.now();
+  function setLook(k) { look = k; maskMat.color.set(k === "red" ? "#B3121A" : "#0C0C0E").convertSRGBToLinear(); }
+  setLook("black");
+  function ease(x) { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x); }
+  function seg(t, a, b) { return Math.max(0, Math.min(1, (t - a) / (b - a))); }
+  var tmp = new THREE.Vector3();
+  function resetPose() {
+    [R, L].forEach(function (a) { a.sh.rotation.set(0, 0, 0); a.el.rotation.set(0, 0, 0); a.hand.rotation.set(0, 0, 0); a.finger.rotation.set(0, 0, 0); });
+    [RL, LL].forEach(function (l) { l.hp.rotation.set(0, 0, 0); l.kn.rotation.set(0, 0, 0); l.ft.rotation.set(0, 0, 0); });
+    fig.position.set(0, 0, 0); fig.rotation.set(0, 0, 0); fig.scale.setScalar(1); hips.rotation.set(0, 0, 0); chest.rotation.set(0, 0, 0); neck.rotation.set(0, 0, 0); head.rotation.set(0, 0, 0);
+  }
+  function handPos(a, out) { a.finger.updateWorldMatrix(true, false); return a.finger.getWorldPosition(out); }
+  function tails(t, amp) { var tp = head.userData.tip; tp.rotation.x = -0.9 + Math.sin(t * 3) * 0.08 * amp; tp.rotation.z = -0.6 + Math.sin(t * 2.3) * 0.1 * amp; sashTails.forEach(function (j, i) { j.rotation.x = Math.sin(t * 5 + i) * 0.12 * amp; j.rotation.z = 0.1 + Math.sin(t * 3.7 + i) * 0.08 * amp; }); }
+  function blink(t) { var b = (t % 3.6) < 0.14 ? 1 : 0; lids.forEach(function (l) { l.position.y = 0.05 - 0.07 * b; }); }
+  function animate(t) {
+    resetPose(); hoop.visible = move === "shot"; puffs.forEach(function (p) { p.m.material.opacity = 0; });
+    var breathe = Math.sin(t * 2.2);
+    chest.rotation.x = 0.03 * breathe; chest.position.y = 0.08 + 0.008 * breathe;
+    blink(t); tails(t, move === "idle" ? 0.6 : 1.4);
+    if (move === "stand") {
+      // the reference stance: feet wide, fists down and out, chin slightly down
+      hips.position.y = 0.86; [RL, LL].forEach(function (l, i) { var s = i ? 1 : -1; l.hp.rotation.z = s * 0.2; l.hp.rotation.x = -0.12; l.kn.rotation.x = 0.22; l.ft.rotation.z = -s * 0.2; l.ft.rotation.x = -0.1; });
+      [R, L].forEach(function (a, i) { var s = i ? 1 : -1; a.sh.rotation.set(0.05, 0, s * 0.42); a.el.rotation.set(-0.35, 0, -s * 0.1); a.hand.rotation.z = -s * 0.25; a.finger.rotation.x = 1.4; });
+      head.rotation.x = 0.1 + 0.02 * breathe; head.rotation.y = Math.sin(t * 0.4) * 0.08;
+      ball.position.set(0.62, 0.26, 0.42); ball.rotation.set(0.2, 0.6, 0);
+    } else if (move === "idle") {
+      // weight on one leg, looks around, spins the ball on the right index finger
+      hips.rotation.z = 0.04; LL.hp.rotation.z = -0.05; RL.kn.rotation.x = 0.15; RL.hp.rotation.x = -0.08;
+      head.rotation.y = Math.sin(t * 0.7) * 0.35; head.rotation.x = -0.05 + Math.sin(t * 0.5) * 0.05;
+      R.sh.rotation.set(-2.2, 0, -0.3); R.el.rotation.set(-0.5, 0, 0); R.finger.rotation.x = 0.4;
+      L.sh.rotation.set(0.1, 0, 0.25); L.el.rotation.x = -0.5; L.hand.rotation.z = 0.2;
+      fig.updateMatrixWorld(true); handPos(R, tmp); ball.position.set(tmp.x, tmp.y + 0.26, tmp.z); ball.rotation.set(0.1, t * 9, 0);
+    } else if (move === "dribble") {
+      // low stance, right-hand pound dribble, two bounces a second
+      var ph = (t * 2) % 1, down = Math.sin(ph * Math.PI);
+      hips.position.y = 0.86 - 0.12; fig.position.y = 0; hips.rotation.x = 0.15;
+      [RL, LL].forEach(function (l, i) { l.hp.rotation.x = -0.55 + (i ? 0.1 : 0); l.kn.rotation.x = 0.85; l.ft.rotation.x = -0.3; l.hp.rotation.z = (i ? 0.15 : -0.15); });
+      chest.rotation.x = 0.25; head.rotation.x = -0.25;
+      R.sh.rotation.set(-0.6 + 0.35 * down, 0, -0.35); R.el.rotation.x = -0.6 + 0.3 * down; R.hand.rotation.x = 0.4;
+      L.sh.rotation.set(-0.9, 0, 0.5); L.el.rotation.x = -1.0;        // guard arm
+      fig.updateMatrixWorld(true); handPos(R, tmp);
+      var top = tmp.y - 0.2, by = 0.26 + (top - 0.26) * (1 - down);
+      ball.position.set(tmp.x, by, tmp.z + 0.05); ball.rotation.x = -t * 12;
+    } else if (move === "shot") {
+      // 3.2 s loop: gather, rise, release at the top, ball arcs into the hoop, land
+      var c = t % 3.2, crouch = ease(seg(c, 0, 0.5)) - ease(seg(c, 0.5, 0.7)), rise = ease(seg(c, 0.5, 0.9)) - ease(seg(c, 1.25, 1.6));
+      hips.position.y = 0.86 - 0.2 * crouch; fig.position.y = 0.55 * rise; fig.rotation.y = -0.45;
+      [RL, LL].forEach(function (l) { l.hp.rotation.x = -0.9 * crouch + 0.15 * rise; l.kn.rotation.x = 1.4 * crouch + 0.3 * rise; l.ft.rotation.x = -0.5 * crouch + 0.4 * rise; });
+      var lift = ease(seg(c, 0.4, 0.95)), flick = ease(seg(c, 0.95, 1.1));
+      R.sh.rotation.set(-0.5 - 2.3 * lift, 0, -0.2); R.el.rotation.x = -1.6 * lift + 1.3 * flick; R.hand.rotation.x = -0.9 * lift + 1.4 * flick;
+      L.sh.rotation.set(-0.5 - 2.0 * lift, 0, 0.35 - 0.2 * lift); L.el.rotation.x = -1.3 * lift; head.rotation.x = -0.2 * lift;
+      fig.updateMatrixWorld(true); handPos(R, tmp);
+      if (c < 1.05) { ball.position.set(tmp.x, tmp.y + 0.24, tmp.z); }
+      else {
+        rimRing.updateWorldMatrix(true, false); rimRing.getWorldPosition(rimWorld);
+        var f = seg(c, 1.05, 2.0), sx = tmp.x, sy = tmp.y + 0.24, sz = tmp.z;
+        if (c < 2.0) { ball.position.set(sx + (rimWorld.x - sx) * f, sy + (rimWorld.y + 0.05 - sy) * f + 1.6 * Math.sin(Math.PI * f), sz + (rimWorld.z - sz) * f); }
+        else { var g2 = seg(c, 2.0, 2.6); ball.position.set(rimWorld.x, rimWorld.y + 0.05 - 3.0 * g2 * g2 * 1.0 > 0.26 ? rimWorld.y + 0.05 - 3.0 * g2 * g2 : 0.26, rimWorld.z); }
+        ball.rotation.x = -c * 10;
+      }
+    } else if (move === "vanish") {
+      // 4 s loop: signature pose, smoke, gone, back in a puff
+      var v = t % 4, pose = ease(seg(v, 0, 0.6));
+      RL.hp.rotation.x = -0.5 * pose; RL.kn.rotation.x = 0.9 * pose; LL.hp.rotation.z = 0.35 * pose; LL.kn.rotation.x = 0.2 * pose; hips.position.y = 0.86 - 0.14 * pose;
+      R.sh.rotation.set(-1.4 * pose, 0, -0.55 * pose); R.el.rotation.set(-1.2 * pose, 0, 0); L.sh.rotation.set(-1.4 * pose, 0, 0.55 * pose); L.el.rotation.x = -1.2 * pose;  // hands together in front
+      R.finger.rotation.x = -0.6 * pose; L.finger.rotation.x = -0.6 * pose; head.rotation.x = 0.1 * pose;
+      var gone = ease(seg(v, 1.6, 1.9)) - ease(seg(v, 2.8, 3.1));
+      fig.scale.setScalar(Math.max(0.001, 1 - gone));
+      fig.updateMatrixWorld(true);
+      ball.position.set(0.55, 0.26 + 0.02 * Math.sin(t * 3), 0.55); ball.rotation.set(0, 0, 0); ball.visible = gone < 0.98 || true;
+      [[1.5, 2.4], [2.65, 3.5]].forEach(function (w) {
+        var k = seg(v, w[0], w[1]); if (k <= 0 || k >= 1) return;
+        puffs.forEach(function (p) { var r = p.r * (0.6 + k * 1.2); p.m.position.set(Math.cos(p.a) * r, p.y + k * 0.4, Math.sin(p.a) * r); p.m.scale.setScalar(0.6 + k * 1.6); p.m.material.opacity = Math.max(p.m.material.opacity, 0.75 * Math.sin(Math.PI * k)); });
+      });
+    }
+  }
+
+  document.querySelectorAll("[data-look]").forEach(function (b) { b.addEventListener("click", function () { document.querySelectorAll("[data-look]").forEach(function (o) { o.setAttribute("aria-pressed", String(o === b)); }); setLook(b.getAttribute("data-look")); }); });
+  document.querySelectorAll("[data-move]").forEach(function (b) { b.addEventListener("click", function () { document.querySelectorAll("[data-move]").forEach(function (o) { o.setAttribute("aria-pressed", String(o === b)); }); move = b.getAttribute("data-move"); t0 = performance.now();
+    if (move === "shot") { controls.target.set(1.4, 1.6, 0); camera.position.set(2.2, 2.4, 9.5); } else { controls.target.set(0, 1.25, 0); camera.position.set(1.6, 1.9, 7.4); } }); });
+  // Optional deep links for review: #black, #red, #dribble, #shot, #vanish
+  // Turnaround camera presets for the reference sheet: #turn-front, #turn-side, #turn-back, #turn-q (stance pose, no plinth motion)
+  (function () {
+    var h = location.hash.slice(1), cams = { "turn-front": [0, 1.45, 9.4], "turn-side": [9.4, 1.45, 0], "turn-back": [0, 1.45, -9.4], "turn-q": [6.6, 2.4, 6.6] };
+    if (cams[h]) { camera.position.fromArray(cams[h]); controls.target.set(0, 1.4, 0); document.getElementById("hint").hidden = true; }
+  })();
+  (function () { var h = location.hash.slice(1); if (h === "red" || h === "black") document.getElementById("l-" + h).click(); if (["stand", "idle", "dribble", "shot", "vanish"].indexOf(h) >= 0) document.getElementById("m-" + h).click(); })();
+  controls.addEventListener("start", function () { document.getElementById("hint").hidden = true; });
+
+  function resize() { var w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w < 600 ? 42 : 30; camera.updateProjectionMatrix(); }
+  window.addEventListener("resize", resize); resize();
+  var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function frame(now) { var t = still ? 1.2 : (now - t0) / 1000; animate(t); controls.update(); renderer.render(scene, camera); requestAnimationFrame(frame); }
+  requestAnimationFrame(frame);
+})();
+</script><a class="hl-back" href="./index.html">&larr; HoopLife showcase</a></body></html>

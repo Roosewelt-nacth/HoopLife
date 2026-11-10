@@ -1,0 +1,209 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}.hl-back{position:fixed;right:max(12px,env(safe-area-inset-right,0px));bottom:max(12px,env(safe-area-inset-bottom,0px));z-index:99;font:600 12px system-ui,sans-serif;color:#F4F4F2;background:rgba(11,11,12,.85);border:1px solid #444;border-radius:999px;padding:8px 14px;text-decoration:none}.hl-back:hover{border-color:#D7262E}</style></head><body><title>HoopLife Keychain</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+  /* Layout: a dark product stage with the live 3D keychain, finish and view controls under it, then a short spec sheet. Single deliberate dark look. */
+  :root {
+    --bg: #0E0E10;
+    --stage-a: #1F1F23;
+    --stage-b: #0B0B0C;
+    --line: #2C2C31;
+    --fg: #F4F4F2;
+    --muted: #9A9AA1;
+    --red: #D7262E;
+    --body: "Archivo", "Segoe UI", system-ui, sans-serif;
+    --mono: "JetBrains Mono", Consolas, monospace;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+  .in { max-width: 1080px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .label { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  header .in { padding-block: 40px 20px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px 24px; }
+  h1 { font-size: clamp(30px, 5vw, 48px); font-weight: 800; letter-spacing: -.02em; line-height: 1; margin: 6px 0 0; }
+  .stage { position: relative; height: min(78vh, 720px); min-height: 440px; background: radial-gradient(70% 70% at 50% 40%, var(--stage-a), var(--stage-b)); border-block: 1px solid var(--line); overflow: hidden; }
+  .stage canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+  .stage canvas:active { cursor: grabbing; }
+  .hint { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); font: 500 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); pointer-events: none; }
+  .fallback { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 24px; color: var(--muted); }
+  .fallback svg { width: 220px; height: 220px; color: var(--fg); }
+  .controls .in { padding-block: 20px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px 32px; }
+  .group { display: grid; gap: 8px; }
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pills button { font: 500 13px var(--body); color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 9px 16px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+  .pills button[aria-pressed="true"] { border-color: var(--red); }
+  .pills button:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+  .specs .in { padding-block: 24px 72px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px 32px; border-top: 1px solid var(--line); }
+  .specs div { display: grid; gap: 4px; }
+  .specs b { font-weight: 700; }
+  .specs span { color: var(--muted); font-size: 14px; }
+  @media (prefers-reduced-motion: reduce) { .hint { display: none; } }
+</style>
+
+<header><div class="in">
+  <div><div class="label">Merch mockup · For Lawrance</div><h1>HoopLife Keychain</h1></div>
+  <div class="label">Logo: B1 basketball (pending approval)</div>
+</div></header>
+
+<section class="stage" id="stage" aria-label="3D keychain preview">
+  <div class="hint" id="hint">Drag to turn · Scroll or pinch to zoom</div>
+</section>
+
+<section class="controls"><div class="in">
+  <div class="group"><span class="label">Metal finish</span>
+    <div class="pills" role="group" aria-label="Metal finish">
+      <button type="button" id="f-chrome" data-finish="chrome" aria-pressed="true"><span class="dot" style="background:linear-gradient(135deg,#f2f2f2,#8d8f94)"></span>Chrome</button>
+      <button type="button" id="f-gold" data-finish="gold" aria-pressed="false"><span class="dot" style="background:linear-gradient(135deg,#f6dc8a,#9c7424)"></span>Gold</button>
+      <button type="button" id="f-black" data-finish="black" aria-pressed="false"><span class="dot" style="background:linear-gradient(135deg,#6a6a70,#1c1c20)"></span>Black nickel</button>
+    </div>
+  </div>
+  <div class="group"><span class="label">View</span>
+    <div class="pills" role="group" aria-label="View">
+      <button type="button" id="v-front" data-view="front" aria-pressed="true">Front</button>
+      <button type="button" id="v-angle" data-view="angle" aria-pressed="false">Angle</button>
+      <button type="button" id="v-back" data-view="back" aria-pressed="false">Back</button>
+    </div>
+  </div>
+</div></section>
+
+<section class="specs"><div class="in">
+  <div><b>Size</b><span>45 mm disc, 4 mm thick, 30 mm split ring</span></div>
+  <div><b>Material</b><span>Die-cast zinc alloy with polished raised lines</span></div>
+  <div><b>Colour</b><span>Black soft enamel, red enamel heartbeat</span></div>
+  <div><b>Back</b><span>Engraved HOOPLIFE · Community · Chennai · Est. 2026</span></div>
+  <div><b>Note</b><span>A visual mockup for review. Final look depends on the manufacturer's sample.</span></div>
+</div></section>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/environments/RoomEnvironment.js"></script>
+<script>
+(function () {
+  var stage = document.getElementById("stage");
+  function fallback() {
+    stage.insertAdjacentHTML("beforeend", '<div class="fallback"><div><svg viewBox="-10 -10 220 220" fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"><circle cx="100" cy="100" r="84"/><path d="M42,42 C64,76 64,124 42,158"/><path d="M158,42 C136,76 136,124 158,158"/><path d="M16,100 H58 M142,100 H184 M100,16 V60 M100,140 V184"/><polyline points="58,100 81,100 90,72 100,128 110,100 142,100" stroke="#D7262E"/></svg><p>3D preview could not start on this device. This is the keychain face.</p></div></div>');
+    document.getElementById("hint").hidden = true;
+  }
+  if (!window.THREE || !THREE.OrbitControls) { fallback(); return; }
+  var renderer;
+  try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true }); } catch (e) { fallback(); return; }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 0.82;
+  stage.insertBefore(renderer.domElement, stage.firstChild);
+
+  var scene = new THREE.Scene();
+  var pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new THREE.RoomEnvironment(), 0.04).texture;
+  var camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
+  camera.position.set(0, 0.75, 7.2);
+  var controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.target.set(0, 0.75, 0);
+  controls.enableDamping = true; controls.enablePan = false;
+  controls.minDistance = 3.2; controls.maxDistance = 11;
+  var key = new THREE.DirectionalLight(0xffffff, 0.7); key.position.set(3, 4, 5); scene.add(key);
+  var rim = new THREE.DirectionalLight(0xffffff, 0.4); rim.position.set(-4, 2, -3); scene.add(rim);
+
+  // Materials
+  var FIN = { chrome: [0xd9dadc, 0.16], gold: [0xd9b25a, 0.22], black: [0x3a3a3f, 0.28] };
+  var metal = new THREE.MeshPhysicalMaterial({ color: FIN.chrome[0], metalness: 1, roughness: FIN.chrome[1] });
+  var enamel = new THREE.MeshPhysicalMaterial({ color: 0x050506, metalness: 0, roughness: 0.6, clearcoat: 0.5, clearcoatRoughness: 0.25, envMapIntensity: 0.25 });
+  var red = new THREE.MeshPhysicalMaterial({ color: 0xa80f17, metalness: 0, roughness: 0.5, clearcoat: 0.6, clearcoatRoughness: 0.15, envMapIntensity: 0.25 });
+
+  var tag = new THREE.Group(); scene.add(tag);
+  var K = 0.01, R = 0.06, Z = 0.075;
+  function P(x, y) { return new THREE.Vector3((x - 100) * K, -(y - 100) * K, Z); }
+  function cap(v, mat) { var s = new THREE.Mesh(new THREE.SphereGeometry(R, 24, 16), mat); s.position.copy(v); tag.add(s); }
+  function tube(curve, mat, seg) { tag.add(new THREE.Mesh(new THREE.TubeGeometry(curve, seg || 64, R, 20, false), mat)); }
+  function line(a, b, mat) { tube(new THREE.LineCurve3(a, b), mat, 2); cap(a, mat); cap(b, mat); }
+
+  // Disc body: enamel face inside a polished metal bezel
+  var disc = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 0.12, 128), enamel); disc.rotation.x = Math.PI / 2; tag.add(disc);
+  var bezel = new THREE.Mesh(new THREE.TorusGeometry(0.985, 0.05, 24, 160), metal); tag.add(bezel);
+  var ring = new THREE.Mesh(new THREE.TorusGeometry(0.84, R, 24, 160), metal); ring.position.z = Z; tag.add(ring);
+  // Seams (logo B1), raised metal
+  [[42, 42, 64, 76, 64, 124, 42, 158], [158, 42, 136, 76, 136, 124, 158, 158]].forEach(function (c) {
+    var a = P(c[0], c[1]), b = P(c[6], c[7]);
+    tube(new THREE.CubicBezierCurve3(a, P(c[2], c[3]), P(c[4], c[5]), b), metal, 80); cap(a, metal); cap(b, metal);
+  });
+  line(P(16, 100), P(58, 100), metal); line(P(142, 100), P(184, 100), metal);
+  line(P(100, 16), P(100, 60), metal); line(P(100, 140), P(100, 184), metal);
+  // Heartbeat in red enamel
+  var pts = [[58, 100], [81, 100], [90, 72], [100, 128], [110, 100], [142, 100]];
+  for (var i = 0; i < pts.length - 1; i++) line(P(pts[i][0], pts[i][1]), P(pts[i + 1][0], pts[i + 1][1]), red);
+
+  // Back: engraved text on enamel
+  var cv = document.createElement("canvas"); cv.width = cv.height = 1024;
+  var backTex = new THREE.CanvasTexture(cv); backTex.encoding = THREE.sRGBEncoding; backTex.anisotropy = 4;
+  function drawBack() {
+    var g = cv.getContext("2d");
+    g.fillStyle = "#0b0b0c"; g.fillRect(0, 0, 1024, 1024);
+    g.fillStyle = "#c9c9cc"; g.textAlign = "center"; g.textBaseline = "middle";
+    g.font = "800 150px Archivo, Arial Black, sans-serif"; g.fillText("HOOPLIFE", 512, 470);
+    g.font = "500 46px 'JetBrains Mono', Consolas, monospace"; g.fillText("COMMUNITY · CHENNAI", 512, 590);
+    g.fillStyle = "#D7262E"; g.fillRect(452, 660, 120, 8);
+    g.fillStyle = "#8f8f94"; g.font = "500 36px 'JetBrains Mono', Consolas, monospace"; g.fillText("EST. 2026", 512, 730);
+    backTex.needsUpdate = true;
+  }
+  drawBack();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawBack);
+  var back = new THREE.Mesh(new THREE.CircleGeometry(0.97, 128), new THREE.MeshPhysicalMaterial({ map: backTex, roughness: 0.4, clearcoat: 1, clearcoatRoughness: 0.1 }));
+  back.position.z = -0.061; back.rotation.y = Math.PI; tag.add(back);
+
+  // Hardware: cast loop, jump ring, double split ring
+  var loop = new THREE.Mesh(new THREE.TorusGeometry(0.13, 0.05, 20, 48), metal); loop.position.set(0, 1.08, 0); tag.add(loop);
+  var jump = new THREE.Mesh(new THREE.TorusGeometry(0.17, 0.028, 16, 48), metal); jump.position.set(0, 1.27, 0); jump.rotation.y = Math.PI / 2; tag.add(jump);
+  [-0.032, 0.032].forEach(function (z) { var s = new THREE.Mesh(new THREE.TorusGeometry(0.52, 0.03, 16, 120), metal); s.position.set(0, 1.92, z); tag.add(s); });
+
+  // Views
+  var views = { front: [0, 0.75, 7.2], angle: [3.6, 1.6, 6.0], back: [0, 0.75, -7.2] };
+  var tween = null;
+  function go(name) {
+    tween = { from: camera.position.clone(), to: new THREE.Vector3().fromArray(views[name]), t0: performance.now() };
+  }
+  document.querySelectorAll("[data-view]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.querySelectorAll("[data-view]").forEach(function (o) { o.setAttribute("aria-pressed", String(o === b)); });
+      go(b.getAttribute("data-view"));
+    });
+  });
+  document.querySelectorAll("[data-finish]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.querySelectorAll("[data-finish]").forEach(function (o) { o.setAttribute("aria-pressed", String(o === b)); });
+      var f = FIN[b.getAttribute("data-finish")]; metal.color.setHex(f[0]); metal.roughness = f[1];
+    });
+  });
+
+  var userBusy = false;
+  controls.addEventListener("start", function () { userBusy = true; tween = null; document.getElementById("hint").hidden = true; });
+  var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function resize() {
+    var w = stage.clientWidth, h = stage.clientHeight;
+    renderer.setSize(w, h, false); camera.aspect = w / h;
+    camera.fov = w < 600 ? 42 : 32; camera.updateProjectionMatrix();
+  }
+  window.addEventListener("resize", resize); resize();
+
+  var start = performance.now();
+  function frame(now) {
+    var t = (now - start) / 1000;
+    if (tween) {
+      var k = Math.min(1, (now - tween.t0) / 900), e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+      camera.position.lerpVectors(tween.from, tween.to, e);
+      if (k >= 1) tween = null;
+    }
+    // A gentle hanging sway until someone grabs it.
+    if (!userBusy && !still) { tag.rotation.y = Math.sin(t * 0.7) * 0.32; tag.rotation.z = Math.sin(t * 0.9) * 0.025; }
+    controls.update();
+    renderer.render(scene, camera);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+<a class="hl-back" href="./index.html">&larr; HoopLife showcase</a></body></html>

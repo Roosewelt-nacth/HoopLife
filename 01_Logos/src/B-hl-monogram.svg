@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 460" role="img" aria-label="HoopLife Community, HL monogram logo">
+  {{BG}}
+  <defs>
+    <clipPath id="b-ring"><circle cx="200" cy="190" r="138"/></clipPath>
+  </defs>
+  <circle cx="200" cy="190" r="150" fill="#0B0B0C" stroke="#C9A24A" stroke-width="8"/>
+  <circle cx="200" cy="190" r="138" fill="none" stroke="#C9A24A" stroke-width="1.5" opacity="0.6"/>
+  <!-- ball seams -->
+  <g clip-path="url(#b-ring)" fill="none" stroke="#C9A24A" stroke-width="2" opacity="0.28">
+    <line x1="200" y1="40" x2="200" y2="340"/>
+    <line x1="50" y1="190" x2="350" y2="190"/>
+    <path d="M95,85 C150,140 150,240 95,295"/>
+    <path d="M305,85 C250,140 250,240 305,295"/>
+  </g>
+  <!-- monogram -->
+  <g transform="translate(200,190) skewX(-8) scale(0.8) translate(-220,-200)">
+    <rect x="110" y="115" width="38" height="170" fill="#FFFFFF"/>
+    <rect x="196" y="115" width="38" height="170" fill="#FFFFFF"/>
+    <rect x="148" y="182" width="48" height="32" fill="#FFFFFF"/>
+    <path d="M252,115 H290 V251 H330 V285 H252 Z" fill="#D7262E"/>
+  </g>
+  <text x="200" y="405" text-anchor="middle" font-family="Anton, Impact, 'Arial Black', sans-serif" font-size="46" letter-spacing="2" fill="{{INK}}">HOOPLIFE</text>
+  <text x="200" y="437" text-anchor="middle" font-family="Anton, Impact, 'Arial Black', sans-serif" font-size="15" letter-spacing="10" fill="#C9A24A">COMMUNITY</text>
+</svg>

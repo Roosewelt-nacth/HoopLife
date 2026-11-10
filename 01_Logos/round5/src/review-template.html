@@ -1,0 +1,149 @@
+<title>HoopLife Ninja Options</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+  /* Layout: black stage with an option switcher, then a white comparison sheet (one row per option). Single deliberate look. */
+  :root {
+    --paper: #FFFFFF;
+    --ink: #0B0B0C;
+    --stage: #0B0B0C;
+    --rule: #E4E4E6;
+    --muted: #6B6B72;
+    --red: #D7262E;
+    --body: "Archivo", "Segoe UI", system-ui, sans-serif;
+    --mono: "JetBrains Mono", Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+  .in { max-width: 1040px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .label { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  h2 { font-size: clamp(22px, 3vw, 28px); font-weight: 700; letter-spacing: -.01em; margin: 0; text-wrap: balance; }
+  h3 { font-size: 20px; font-weight: 700; margin: 0; }
+  p { margin: 0; max-width: 60ch; }
+
+  .stage { background: var(--stage); color: #FFFFFF; }
+  .stage .in { padding-block: 56px 48px; display: grid; gap: 32px; justify-items: center; text-align: center; }
+  .stage .top { width: 100%; display: flex; justify-content: space-between; gap: 16px; color: #8C8C93; }
+  .screen { width: min(100%, 780px); min-height: 160px; display: grid; place-items: center; }
+  .screen svg { width: 100%; height: auto; overflow: visible; }
+  .tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+  .tabs button { font: 500 12px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: #BDBDC2; background: transparent; border: 1px solid #3A3A40; border-radius: 999px; padding: 9px 16px; cursor: pointer; }
+  .tabs button[aria-pressed="true"] { color: #FFFFFF; border-color: var(--red); }
+  .tabs button:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+
+  .play .d { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw .8s cubic-bezier(.6,0,.2,1) forwards; animation-delay: calc(var(--i) * 110ms + 200ms); }
+  .play .pulse { transform-box: fill-box; transform-origin: center; animation: draw .5s ease-out .5s forwards, beat .7s ease-in-out 2.1s 2; }
+  .play .tail { animation: draw .45s ease-out 1s forwards; }
+  .play .fade { animation: fade .6s ease-out 1.1s both; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  @keyframes beat { 0%, 100% { transform: none; } 30% { transform: scaleY(1.45); } 55% { transform: scaleY(.9); } }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .play .d, .play .pulse, .play .tail, .play .fade { animation: none; stroke-dasharray: none; stroke-dashoffset: 0; } }
+
+  main .in { padding-block: 56px 80px; display: grid; gap: 56px; }
+  .intro { display: grid; gap: 12px; }
+  .opt { display: grid; gap: 16px; border-top: 1px solid var(--ink); padding-top: 16px; }
+  .opt-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 24px; }
+  .opt-head p { color: var(--muted); }
+  .row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 2fr); gap: 12px; }
+  @media (max-width: 760px) { .row { grid-template-columns: repeat(2, minmax(0, 1fr)); } .row .w { grid-column: 1 / -1; } }
+  .tile { border: 1px solid var(--rule); display: grid; place-items: center; padding: 24px; aspect-ratio: 1; max-width: 100%; }
+  .tile.w { aspect-ratio: auto; min-height: 100%; padding: 32px; }
+  .tile svg { width: 100%; height: auto; max-width: 180px; }
+  .tile.w svg { max-width: 420px; }
+  .tile.dark { background: var(--stage); border-color: var(--stage); color: #FFFFFF; }
+  .tile.light { background: var(--paper); color: var(--ink); }
+  .badge { font: 500 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: #FFFFFF; background: var(--ink); padding: 3px 8px; }
+
+  .refine { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 640px) { .refine { grid-template-columns: minmax(0, 1fr); } }
+  .refine figure { margin: 0; display: grid; gap: 10px; }
+  .refine .tile { aspect-ratio: 16 / 7; }
+  .refine .tile svg { max-width: 420px; }
+  figcaption { color: var(--muted); font-size: 14px; }
+  figcaption b { color: var(--ink); }
+
+  .ask { border: 1px solid var(--ink); padding: 24px; display: grid; gap: 10px; }
+  .ask ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+</style>
+
+<section class="stage play" id="stage" aria-label="Logo intro">
+  <div class="in">
+    <div class="top label"><span>HoopLife Community</span><span>Intro preview</span></div>
+    <div class="screen">
+      <div data-v="base">{{word-base}}</div>
+      <div data-v="band" hidden>{{word-band}}</div>
+      <div data-v="eyes" hidden>{{word-eyes}}</div>
+      <div data-v="mask" hidden>{{word-mask}}</div>
+    </div>
+    <div class="tabs" role="group" aria-label="Choose option">
+      <button type="button" id="t-base" data-v="base" aria-pressed="true">Checkpoint</button>
+      <button type="button" id="t-band" data-v="band" aria-pressed="false">N1 Headband</button>
+      <button type="button" id="t-eyes" data-v="eyes" aria-pressed="false">N2 Eyes</button>
+      <button type="button" id="t-mask" data-v="mask" aria-pressed="false">N3 Mask</button>
+    </div>
+  </div>
+</section>
+
+<main>
+  <div class="in">
+    <div class="intro">
+      <div class="label">Round 5 · Ninja inside the Pulse H</div>
+      <h2>Three ways to bring the ninja in, without losing the premium feel.</h2>
+      <p>The checkpoint is saved as it is. Each option adds one small ninja detail to the same mark. Tap the buttons above to see each intro.</p>
+    </div>
+
+    <section class="opt" aria-labelledby="o0">
+      <div class="opt-head"><h3 id="o0">Checkpoint <span class="badge">Saved</span></h3><p>The Pulse H as approved. No ninja.</p></div>
+      <div class="row"><div class="tile dark">{{icon-base}}</div><div class="tile light">{{icon-base}}</div><div class="tile light w">{{word-base}}</div></div>
+    </section>
+
+    <section class="opt" aria-labelledby="o1">
+      <div class="opt-head"><h3 id="o1">N1 · Headband</h3><p>The red pulse ties off outside the ball as a headband with two tails. Still one red line.</p></div>
+      <div class="row"><div class="tile dark">{{icon-band}}</div><div class="tile light">{{icon-band}}</div><div class="tile light w">{{word-band}}</div></div>
+    </section>
+
+    <section class="opt" aria-labelledby="o2">
+      <div class="opt-head"><h3 id="o2">N2 · Eyes</h3><p>Two slanted ninja eyes above the pulse. The ball becomes a face that's watching you.</p></div>
+      <div class="row"><div class="tile dark">{{icon-eyes}}</div><div class="tile light">{{icon-eyes}}</div><div class="tile light w">{{word-eyes}}</div></div>
+    </section>
+
+    <section class="opt" aria-labelledby="o3">
+      <div class="opt-head"><h3 id="o3">N3 · Mask</h3><p>A solid ninja mask across the top of the H, with cut-out eyes. The boldest option, and the closest to Lawrance.</p></div>
+      <div class="row"><div class="tile dark">{{icon-mask}}</div><div class="tile light">{{icon-mask}}</div><div class="tile light w">{{word-mask}}</div></div>
+    </section>
+
+    <section class="opt" aria-labelledby="o4">
+      <div class="opt-head"><h3 id="o4">Refinement · Weight</h3><p>One improvement to test on any option.</p></div>
+      <div class="refine">
+        <figure><div class="tile light">{{word-base}}</div><figcaption><b>Now.</b> Same weight for every letter.</figcaption></figure>
+        <figure><div class="tile light">{{word-weight}}</div><figcaption><b>Bolder HOOP, lighter LIFE.</b> Reads as two words at a glance and gives the logo more punch.</figcaption></figure>
+      </div>
+    </section>
+
+    <div class="ask">
+      <div class="label">For Lawrance</div>
+      <ul>
+        <li>Keep the checkpoint, or pick N1, N2 or N3?</li>
+        <li>Same-weight letters, or bolder HOOP?</li>
+      </ul>
+    </div>
+  </div>
+</main>
+
+<script>
+  (function () {
+    var stage = document.getElementById("stage");
+    var tabs = stage.querySelectorAll(".tabs button");
+    var screens = stage.querySelectorAll(".screen [data-v]");
+    tabs.forEach(function (b) {
+      b.addEventListener("click", function () {
+        tabs.forEach(function (t) { t.setAttribute("aria-pressed", String(t === b)); });
+        screens.forEach(function (s) { s.hidden = s.getAttribute("data-v") !== b.getAttribute("data-v"); });
+        stage.classList.remove("play"); void stage.offsetWidth; stage.classList.add("play");
+      });
+    });
+  })();
+</script>

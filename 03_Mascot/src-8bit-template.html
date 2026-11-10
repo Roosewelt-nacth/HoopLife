@@ -1,0 +1,401 @@
+<meta charset="utf-8">
+<title>HoopLife Ninja Court 8-Bit</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+  /* Layout: a letterboxed pixel-art game screen with an arcade HUD, a control deck under it, then roster and how-to-play. Single deliberate dark arcade look. */
+  :root {
+    --bg: #0d0f14;
+    --panel: #161a22;
+    --line: #2a3040;
+    --fg: #f2efe6;
+    --muted: #9aa3b5;
+    --moss: #7ec26a;
+    --clay: #f08a4a;
+    --gold: #ffd166;
+    --pix: "Press Start 2P", "Courier New", monospace;
+    --mono: "JetBrains Mono", Consolas, monospace;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { background: var(--bg); color: var(--fg); font-family: var(--mono); font-size: 15px; line-height: 1.55; }
+  .in { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .label { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  header .in { padding-block: 26px 12px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 8px 24px; }
+  h1 { font: 400 clamp(18px, 3.2vw, 30px) var(--pix); line-height: 1.2; margin: 8px 0 0; color: var(--gold); text-shadow: 3px 3px 0 #b3221b; }
+  .stage { position: relative; height: min(76vh, 760px); min-height: 360px; background: #000; border-block: 2px solid #000; overflow: hidden; display: grid; place-items: center; user-select: none; -webkit-user-select: none; }
+  .stage canvas { image-rendering: pixelated; image-rendering: crisp-edges; display: block; touch-action: none; outline: none; }
+  .board { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); display: flex; background: #0b0d12; border: 3px solid #f2efe6; box-shadow: 4px 4px 0 #000; pointer-events: none; font-family: var(--pix); }
+  .team { display: grid; gap: 4px; padding: 6px 12px; min-width: 110px; text-align: center; }
+  .team b { font: 400 22px var(--pix); line-height: 1; }
+  .team span { font: 400 8px var(--pix); }
+  .team.home span { color: var(--moss); }
+  .team.away span { color: var(--clay); }
+  .mid { display: grid; place-items: center; gap: 4px; padding: 6px 10px; border-inline: 3px solid #f2efe6; font: 400 7px var(--pix); color: var(--muted); }
+  .clock { font: 400 14px var(--pix); color: var(--gold); }
+  .poss { width: 8px; height: 8px; }
+  .tags { position: absolute; top: 12px; left: max(12px, env(safe-area-inset-left, 0px)); display: grid; gap: 6px; pointer-events: none; }
+  .tag { background: #0b0d12; border: 2px solid #f2efe6; padding: 5px 8px; font: 400 7px var(--pix); text-transform: uppercase; }
+  .tag i { font-style: normal; color: var(--gold); }
+  .caption { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); max-width: calc(100% - 28px); background: #0b0d12; border: 3px solid var(--gold); box-shadow: 4px 4px 0 #000; padding: 8px 12px; font: 400 9px/1.6 var(--pix); pointer-events: none; text-align: center; }
+  .banner { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+  .banner div { background: #0b0d12; border: 4px solid var(--gold); box-shadow: 6px 6px 0 #000; padding: 18px 24px; text-align: center; font: 400 clamp(14px, 3vw, 24px) var(--pix); color: var(--gold); }
+  .banner small { display: block; font: 400 8px var(--pix); color: var(--muted); margin-top: 10px; }
+  .pad { position: absolute; inset: auto 0 58px 0; display: flex; justify-content: space-between; align-items: end; padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px)); pointer-events: none; }
+  .stick { width: 120px; height: 120px; border-radius: 50%; background: rgba(255,255,255,.12); border: 2px solid rgba(255,255,255,.4); position: relative; pointer-events: auto; touch-action: none; }
+  .knob { position: absolute; left: 50%; top: 50%; width: 48px; height: 48px; margin: -24px 0 0 -24px; border-radius: 50%; background: rgba(255,255,255,.4); }
+  .acts { display: grid; grid-template-columns: repeat(3, 60px); gap: 8px; pointer-events: auto; }
+  .acts button { height: 50px; border: 2px solid #f2efe6; background: #0b0d12; color: var(--fg); font: 400 7px var(--pix); touch-action: manipulation; }
+  .acts button:active { background: #b3221b; }
+  .fallback { color: var(--muted); padding: 24px; text-align: center; }
+  .deck .in { padding-block: 16px; display: flex; flex-wrap: wrap; gap: 14px 28px; }
+  .group { display: grid; gap: 8px; align-content: start; }
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pills button { font: 400 8px var(--pix); color: var(--fg); background: #0b0d12; border: 2px solid var(--line); padding: 9px 10px; cursor: pointer; }
+  .pills button[aria-pressed="true"] { border-color: var(--gold); color: var(--gold); }
+  .pills button:focus-visible, .acts button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  .roster .in { padding-block: 6px 18px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; border-top: 2px solid var(--line); }
+  @media (max-width: 760px) { .roster .in { grid-template-columns: minmax(0, 1fr); } }
+  .side h2 { font: 400 11px var(--pix); margin: 14px 0 10px; }
+  .side ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .side li { display: grid; grid-template-columns: 36px 100px minmax(0, 1fr); gap: 10px; align-items: baseline; padding: 6px 10px; background: var(--panel); border: 2px solid var(--line); font-size: 13px; }
+  .side li b { font: 400 9px var(--pix); }
+  .side li span { color: var(--muted); }
+  .how .in { padding-block: 10px 60px; display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px 28px; border-top: 2px solid var(--line); }
+  .how div { display: grid; gap: 6px; align-content: start; padding-top: 12px; }
+  .how b { font: 400 9px var(--pix); color: var(--gold); }
+  .how span { color: var(--muted); font-size: 13px; }
+  kbd { font: 700 12px var(--mono); border: 1px solid #4b5468; border-bottom-width: 2px; padding: 0 5px; color: var(--fg); }
+</style>
+
+<header><div class="in">
+  <div><div class="label">HoopLife · Ninja Court · Arcade edition</div><h1>NINJA COURT 8-BIT</h1></div>
+  <div class="label">5v5 full court · side-view arcade</div>
+</div></header>
+
+<section class="stage" id="stage" aria-label="HoopLife 8-bit 5v5 basketball game">
+  <canvas id="screen" width="400" height="225" tabindex="0"></canvas>
+  <div class="board" aria-live="polite">
+    <div class="team home"><span>NINJA</span><b id="s0">0</b></div>
+    <div class="mid"><div class="poss" id="possDot"></div><div class="clock" id="shotClock">24</div><div>TO 21</div></div>
+    <div class="team away"><span>RIVALS</span><b id="s1">0</b></div>
+  </div>
+  <div class="tags"><div class="tag">PLAY <i id="playTag">BRING IT UP</i></div><div class="tag">D <i id="defTag">MAN</i></div></div>
+  <div class="caption" id="caption">INSERT COIN... TIP-OFF!</div>
+  <div class="banner" id="banner" hidden><div id="bannerText">GAME</div></div>
+  <div class="pad" id="pad" hidden>
+    <div class="stick" id="stick" aria-label="Move"><div class="knob" id="knob"></div></div>
+    <div class="acts">
+      <button type="button" id="b-move">MOVE</button><button type="button" id="b-screen">PICK</button><button type="button" id="b-vanish">POOF</button>
+      <button type="button" id="b-sprint">RUN</button><button type="button" id="b-pass">PASS</button><button type="button" id="b-shoot">SHOOT</button>
+    </div>
+  </div>
+</section>
+
+<section class="deck"><div class="in">
+  <div class="group"><span class="label">Mode</span><div class="pills" role="group" aria-label="Mode">
+    <button type="button" id="mode-watch" data-mode="watch" aria-pressed="true">WATCH</button>
+    <button type="button" id="mode-play" data-mode="play" aria-pressed="false">PLAY NINJA</button></div></div>
+  <div class="group"><span class="label">Scene</span><div class="pills" role="group" aria-label="Scene">
+    <button type="button" id="sc-street" data-scene="street" aria-pressed="true">STREET</button>
+    <button type="button" id="sc-blossom" data-scene="blossom" aria-pressed="false">BLOSSOM</button>
+    <button type="button" id="sc-lake" data-scene="lake" aria-pressed="false">LAKE</button></div></div>
+  <div class="group"><span class="label">Camera</span><div class="pills" role="group" aria-label="Camera">
+    <button type="button" id="cam-follow" data-cam="follow" aria-pressed="true">FOLLOW</button>
+    <button type="button" id="cam-wide" data-cam="wide" aria-pressed="false">WIDE</button></div></div>
+  <div class="group"><span class="label">Rivals D</span><div class="pills" role="group" aria-label="Defence">
+    <button type="button" id="d-man" data-def="man" aria-pressed="true">MAN</button>
+    <button type="button" id="d-zone" data-def="zone" aria-pressed="false">2-3 ZONE</button></div></div>
+  <div class="group"><span class="label">Sound</span><div class="pills">
+    <button type="button" id="snd" aria-pressed="false">SFX OFF</button>
+    <button type="button" id="mus" aria-pressed="false">MUSIC OFF</button></div></div>
+  <div class="group"><span class="label">Game</span><div class="pills">
+    <button type="button" id="g-highlight">NINJA HIGHLIGHT</button>
+    <button type="button" id="g-reset">NEW GAME</button></div></div>
+</div></section>
+
+<section class="roster"><div class="in">
+  <div class="side"><h2>TEAM NINJA</h2><ul id="r0"></ul></div>
+  <div class="side"><h2>RIVALS</h2><ul id="r1"></ul></div>
+</div></section>
+
+<section class="how"><div class="in">
+  <div><b>RULES</b><span>Full court 5v5, 2s and 3s, 24-second shot clock, first to 21.</span></div>
+  <div><b>MOVES</b><span>Crossover, behind-the-back, between-the-legs, spin, hesitation, step-back, euro step, floater, fadeaway, hook, dunk, alley-oop, block, steal, ninja vanish.</span></div>
+  <div><b>KEYS</b><span><kbd>A</kbd>/<kbd>D</kbd> run · <kbd>W</kbd>/<kbd>S</kbd> up/down court · <kbd>Shift</kbd> sprint · <kbd>Space</kbd> shoot/block · <kbd>E</kbd> pass · <kbd>Q</kbd> move · <kbd>R</kbd> pick · <kbd>F</kbd> vanish</span></div>
+  <div><b>SOUND</b><span>Tap SFX or MUSIC to switch on retro sound. It stays off until you choose.</span></div>
+</div></section>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script>
+(function () {
+  "use strict";
+  var stage = document.getElementById("stage"), cv = document.getElementById("screen");
+  if (!window.THREE || !cv.getContext) { stage.insertAdjacentHTML("beforeend", '<p class="fallback">The game could not start on this device.</p>'); return; }
+  var ctx = cv.getContext("2d"); ctx.imageSmoothingEnabled = false;
+  var W = 400, H = 225, V3 = THREE.Vector3, rand = Math.random;
+  function clamp(x, a, b) { return Math.max(a, Math.min(b, x)); }
+  function ease(x) { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); }
+  function d2(a, b) { var dx = a.x - b.x, dz = a.z - b.z; return Math.sqrt(dx * dx + dz * dz); }
+  function lerpAngle(a, b, t) { var d = ((b - a + Math.PI * 3) % (Math.PI * 2)) - Math.PI; return a + d * clamp(t, 0, 1); }
+  function pick(arr) { return arr[Math.floor(rand() * arr.length)]; }
+  // court in the same world units as the 3D game (x across, z along the court)
+  var HALFW = 7, HALFL = 13, ARC = 6.3, CORNER = 6.1;
+  var HOOPS = [new V3(0, 3.05, -11.6), new V3(0, 3.05, 11.6)];
+  function attackHoop(t) { return HOOPS[t]; }
+  function outDir(t) { return t === 0 ? 1 : -1; }
+  function spotFor(t, lx, lz) { var h = attackHoop(t); return new V3(lx, 0, h.z + outDir(t) * lz); }
+  var nets = [{ t: 0 }, { t: 0 }];
+
+/*SIM*/
+
+  // ======================= chiptune sound =======================
+  var AC = null, sfxOn = false, musOn = false, lastDrib = 0, musT = 0, musStep = 0;
+  function audio() { if (!AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { AC = null; } } if (AC && AC.state === "suspended") AC.resume(); return AC; }
+  function tone(type, f0, f1, dur, vol, when) { if (!AC) return; var t = AC.currentTime + (when || 0), o = AC.createOscillator(), g = AC.createGain(); o.type = type; o.frequency.setValueAtTime(f0, t); if (f1) o.frequency.exponentialRampToValueAtTime(f1, t + dur); g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur); o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t + dur + 0.02); }
+  function noise(dur, vol, when) { if (!AC) return; var t = AC.currentTime + (when || 0), n = Math.floor(AC.sampleRate * dur), b = AC.createBuffer(1, n, AC.sampleRate), d = b.getChannelData(0); for (var i = 0; i < n; i++) d[i] = (rand() * 2 - 1) * (1 - i / n); var s = AC.createBufferSource(), g = AC.createGain(); s.buffer = b; g.gain.value = vol; s.connect(g); g.connect(AC.destination); s.start(t); }
+  function sfx(k) {
+    if (!sfxOn || !AC) return;
+    if (k === "dribble") tone("square", 120, 70, 0.05, 0.05);
+    else if (k === "pass") tone("triangle", 520, 880, 0.08, 0.08);
+    else if (k === "shot") tone("square", 300, 900, 0.14, 0.05);
+    else if (k === "swish") { [1047, 1319, 1568, 2093].forEach(function (f, i) { tone("square", f, 0, 0.07, 0.05, i * 0.06); }); }
+    else if (k === "dunk") { noise(0.18, 0.18); tone("square", 110, 55, 0.25, 0.08); [784, 988, 1175].forEach(function (f, i) { tone("square", f, 0, 0.08, 0.05, 0.12 + i * 0.07); }); }
+    else if (k === "block") { noise(0.08, 0.15); tone("square", 220, 110, 0.12, 0.07); }
+    else if (k === "steal") tone("square", 990, 330, 0.12, 0.06);
+    else if (k === "buzzer") tone("sawtooth", 200, 190, 0.5, 0.06);
+    else if (k === "vanish") { noise(0.25, 0.1); tone("triangle", 1400, 200, 0.3, 0.05); }
+    else if (k === "rim") tone("square", 660, 520, 0.09, 0.05);
+  }
+  var BASS = [110, 0, 110, 165, 0, 147, 131, 0], LEAD = [440, 523, 659, 523, 587, 494, 440, 392];
+  function music(dt) { if (!musOn || !AC) return; musT -= dt; if (musT > 0) return; musT = 0.18; var i = musStep++ % 8; if (BASS[i]) tone("square", BASS[i], 0, 0.15, 0.035); if (musStep % 2 === 0) tone("triangle", LEAD[(musStep / 2 | 0) % 8], 0, 0.12, 0.03); }
+  // sound cues from the play-by-play
+  var _caption = caption;
+  caption = function (txt, hold) { _caption(txt, hold); var s = String(txt);
+    if (/DUNK|Alley-oop/.test(s)) sfx("dunk"); else if (/\+\d/.test(s)) sfx("swish"); else if (/Blocked/.test(s)) sfx("block"); else if (/pokes|picks off|steal/i.test(s)) sfx("steal"); else if (/violation|WIN/.test(s)) sfx("buzzer"); else if (/Off the rim/.test(s)) sfx("rim"); };
+
+  // ======================= pixel renderer =======================
+  var cam = { z: 0, ppu: 13, mode: "follow" }, FLOOR = 156, DEPTH = 4.9, HY = 10.5;
+  function proj(x, y, z) { return { x: Math.round(W / 2 + (z - cam.z) * cam.ppu), y: Math.round(FLOOR + x * DEPTH - y * HY * cam.ppu / 13) }; }
+  function px(x, y, w, h, c) { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), w, h); }
+  function hex(n) { return "#" + ("000000" + n.toString(16)).slice(-6); }
+  function shade(c, k) { var n = parseInt(c.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255; function f(v) { return clamp(Math.round(v * k), 0, 255); } return "rgb(" + f(r) + "," + f(g) + "," + f(b) + ")"; }
+
+  // ---------- scenes: backdrop drawn once to a wide offscreen canvas, scrolled with parallax ----------
+  var BW = 900, backdrops = {}, sceneName = "street";
+  var COURT = {
+    street: { floor: "#3b3f47", floor2: "#353941", key: "#b3221b", line: "#e9e4d6", apron: "#2a2d33", arc: "#ffd166" },
+    blossom: { floor: "#3f6b3e", floor2: "#3a643a", key: "#b4653f", line: "#f3ead8", apron: "#b89c72", arc: "#d8b36a" },
+    lake: { floor: "#3a5f36", floor2: "#365934", key: "#a65a38", line: "#f3ead8", apron: "#8a7a5c", arc: "#ffcf7a" }
+  };
+  function band(g, y0, y1, cols) { var n = cols.length, h = (y1 - y0) / n; cols.forEach(function (c, i) { g.fillStyle = c; g.fillRect(0, Math.round(y0 + i * h), BW, Math.ceil(h) + 1); }); }
+  function dither(g, x0, y0, w, h, c, every) { g.fillStyle = c; for (var y = y0; y < y0 + h; y++) for (var x = x0 + (y % 2); x < x0 + w; x += every || 2) g.fillRect(x, y, 1, 1); }
+  function buildBackdrops() {
+    // STREET: city skyline, chain-link fence, brick wall with original graffiti, street lights
+    (function () { var c = document.createElement("canvas"); c.width = BW; c.height = 120; var g = c.getContext("2d"); g.imageSmoothingEnabled = false;
+      band(g, 0, 60, ["#1b1f3a", "#252a4d", "#33386a", "#4a4a7a", "#6a5a86"]);
+      for (var x = 0; x < BW; x += 6 + Math.floor(rand() * 10)) { var bw = 14 + Math.floor(rand() * 26), bh = 18 + Math.floor(rand() * 40); g.fillStyle = rand() < 0.5 ? "#141729" : "#1a1e33"; g.fillRect(x, 66 - bh, bw, bh); for (var wy = 66 - bh + 3; wy < 64; wy += 4) for (var wx = x + 2; wx < x + bw - 2; wx += 3) if (rand() < 0.35) { g.fillStyle = rand() < 0.7 ? "#ffd27a" : "#9ad1ff"; g.fillRect(wx, wy, 1, 2); } x += bw; }
+      // brick wall
+      g.fillStyle = "#6e2f25"; g.fillRect(0, 62, BW, 58);
+      for (var y = 62; y < 120; y += 4) { g.fillStyle = "#4e1f19"; g.fillRect(0, y, BW, 1); for (var bx = ((y / 4) % 2) * 4; bx < BW; bx += 8) g.fillRect(bx, y, 1, 4); }
+      dither(g, 0, 62, BW, 58, "rgba(0,0,0,.18)", 3);
+      // graffiti pieces (original): HOOPLIFE bubble letters, 01, the B1 ball, tags, stars and drips
+      function piece(text, x, y, size, fill, fill2, out) { var t = document.createElement("canvas"); t.width = text.length * size; t.height = size + 6; var q = t.getContext("2d"); q.font = "bold " + size + "px Impact, 'Arial Black', sans-serif"; q.textBaseline = "top";
+        q.fillStyle = out; for (var ox = -2; ox <= 2; ox++) for (var oy = -2; oy <= 2; oy++) q.fillText(text, 2 + ox, 2 + oy); var gr = q.createLinearGradient(0, 0, 0, size); gr.addColorStop(0, fill); gr.addColorStop(1, fill2); q.fillStyle = gr; q.fillText(text, 2, 2);
+        q.fillStyle = "rgba(255,255,255,.6)"; q.fillRect(4, 4, t.width * 0.6, 1); g.drawImage(t, x, y);
+        for (var k = 0; k < 6; k++) { var dx = x + 6 + Math.floor(rand() * (t.width - 12)), dl = 3 + Math.floor(rand() * 7); g.fillStyle = fill2; g.fillRect(dx, y + size + 2, 1, dl); } }
+      // the visible stretch of wall is about x 120-540; extra pieces either side show when the camera scrolls
+      piece("HOOPLIFE", 128, 70, 22, "#ffd166", "#f08a4a", "#1a1a1a");
+      piece("01", 268, 64, 30, "#7ec26a", "#2f8f5a", "#101010");
+      piece("HOOPS", 345, 74, 18, "#9ad1ff", "#4a7bd6", "#101010");
+      piece("HOOPLIFE", 440, 70, 20, "#ff6f91", "#b3221b", "#101010");
+      piece("ONE COURT", 20, 76, 14, "#f2efe6", "#9aa3b5", "#101010");
+      piece("PASSION", 600, 72, 18, "#ffd166", "#f08a4a", "#101010");
+      piece("HOOPLIFE", 740, 70, 20, "#7ec26a", "#2f8f5a", "#101010");
+      // B1 ball mark spray
+      [[248, 96], [428, 98], [575, 92], [110, 92]].forEach(function (b) { g.fillStyle = "#101010"; g.beginPath(); g.arc(b[0], b[1], 11, 0, 7); g.fill(); g.fillStyle = "#f08a4a"; g.beginPath(); g.arc(b[0], b[1], 9, 0, 7); g.fill(); g.fillStyle = "#101010"; g.fillRect(b[0] - 9, b[1], 18, 1); g.fillRect(b[0], b[1] - 9, 1, 6); g.fillRect(b[0], b[1] + 4, 1, 6); g.fillStyle = "#fff"; g.fillRect(b[0] - 4, b[1], 2, 1); g.fillRect(b[0] - 2, b[1] - 3, 1, 3); g.fillRect(b[0] - 1, b[1], 1, 3); g.fillRect(b[0], b[1], 4, 1); });
+      // tags and stars
+      for (var k2 = 0; k2 < 26; k2++) { var tx = Math.floor(rand() * BW), ty = 64 + Math.floor(rand() * 50); g.fillStyle = pick(["#f2efe6", "#ffd166", "#9ad1ff", "#ff6f91", "#7ec26a"]); for (var s = 0; s < 10; s++) g.fillRect(tx + s, ty + Math.round(Math.sin(s * 1.3 + k2) * 2), 1, 1); }
+      for (var k3 = 0; k3 < 12; k3++) { var sx = Math.floor(rand() * BW), sy = 66 + Math.floor(rand() * 40); g.fillStyle = "#ffd166"; g.fillRect(sx, sy - 2, 1, 5); g.fillRect(sx - 2, sy, 5, 1); }
+      // chain-link fence above the wall
+      g.fillStyle = "rgba(200,205,215,.45)"; for (var fx = 0; fx < BW; fx += 4) for (var fy = 40; fy < 62; fy++) if ((fx + fy) % 4 === 0 || (fx - fy + 400) % 4 === 0) g.fillRect(fx + ((fy % 4) ? 0 : 0), fy, 1, 1);
+      g.fillStyle = "#8a8f99"; g.fillRect(0, 40, BW, 1); for (var pxx = 0; pxx < BW; pxx += 60) g.fillRect(pxx, 40, 1, 22);
+      // street lights
+      for (var lx = 30; lx < BW; lx += 170) { g.fillStyle = "#22252c"; g.fillRect(lx, 20, 2, 100); g.fillRect(lx, 20, 10, 2); g.fillStyle = "#fff1c2"; g.fillRect(lx + 8, 22, 4, 2); g.fillStyle = "rgba(255,230,160,.12)"; g.beginPath(); g.moveTo(lx + 10, 24); g.lineTo(lx - 14, 120); g.lineTo(lx + 34, 120); g.fill(); }
+      backdrops.street = c; })();
+    // BLOSSOM: spring sky, far hills, a row of cherry trees, falling petals added live
+    (function () { var c = document.createElement("canvas"); c.width = BW; c.height = 120; var g = c.getContext("2d");
+      band(g, 0, 70, ["#7fb6e0", "#8fc2e6", "#a3cdea", "#b9d9ee", "#d2e6f1", "#e8eef0"]);
+      for (var i = 0; i < 6; i++) { g.fillStyle = "#fff"; var cx = Math.floor(rand() * BW), cy = 10 + Math.floor(rand() * 20); g.fillRect(cx, cy, 18, 3); g.fillRect(cx + 4, cy - 2, 10, 2); }
+      g.fillStyle = "#86a88a"; for (var x = 0; x < BW; x++) { var h = 18 + Math.sin(x / 50) * 8 + Math.sin(x / 17) * 3; g.fillRect(x, 78 - h, 1, h); }
+      g.fillStyle = "#5f8a4f"; g.fillRect(0, 78, BW, 42); dither(g, 0, 78, BW, 42, "#557d47", 3);
+      for (var t = 0; t < 22; t++) { var tx = 10 + t * 41 + Math.floor(rand() * 12), ty = 96; g.fillStyle = "#5b3d2e"; g.fillRect(tx, ty - 26, 3, 30); g.fillRect(tx - 4, ty - 18, 4, 1); g.fillRect(tx + 3, ty - 21, 5, 1);
+        for (var b = 0; b < 40; b++) { var a = rand() * 7, r = rand() * 15; g.fillStyle = pick(["#f2a6bd", "#e98aa6", "#f7c3d1", "#d4648a"]); g.fillRect(Math.round(tx + 1 + Math.cos(a) * r * 1.2), Math.round(ty - 34 + Math.sin(a) * r * 0.75), 3, 3); } }
+      for (var s = 0; s < 6; s++) { var bx = 60 + s * 150; g.fillStyle = "#8a6043"; g.fillRect(bx, 108, 18, 2); g.fillRect(bx, 104, 18, 1); g.fillStyle = "#3d4a37"; g.fillRect(bx + 1, 110, 1, 4); g.fillRect(bx + 16, 110, 1, 4); }
+      backdrops.blossom = c; })();
+    // LAKE: sunset bands, sun, lake with reflections, pine silhouettes, reeds
+    (function () { var c = document.createElement("canvas"); c.width = BW; c.height = 120; var g = c.getContext("2d");
+      band(g, 0, 62, ["#2f3466", "#463d70", "#6b4a7a", "#9a5577", "#c8606a", "#e7774f", "#f08a4a", "#f9b264"]);
+      g.fillStyle = "#ffd89a"; g.beginPath(); g.arc(560, 58, 16, 0, 7); g.fill(); g.fillStyle = "#ffeec7"; g.beginPath(); g.arc(560, 58, 11, 0, 7); g.fill();
+      g.fillStyle = "#3b2f52"; for (var x = 0; x < BW; x++) { var h = 14 + Math.sin(x / 70) * 6 + Math.sin(x / 23) * 3; g.fillRect(x, 62 - h, 1, h); }
+      band(g, 62, 90, ["#7a5a7e", "#6a5478", "#53547a", "#3f5577", "#2f5b78"]);
+      for (var r = 0; r < 90; r++) { var rx = 520 + Math.floor((rand() - 0.5) * 120), ry = 63 + Math.floor(rand() * 26); g.fillStyle = rand() < 0.6 ? "#ffcf8a" : "#ffe7b8"; g.fillRect(rx, ry, 2 + Math.floor(rand() * 6), 1); }
+      for (var p = 0; p < 40; p++) { var tx = Math.floor(rand() * BW), th = 16 + Math.floor(rand() * 18); g.fillStyle = "#1e2a24"; for (var k = 0; k < th; k++) { var w = Math.floor((k / th) * 7) + 1; g.fillRect(tx - w, 90 - th + k, w * 2 + 1, 1); } }
+      g.fillStyle = "#3f5a2e"; g.fillRect(0, 90, BW, 30); dither(g, 0, 90, BW, 30, "#36502a", 3);
+      for (var q = 0; q < 220; q++) { var qx = Math.floor(rand() * BW), qh = 4 + Math.floor(rand() * 9); g.fillStyle = rand() < 0.7 ? "#7d8a4a" : "#6b4a2e"; g.fillRect(qx, 92 - qh, 1, qh); }
+      backdrops.lake = c; })();
+  }
+  buildBackdrops();
+  var petals = []; for (var pp = 0; pp < 80; pp++) petals.push({ x: rand() * W, y: rand() * H, s: 0.3 + rand() * 0.6, ph: rand() * 6 });
+
+  function drawBackdrop() {
+    var img = backdrops[sceneName], off = Math.round(((cam.z * 4) % (BW - W) + (BW - W)) % (BW - W) * 0.5 + (BW - W) / 4);
+    ctx.drawImage(img, off, 0, W, 120, 0, 0, W, 120);
+    var C = COURT[sceneName]; px(0, 120, W, H - 120, C.apron);
+    if (sceneName === "street") { for (var y = 121; y < H; y += 3) for (var x = (y % 2) * 2; x < W; x += 7) px(x, y, 1, 1, "rgba(255,255,255,.04)"); }
+  }
+  function drawCourt() {
+    var C = COURT[sceneName];
+    var top = proj(-HALFW, 0, 0).y, bot = proj(HALFW, 0, 0).y, l = proj(0, 0, -HALFL).x, r = proj(0, 0, HALFL).x;
+    px(l, top, r - l, bot - top, C.floor);
+    for (var y = top; y < bot; y += 2) px(l, y, r - l, 1, C.floor2);
+    // keys
+    [-1, 1].forEach(function (s) { var b = proj(0, 0, s * HALFL).x, f = proj(0, 0, s * (HALFL - 5.4)).x, kt = proj(-2.3, 0, 0).y, kb = proj(2.3, 0, 0).y; px(Math.min(b, f), kt, Math.abs(f - b), kb - kt, C.key); });
+    ctx.fillStyle = C.line;
+    function hl(x0, x1, y) { ctx.fillRect(Math.min(x0, x1), y, Math.abs(x1 - x0) + 1, 1); } function vl(x, y0, y1) { ctx.fillRect(x, Math.min(y0, y1), 1, Math.abs(y1 - y0) + 1); }
+    hl(l, r, top); hl(l, r, bot); vl(l, top, bot); vl(r, top, bot); vl(proj(0, 0, 0).x, top, bot);
+    function ellipse(cx, cz, rad, from, to, col) { ctx.fillStyle = col || C.line; for (var a = from; a <= to; a += 0.02) { var p = proj(cx + Math.sin(a) * rad, 0, cz + Math.cos(a) * rad); ctx.fillRect(p.x, p.y, 1, 1); } }
+    ellipse(0, 0, 1.8, 0, Math.PI * 2);
+    [-1, 1].forEach(function (s) {
+      var b = s * HALFL, ft = s * (HALFL - 5.4), kt = proj(-2.3, 0, 0).y, kb = proj(2.3, 0, 0).y, bx = proj(0, 0, b).x, fx = proj(0, 0, ft).x;
+      ctx.fillStyle = C.line; hl(bx, fx, kt); hl(bx, fx, kb); vl(fx, kt, kb);
+      ellipse(0, ft, 1.7, 0, Math.PI * 2);
+      var rimZ = s * 11.6, a0 = Math.acos(CORNER / ARC);
+      ellipse(0, rimZ, ARC, s < 0 ? -Math.PI / 2 + a0 : Math.PI / 2 + a0, s < 0 ? Math.PI / 2 - a0 : Math.PI * 1.5 - a0, C.arc);
+      ctx.fillStyle = C.arc; var c1 = proj(-CORNER, 0, b), c2 = proj(-CORNER, 0, rimZ - s * Math.sqrt(ARC * ARC - CORNER * CORNER)); hl(c1.x, c2.x, c1.y); var c3 = proj(CORNER, 0, b), c4 = proj(CORNER, 0, rimZ - s * Math.sqrt(ARC * ARC - CORNER * CORNER)); hl(c3.x, c4.x, c3.y);
+    });
+    // centre-court B1 mark
+    var m = proj(0, 0, 0); ctx.fillStyle = C.line; for (var a = 0; a < 7; a += 0.05) ctx.fillRect(Math.round(m.x + Math.cos(a) * 9), Math.round(m.y + Math.sin(a) * 4), 1, 1); ctx.fillStyle = "#d7262e"; ctx.fillRect(m.x - 6, m.y, 4, 1); ctx.fillRect(m.x - 2, m.y - 2, 1, 2); ctx.fillRect(m.x - 1, m.y, 1, 2); ctx.fillRect(m.x, m.y, 6, 1);
+  }
+  function drawHoop(i) {
+    var s = i ? 1 : -1, pole = proj(0, 0, s * 13.9), rim = proj(0, 3.05, s * 11.6), board = proj(0, 3.55, s * 12.2);
+    px(pole.x - 1, rim.y - 14, 3, pole.y - rim.y + 14, "#2a2d33"); px(Math.min(pole.x, board.x), rim.y - 14, Math.abs(pole.x - board.x) + 1, 2, "#2a2d33");
+    px(board.x - 1, board.y - 6, 2, 13, "#f2efe6"); px(board.x - 1, board.y - 1, 2, 4, "#d7262e");
+    var rx = rim.x + (s < 0 ? 1 : -1) * 0; px(Math.min(board.x, rim.x), rim.y, Math.abs(board.x - rim.x), 1, "#f08a4a"); px(rim.x - 3, rim.y, 7, 1, "#f08a4a");
+    var sway = nets[i].t > 0 ? Math.round(Math.sin(nets[i].t * 12) * 1.5) : 0;
+    for (var k = 0; k < 5; k++) { var nx = rim.x - 3 + k * 1.5; ctx.fillStyle = "#f2efe6"; ctx.fillRect(Math.round(nx + sway * (k % 2)), rim.y + 1, 1, 5 + (k % 2)); }
+    px(rim.x - 2, rim.y + 3, 5, 1, "rgba(242,239,230,.6)");
+  }
+
+  // ---------- realistic athletic pixel players ----------
+  var TEAMCOL = [{ jersey: "#2f5d3a", trim: "#d8b36a", shorts: "#264d30", shoe: "#f2efe6" }, { jersey: "#c2683f", trim: "#f3ead8", shorts: "#a5552f", shoe: "#1d1f1a" }];
+  function drawPlayer(p) {
+    if (p.hidden > 0) return;
+    var L = p.look, sc = p.f.root.scale.x, Hh = Math.round(21 * sc * cam.ppu / 13), feet = proj(p.pos.x, 0, p.pos.z), y0 = feet.y - Math.round(p.jy * HY * cam.ppu / 13), x0 = feet.x;
+    var face = Math.cos(p.yaw) >= 0 ? 1 : -1, T = TEAMCOL[p.team], skin = hex(L.skin), skinD = shade(skin, 0.8);
+    var jersey = p.ninja ? "#16161a" : T.jersey, shorts = p.ninja ? "#16161a" : T.shorts, trim = p.ninja ? "#b3221b" : T.trim;
+    var big = sc > 1.1 ? 1 : 0, tw = 6 + big, sw = 6 + big;
+    // shadow
+    var shw = 8 + big * 2; ctx.fillStyle = "rgba(0,0,0,.28)"; ctx.fillRect(x0 - shw / 2, feet.y, shw, 2);
+    var off = p.team === G.poss, hold = ball.holder === p, run = clamp(p.vel.length() / 4.5, 0, 1.3), st = Math.sin(p.phase), stride = Math.round(st * 2 * run);
+    var legH = Math.round(Hh * 0.42), torsoH = Math.round(Hh * 0.3), headH = 4 + (sc > 1.05 ? 1 : 0);
+    var hipY = y0 - legH, shY = hipY - torsoH, headY = shY - headH - 1;
+    var defend = !off && G.phase === "set" && G.dead <= 0, wide = defend || p.pose === "screen" ? 1 : 0;
+    // legs + socks + shoes
+    [[-1, stride], [1, -stride]].forEach(function (lg) { var lx = x0 + lg[0] * (1 + wide) - (lg[0] < 0 ? 2 : 0) + lg[1]; px(lx, hipY, 2, legH - 2, p.ninja ? "#16161a" : skin); px(lx, y0 - 4, 2, 2, p.ninja ? "#2a2a2f" : "#f2efe6"); px(lx - (face < 0 ? 1 : 0), y0 - 2, 3, 2, p.ninja ? "#101010" : T.shoe); });
+    // shorts
+    px(x0 - sw / 2, hipY - 1, sw, Math.round(legH * 0.45), shorts); px(x0 - sw / 2, hipY - 1 + Math.round(legH * 0.45) - 1, sw, 1, trim);
+    // torso / jersey
+    px(x0 - tw / 2, shY, tw, torsoH, jersey); px(x0 - tw / 2, shY, tw, 1, shade(jersey, 1.15));
+    if (p.ninja) { px(x0 - tw / 2, hipY - 2, tw, 2, "#5b5348"); px(x0 - tw / 2, hipY - 2, tw, 1, "#b3221b"); px(x0 - 1 + face, shY + 1, 1, torsoH - 3, "#2b2b31"); }
+    else { px(x0 - tw / 2, shY + torsoH - 1, tw, 1, trim); px(x0 - 1, shY + 2, 2, 2, trim); }
+    // arms by situation
+    var aUp = p.state === "shoot" || p.state === "dunk" || p.state === "oop" || p.pose === "block" || p.celebrate > 0;
+    var armCol = p.ninja ? skin : skin;
+    function arm(side, mode) { var ax = side > 0 ? x0 + tw / 2 : x0 - tw / 2 - 2;
+      if (mode === "up") { px(ax + (side > 0 ? -1 : 1), shY - 8, 2, 9, armCol); px(ax + (side > 0 ? -1 : 1), shY - 9, 2, 2, skinD); }
+      else if (mode === "out") { px(side > 0 ? ax : ax - 4, shY + 1, 6, 2, armCol); }
+      else if (mode === "drib") { px(ax, shY + 1, 2, torsoH, armCol); px(ax + side, shY + torsoH, 2, 3, armCol); }
+      else { var sw2 = Math.round(-st * 2 * run * side); px(ax + sw2 * 0.5, shY + 1, 2, torsoH + 1, armCol); }
+      if (p.ninja && mode !== "up") px(side > 0 ? ax : ax, shY + torsoH - 1, 2, 2, "#3a3a40"); }
+    var dribSide = ball.side * face;
+    arm(-1, aUp ? "up" : wide ? "out" : hold && dribSide < 0 ? "drib" : "swing"); arm(1, aUp ? "up" : wide ? "out" : hold && dribSide > 0 ? "drib" : "swing");
+    // neck + head
+    px(x0 - 1, shY - 1, 2, 1, skinD);
+    var hx = x0 - 2, hw = 4 + big;
+    if (p.ninja) {
+      px(hx - 1, headY - 1, hw + 2, headH + 2, "#16161a");                                       // hood
+      var tipSway = Math.round(Math.sin(p.phase * 0.5) * 1);
+      px(face > 0 ? hx - 2 : hx + hw + 1, headY - 1 + tipSway, 2, 2, "#16161a"); px(face > 0 ? hx - 4 : hx + hw + 2, headY + tipSway, 2, 1, "#16161a");
+      px(hx + (face > 0 ? 1 : 0), headY + 1, hw - 1, 2, skin); px(hx + (face > 0 ? 2 : 0), headY + 1, 1, 1, "#ffffff"); px(hx + (face > 0 ? 3 : 1), headY + 1, 1, 1, "#ffffff");
+      px(hx + (face > 0 ? 1 : 0), headY + 1 - 1, hw - 1, 1, "#16161a");
+    } else {
+      px(hx, headY, hw, headH, skin); px(hx + (face > 0 ? hw - 1 : 0), headY + 1, 1, 1, "#141414");       // eye
+      px(hx + (face > 0 ? hw - 2 : 1), headY + headH - 1, 1, 1, skinD);
+      var hc = L.hairColor ? hex(L.hairColor) : "#1a120d";
+      if (L.hair === "afro") { px(hx - 1, headY - 2, hw + 2, 3, hc); px(hx - 1, headY, 1, 2, hc); px(hx + hw, headY, 1, 2, hc); }
+      else if (L.hair === "cap") { px(hx, headY - 1, hw, 2, trim); px(face > 0 ? hx + hw : hx - 2, headY, 2, 1, trim); }
+      else if (L.hair === "band") { px(hx, headY - 1, hw, 1, hc); px(hx, headY, hw, 1, trim); }
+      else if (L.hair === "bun") { px(hx, headY - 1, hw, 1, hc); px(face > 0 ? hx - 1 : hx + hw, headY - 2, 2, 2, hc); }
+      else if (L.hair === "buzz") { px(hx, headY - 1, hw, 1, shade(hc, 1.3)); }
+      else { px(hx, headY - 1, hw, 1, hc); px(face > 0 ? hx : hx + hw - 1, headY, 1, 2, hc); }
+      if (L.beard) px(hx + (face > 0 ? 1 : 0), headY + headH - 1, hw - 1, 1, hc);
+    }
+    if (p === ninja && G.mode === "play") { ctx.fillStyle = "#ffd166"; ctx.fillRect(x0 - 2, headY - 6, 5, 1); ctx.fillRect(x0 - 1, headY - 5, 3, 1); ctx.fillRect(x0, headY - 4, 1, 1); }
+  }
+  function drawBall() {
+    var b = ball.pos, s = proj(b.x, 0, b.z), p = proj(b.x, b.y, b.z);
+    ctx.fillStyle = "rgba(0,0,0,.3)"; ctx.fillRect(s.x - 1, s.y, 3, 1);
+    px(p.x - 1, p.y - 2, 3, 3, "#e0702e"); px(p.x - 1, p.y - 1, 3, 1, "#7a2e10"); px(p.x - 1, p.y - 2, 1, 1, "#ffb37a");
+  }
+  function drawPuffs(dt) { puffs = puffs.filter(function (q) { q.life -= dt * 1.2; return q.life > 0; }); puffs.forEach(function (q) { q.x += q.vx * dt; q.z += q.vz * dt; q.y += q.vy * dt; var p = proj(q.x, q.y, q.z), r = Math.round((1 - q.life) * 3) + 1; ctx.fillStyle = "rgba(220,220,225," + (q.life * 0.8) + ")"; ctx.fillRect(p.x - r, p.y - r, r * 2, r * 2); }); }
+  function drawPetals(dt, t) { if (sceneName !== "blossom") return; petals.forEach(function (q) { q.y += dt * 12 * q.s; q.x += (Math.sin(t + q.ph) * 6 + 4) * dt; if (q.y > H) { q.y = -2; q.x = rand() * W; } if (q.x > W) q.x = 0; ctx.fillStyle = q.s > 0.6 ? "#f7c3d1" : "#e98aa6"; ctx.fillRect(Math.round(q.x), Math.round(q.y), 2, 1); }); }
+
+  function render(dt, t) {
+    var target = cam.mode === "wide" ? 0 : clamp(ball.pos.z * 0.85, -6, 6);
+    cam.ppu += ((cam.mode === "wide" ? 10.2 : 13) - cam.ppu) * clamp(dt * 3, 0, 1);
+    cam.z += (target - cam.z) * clamp(dt * 3, 0, 1);
+    drawBackdrop(); drawCourt();
+    // depth-sorted: far side first; hoops sit at the middle of the court depth
+    var items = players.map(function (p) { return { d: p.pos.x, f: function () { drawPlayer(p); } }; });
+    items.push({ d: -0.01, f: function () { drawHoop(0); } }, { d: -0.01, f: function () { drawHoop(1); } }, { d: ball.pos.x + 0.02, f: drawBall });
+    items.sort(function (a, b) { return a.d - b.d; }).forEach(function (it) { it.f(); });
+    drawPuffs(dt); drawPetals(dt, t);
+    if (sceneName === "lake") { ctx.fillStyle = "rgba(255,170,90,.06)"; ctx.fillRect(0, 0, W, H); }
+    if (sceneName === "street") { ctx.fillStyle = "rgba(20,24,50,.08)"; ctx.fillRect(0, 0, W, H); }
+  }
+
+  // ======================= UI =======================
+  function press(sel, btn) { document.querySelectorAll(sel).forEach(function (o) { o.setAttribute("aria-pressed", String(o === btn)); }); }
+  document.querySelectorAll("[data-mode]").forEach(function (b) { b.addEventListener("click", function () { press("[data-mode]", b); G.mode = b.getAttribute("data-mode"); document.getElementById("pad").hidden = G.mode !== "play" || !matchMedia("(pointer: coarse)").matches; caption(G.mode === "play" ? "PLAYER 1: YOU ARE THE NINJA" : "WATCHING THE CPU GAME", 2.2); if (G.mode === "play") cv.focus(); }); });
+  document.querySelectorAll("[data-scene]").forEach(function (b) { b.addEventListener("click", function () { press("[data-scene]", b); sceneName = b.getAttribute("data-scene"); }); });
+  document.querySelectorAll("[data-cam]").forEach(function (b) { b.addEventListener("click", function () { press("[data-cam]", b); cam.mode = b.getAttribute("data-cam"); }); });
+  document.querySelectorAll("[data-def]").forEach(function (b) { b.addEventListener("click", function () { press("[data-def]", b); G.def[1] = b.getAttribute("data-def"); document.getElementById("defTag").textContent = G.def[1] === "zone" ? "ZONE" : "MAN"; }); });
+  document.getElementById("snd").addEventListener("click", function () { sfxOn = !sfxOn; if (sfxOn) audio(); this.setAttribute("aria-pressed", String(sfxOn)); this.textContent = sfxOn ? "SFX ON" : "SFX OFF"; sfx("swish"); });
+  document.getElementById("mus").addEventListener("click", function () { musOn = !musOn; if (musOn) audio(); this.setAttribute("aria-pressed", String(musOn)); this.textContent = musOn ? "MUSIC ON" : "MUSIC OFF"; });
+  document.getElementById("g-reset").addEventListener("click", newGame);
+  document.getElementById("g-highlight").addEventListener("click", function () { if (G.over > 0) return; G.dead = 0; inbound(0); ninja.pos.copy(spotFor(0, 0, 8)); G.phase = "set"; G.play = "ninja"; setPlay(PLAY_NAME.ninja); planNinja(); if (G.mode === "play") { press("[data-mode]", document.getElementById("mode-watch")); G.mode = "watch"; document.getElementById("pad").hidden = true; } caption("NINJA HIGHLIGHT!", 1.2); });
+  function resize() { var sw = stage.clientWidth, sh = stage.clientHeight, k = Math.max(1, Math.min(sw / W, sh / H)); cv.style.width = Math.floor(W * k) + "px"; cv.style.height = Math.floor(H * k) + "px"; }
+  window.addEventListener("resize", resize); resize();
+
+  newGame(); caption("INSERT COIN... TIP-OFF!", 2);
+  var hsh = location.hash.slice(1); if (hsh === "blossom" || hsh === "lake") document.getElementById("sc-" + hsh).click(); if (hsh === "wide") document.getElementById("cam-wide").click(); if (hsh === "play") document.getElementById("mode-play").click();
+  window.hoopSim = function (n) { for (var i = 0; i < n * 60; i++) step(1 / 60); return { score: G.score.slice(), play: document.getElementById("playTag").textContent, caption: document.getElementById("caption").textContent }; };
+
+  var last = performance.now(), acc = 0, warned = false, lastBallY = 1;
+  function frame(now) {
+    requestAnimationFrame(frame);
+    var dt = Math.min(0.05, (now - last) / 1000); last = now; acc += dt;
+    try {
+      while (acc >= 1 / 60) { step(1 / 60); acc -= 1 / 60; }
+      if (ball.mode === "held" && ball.pos.y < 0.2 && lastBallY >= 0.2 && now - lastDrib > 160) { sfx("dribble"); lastDrib = now; } lastBallY = ball.pos.y;
+      music(dt); render(dt, now / 1000);
+    } catch (err) { acc = 0; if (!warned) { warned = true; console.error("HL-ERR " + (err && err.stack || err)); } }
+    nets.forEach(function (n) { if (n.t > 0) n.t -= dt * 2.5; });
+  }
+  requestAnimationFrame(frame);
+})();
+</script>

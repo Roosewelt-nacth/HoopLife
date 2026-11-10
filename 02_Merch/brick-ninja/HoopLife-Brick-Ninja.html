@@ -1,0 +1,237 @@
+<meta charset="utf-8">
+<title>HoopLife Brick Ninja</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+  /* Layout: product stage with the live 3D brick figure; view controls (assembled / exploded / boxed) under it; then the parts list and spec. Single deliberate warm-studio look. */
+  :root {
+    --bg: #121311;
+    --line: #2d2f2a;
+    --fg: #F3EEE2;
+    --muted: #A5A79E;
+    --clay: #C2683F;
+    --gold: #D8B36A;
+    --body: "Archivo", "Segoe UI", system-ui, sans-serif;
+    --mono: "JetBrains Mono", Consolas, monospace;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+  .in { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .label { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  header .in { padding-block: 36px 16px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 10px 24px; }
+  h1 { font-size: clamp(30px, 5vw, 48px); font-weight: 900; letter-spacing: -.02em; line-height: 1; margin: 6px 0 0; }
+  .stage { position: relative; height: min(76vh, 720px); min-height: 460px; background: radial-gradient(70% 70% at 50% 42%, #3a3328, #121311); border-block: 1px solid var(--line); overflow: hidden; }
+  .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+  .hint { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); font: 500 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); background: rgba(0,0,0,.35); padding: 4px 10px; border-radius: 999px; pointer-events: none; white-space: nowrap; }
+  .fallback { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); }
+  .controls .in { padding-block: 18px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 14px 28px; }
+  .group { display: grid; gap: 8px; }
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pills button { font: 600 13px var(--body); color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 9px 16px; cursor: pointer; }
+  .pills button[aria-pressed="true"] { border-color: var(--gold); background: rgba(216,179,106,.12); }
+  .pills button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  .info .in { padding-block: 20px 64px; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 28px; border-top: 1px solid var(--line); }
+  @media (max-width: 760px) { .info .in { grid-template-columns: minmax(0, 1fr); } }
+  h2 { font-size: 20px; font-weight: 900; margin: 0 0 10px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); }
+  th { font: 700 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  td.n { font-variant-numeric: tabular-nums; text-align: right; }
+  .sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 6px; border: 1px solid rgba(255,255,255,.2); }
+  .specs { display: grid; gap: 12px; align-content: start; }
+  .specs div { display: grid; gap: 2px; }
+  .specs b { font-weight: 800; }
+  .specs span { color: var(--muted); font-size: 14px; }
+</style>
+
+<header><div class="in">
+  <div><div class="label">Merch · Collectible · For Lawrance</div><h1>HoopLife Brick Ninja</h1></div>
+  <div class="label">Brick-built figure · merch only</div>
+</div></header>
+
+<section class="stage" id="stage" aria-label="3D brick-built ninja figure">
+  <div class="hint" id="hint">Drag to turn · Scroll or pinch to zoom</div>
+</section>
+
+<section class="controls"><div class="in">
+  <div class="group"><span class="label">View</span><div class="pills" role="group" aria-label="View">
+    <button type="button" id="v-built" data-view="built" aria-pressed="true">Assembled</button>
+    <button type="button" id="v-explode" data-view="explode" aria-pressed="false">Exploded parts</button>
+    <button type="button" id="v-box" data-view="box" aria-pressed="false">In the box</button></div></div>
+  <div class="group"><span class="label">Pose</span><div class="pills" role="group" aria-label="Pose">
+    <button type="button" id="p-stance" data-pose="stance" aria-pressed="true">Stance</button>
+    <button type="button" id="p-spin" data-pose="spin" aria-pressed="false">Ball spin</button>
+    <button type="button" id="p-shot" data-pose="shot" aria-pressed="false">Jump shot</button></div></div>
+  <div class="group"><span class="label">Mask</span><div class="pills" role="group" aria-label="Mask">
+    <button type="button" id="m-black" data-mask="black" aria-pressed="true">Black</button>
+    <button type="button" id="m-red" data-mask="red" aria-pressed="false">Red</button></div></div>
+</div></section>
+
+<section class="info"><div class="in">
+  <div><h2>Parts list</h2><table><thead><tr><th>Part</th><th>Colour</th><th class="n">Qty</th></tr></thead><tbody id="parts"></tbody></table></div>
+  <div class="specs">
+    <h2>Spec</h2>
+    <div><b>Size</b><span>About 9 cm tall on a 6 × 6 stud display plate.</span></div>
+    <div><b>Build</b><span id="pieceCount"></span></div>
+    <div><b>Prints</b><span>Face: eyes and brows. Mask tile. Torso: crossover wrap and red sash line, 01 on the back. Ball: B1 seams and heartbeat. Plate tile: HOOPLIFE.</span></div>
+    <div><b>Use</b><span>Merch only: drops, giveaways, member gifts. Not used in the game or intro.</span></div>
+    <div><b>Trademark</b><span>An original brick-built design. Sold as a HoopLife collectible, not as a LEGO product. LEGO is a trademark of the LEGO Group.</span></div>
+  </div>
+</div></section>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/environments/RoomEnvironment.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/geometries/RoundedBoxGeometry.js"></script>
+<script>
+(function () {
+  "use strict";
+  var stage = document.getElementById("stage");
+  function fail() { stage.insertAdjacentHTML("beforeend", '<div class="fallback"><p>The 3D preview could not start on this device.</p></div>'); }
+  if (!window.THREE || !THREE.OrbitControls) { fail(); return; }
+  var renderer; try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true }); } catch (e) { fail(); return; }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2)); renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.85;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap; stage.insertBefore(renderer.domElement, stage.firstChild);
+  var scene = new THREE.Scene(); scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new THREE.RoomEnvironment(), 0.04).texture;
+  var camera = new THREE.PerspectiveCamera(30, 1, 0.1, 200); camera.position.set(6, 6.5, 13);
+  var controls = new THREE.OrbitControls(camera, renderer.domElement); controls.target.set(0, 3.2, 0); controls.enableDamping = true; controls.enablePan = false; controls.minDistance = 6; controls.maxDistance = 30;
+  var key = new THREE.DirectionalLight(0xfff0dc, 1.1); key.position.set(5, 10, 7); key.castShadow = true; key.shadow.mapSize.set(1024, 1024); Object.assign(key.shadow.camera, { left: -8, right: 8, top: 10, bottom: -4 }); scene.add(key);
+  scene.add(new THREE.HemisphereLight(0xfff1dd, 0x2a241c, 0.45));
+  var V3 = THREE.Vector3;
+
+  // ---------- brick system: 1 stud = 0.8 units, 1 brick height = 0.96, 1 plate = 0.32 ----------
+  var S = 0.8, BH = 0.96, PH = 0.32;
+  function plastic(c, o) { var dark = new THREE.Color(c).getHSL({}).l < 0.25; return new THREE.MeshPhysicalMaterial(Object.assign({ color: c, roughness: 0.34, clearcoat: dark ? 0.35 : 0.55, clearcoatRoughness: 0.3, envMapIntensity: dark ? 0.22 : 0.5 }, o || {})); }
+  var C = { black: 0x16161a, dkgrey: 0x5b5d61, sand: 0x8b7d6b, skin: 0xe2ad86, red: 0xb3221b, white: 0xf2f0ea, orange: 0xd0602a, gold: 0xc9a24a };
+  var mats = {}; function M(k) { return mats[k] || (mats[k] = plastic(C[k])); }
+  var parts = [];      // every piece, with its built and exploded positions
+  var counts = {};
+  var studGeo = new THREE.CylinderGeometry(0.24, 0.24, 0.17, 20);
+  function brick(name, colour, w, d, h, x, y, z, parent, opts) {
+    opts = opts || {};
+    var g = new THREE.Group(); (parent || scene).add(g);
+    var geo = THREE.RoundedBoxGeometry ? new THREE.RoundedBoxGeometry(w * S - 0.02, h, d * S - 0.02, 2, 0.03) : new THREE.BoxGeometry(w * S - 0.02, h, d * S - 0.02);
+    var body = new THREE.Mesh(geo, opts.faces || M(colour)); body.position.y = h / 2; body.castShadow = body.receiveShadow = true; g.add(body);
+    if (!opts.noStuds) for (var i = 0; i < w; i++) for (var j = 0; j < d; j++) { var st = new THREE.Mesh(studGeo, M(colour)); st.position.set((i - (w - 1) / 2) * S, h + 0.085, (j - (d - 1) / 2) * S); st.castShadow = true; g.add(st); }
+    g.position.set(x, y, z);
+    var label = name + "|" + colour; counts[label] = (counts[label] || 0) + 1;
+    parts.push({ g: g, built: g.position.clone(), ex: opts.ex || new V3(0, 0, 0) });
+    return g;
+  }
+  function slope(name, colour, w, d, h, x, y, z, parent, rotY, ex) {
+    // a wedge brick: flat back, sloping front, one row of studs at the back
+    var g = new THREE.Group(); (parent || scene).add(g);
+    var shape = new THREE.Shape(); shape.moveTo(-d * S / 2, 0); shape.lineTo(d * S / 2, 0); shape.lineTo(d * S / 2, 0.2); shape.lineTo(-d * S / 2 + S, h); shape.lineTo(-d * S / 2, h); shape.closePath();
+    var geo = new THREE.ExtrudeGeometry(shape, { depth: w * S - 0.02, bevelEnabled: false }); geo.translate(0, 0, -(w * S - 0.02) / 2); geo.rotateY(-Math.PI / 2);
+    var m = new THREE.Mesh(geo, M(colour)); m.castShadow = true; g.add(m);
+    for (var i = 0; i < w; i++) { var st = new THREE.Mesh(studGeo, M(colour)); st.position.set((i - (w - 1) / 2) * S, h + 0.085, -(d - 1) * S / 2); g.add(st); }
+    g.position.set(x, y, z); g.rotation.y = rotY || 0;
+    var label = name + "|" + colour; counts[label] = (counts[label] || 0) + 1;
+    parts.push({ g: g, built: g.position.clone(), ex: ex || new V3(0, 0, 0) }); return g;
+  }
+  function printed(w, h, draw) { var c = document.createElement("canvas"); c.width = w; c.height = h; var x = c.getContext("2d"); draw(x, w, h); var t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.anisotropy = 8; return t; }
+  function faces(base, front, back) { var b = plastic(C[base]); return [b, b, b, b, front ? plastic(0xffffff, { map: front }) : b, back ? plastic(0xffffff, { map: back }) : b]; }
+
+  // ---------- prints ----------
+  var faceT = printed(256, 256, function (g, w, h) { g.fillStyle = "#E2AD86"; g.fillRect(0, 0, w, h);
+    [-1, 1].forEach(function (s) { g.fillStyle = "#111"; g.beginPath(); g.ellipse(128 + s * 46, 112, 20, 24, 0, 0, 7); g.fill(); g.fillStyle = "#fff"; g.beginPath(); g.arc(128 + s * 46 - 6, 104, 6, 0, 7); g.fill();
+      g.strokeStyle = "#111"; g.lineWidth = 12; g.lineCap = "round"; g.beginPath(); g.moveTo(128 + s * 18, 76); g.lineTo(128 + s * 76, 60); g.stroke(); }); });
+  function maskT(col) { return printed(256, 128, function (g, w, h) { g.fillStyle = col; g.fillRect(0, 0, w, h); g.strokeStyle = "rgba(255,255,255,.12)"; g.lineWidth = 3; for (var y = 20; y < h; y += 22) { g.beginPath(); g.moveTo(10, y); g.quadraticCurveTo(128, y + 10, 246, y); g.stroke(); } }); }
+  var torsoF = printed(384, 256, function (g, w, h) { g.fillStyle = "#16161A"; g.fillRect(0, 0, w, h); g.fillStyle = "#2b2b31"; g.beginPath(); g.moveTo(70, 0); g.lineTo(130, 0); g.lineTo(320, h); g.lineTo(260, h); g.closePath(); g.fill(); g.fillStyle = "#B3221B"; g.fillRect(0, h - 26, w, 10); });
+  var torsoB = printed(384, 256, function (g, w, h) { g.fillStyle = "#16161A"; g.fillRect(0, 0, w, h); g.font = "900 120px Archivo, Arial Black, sans-serif"; g.textAlign = "center"; g.fillStyle = "#B3221B"; g.fillText("01", w / 2, 150); g.fillStyle = "#B3221B"; g.fillRect(0, h - 26, w, 10); });
+  var tileT = printed(512, 128, function (g, w, h) { g.fillStyle = "#16161A"; g.fillRect(0, 0, w, h); var k = 300 / 606; g.save(); g.translate((w - 300) / 2, 40); g.scale(k, k); g.strokeStyle = "#F3EEE2"; g.lineWidth = 14; g.lineCap = g.lineJoin = "round";
+    [[0, "M0,0 V100 M52,0 V100 M0,50 H52"], [80, "M42,0 A42,50 0 1 0 42.01,0"], [192, "M42,0 A42,50 0 1 0 42.01,0"], [304, "M0,100 V0 H26 A26,26 0 0 1 26,52 H0"], [384, "M0,0 V100 H46"], [458, "M0,0 V100"], [486, "M46,0 H0 V100 M0,50 H38"], [560, "M46,0 H0 V100 H46 M0,50 H38"]].forEach(function (q) { g.save(); g.translate(q[0], 0); g.stroke(new Path2D(q[1])); g.restore(); }); g.restore(); });
+  var ballT = printed(512, 256, function (g, w, h) { g.fillStyle = "#D0602A"; g.fillRect(0, 0, w, h); g.strokeStyle = "#1b1411"; g.lineWidth = 6; [0, 128, 256, 384].forEach(function (x) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, h); g.stroke(); }); g.beginPath(); g.moveTo(0, 128); g.lineTo(w, 128); g.stroke();
+    g.strokeStyle = "#fff"; g.lineWidth = 7; g.lineJoin = "round"; g.beginPath(); [[180, 128], [226, 128], [238, 104], [256, 152], [268, 128], [332, 128]].forEach(function (p, i) { g[i ? "lineTo" : "moveTo"](p[0], p[1]); }); g.stroke(); });
+
+  // ---------- the build ----------
+  var fig = new THREE.Group(); scene.add(fig);
+  // display plate 6x6 + printed tile
+  brick("Plate 6 × 6", "black", 6, 6, PH, 0, 0, 0, fig, { ex: new V3(0, -1.2, 0) });
+  var rim = new THREE.Mesh(new THREE.BoxGeometry(6 * S + 0.04, 0.04, 6 * S + 0.04), plastic(C.red)); rim.position.y = 0.02; fig.add(rim);
+  brick("Tile 1 × 4 (HOOPLIFE print)", "black", 4, 1, PH * 0.6, 0, PH, 2 * S, fig, { noStuds: true, faces: faces("black", null, null), ex: new V3(0, -0.6, 1.2) }).children[0].material = [plastic(C.black), plastic(C.black), plastic(0xffffff, { map: tileT }), plastic(C.black), plastic(C.black), plastic(C.black)];
+  var y = PH;
+  // feet + legs
+  brick("Plate 1 × 2", "black", 1, 2, PH, -0.45, y, 0.25, fig, { ex: new V3(-1.2, -0.4, 0.4) }); brick("Plate 1 × 2", "black", 1, 2, PH, 0.45, y, 0.25, fig, { ex: new V3(1.2, -0.4, 0.4) });
+  var legY = y + PH;
+  var legL = brick("Brick 1 × 1 (leg)", "black", 1, 1, BH * 1.2, -0.45, legY, 0, fig, { noStuds: true, ex: new V3(-1.3, 0, 0) }), legR = brick("Brick 1 × 1 (leg)", "black", 1, 1, BH * 1.2, 0.45, legY, 0, fig, { noStuds: true, ex: new V3(1.3, 0, 0) });
+  var hipY = legY + BH * 1.2;
+  brick("Brick 2 × 2 (sash)", "sand", 2, 2, BH * 0.55, 0, hipY, 0, fig, { noStuds: true, ex: new V3(0, 0.4, 1.6) });
+  var sashLine = new THREE.Mesh(new THREE.BoxGeometry(2 * S + 0.02, 0.06, 2 * S + 0.02), plastic(C.red)); sashLine.position.y = hipY + BH * 0.45; fig.add(sashLine); parts.push({ g: sashLine, built: sashLine.position.clone(), ex: new V3(0, 0.4, 1.6) });
+  brick("Plate 1 × 1 (knot)", "sand", 1, 1, PH, 0.1, hipY + 0.12, 0.85, fig, { noStuds: true, ex: new V3(0.4, 0.4, 2.4) });
+  var torsoY = hipY + BH * 0.55;
+  var torso = brick("Brick 2 × 3 (torso print)", "black", 3, 2, BH * 1.35, 0, torsoY, 0, fig, { noStuds: true, faces: faces("black", torsoF, torsoB), ex: new V3(0, 1.0, 0) });
+  // arms + hands, on pivots
+  function arm(s) { var piv = new THREE.Group(); piv.position.set(s * 1.55 * S, torsoY + BH * 1.2, 0); fig.add(piv);
+    var up = brick("Brick 1 × 1 (sleeve)", "black", 1, 1, BH * 0.9, 0, -BH * 0.9, 0, piv, { noStuds: true, ex: new V3(s * 1.6, 1.0, 0) });
+    var hand = brick("Round 1 × 1 (hand)", "skin", 1, 1, BH * 0.6, 0, -BH * 1.5, 0, piv, { noStuds: true, ex: new V3(s * 1.9, 0.6, 0.4) });
+    var wrap = new THREE.Mesh(new THREE.BoxGeometry(S + 0.02, 0.14, S + 0.02), plastic(C.dkgrey)); wrap.position.set(0, -BH * 0.84, 0); piv.add(wrap); parts.push({ g: wrap, built: wrap.position.clone(), ex: new V3(s * 1.7, 0.8, 0) });
+    return { piv: piv, hand: hand }; }
+  var LA = arm(1), RA = arm(-1);
+  // head: 2x2 skin brick with printed face, mask tile across the lower face, hood from black bricks and slopes with a pointed tip
+  var headY = torsoY + BH * 1.35;
+  var neck = brick("Plate 2 × 2 (cowl)", "black", 2, 2, PH, 0, headY, 0, fig, { noStuds: true, ex: new V3(0, 1.6, 0) });
+  var head = new THREE.Group(); head.position.set(0, headY + PH, 0); fig.add(head);
+  brick("Brick 2 × 2 (face print)", "skin", 2, 2, BH * 1.2, 0, 0, 0, head, { noStuds: true, faces: faces("skin", faceT, null), ex: new V3(0, 2.3, 0) });
+  var maskMesh = brick("Tile 1 × 2 (mask print)", "black", 2, 1, BH * 0.52, 0, 0, 0.86, head, { noStuds: true, ex: new V3(0, 2.0, 1.6) });
+  maskMesh.children[0].scale.z = 0.18;
+  var maskMat = plastic(C.black, { map: maskT("#16161A") }); maskMesh.children[0].material = maskMat;
+  brick("Brick 1 × 2 (hood side)", "black", 1, 2, BH * 1.2, -1.5 * S, 0, -0.5 * S, head, { noStuds: true, ex: new V3(-1.8, 2.6, 0) });
+  brick("Brick 1 × 2 (hood side)", "black", 1, 2, BH * 1.2, 1.5 * S, 0, -0.5 * S, head, { noStuds: true, ex: new V3(1.8, 2.6, 0) });
+  brick("Brick 1 × 4 (hood back)", "black", 4, 1, BH * 1.2, 0, 0, -1.5 * S, head, { noStuds: true, ex: new V3(0, 2.6, -1.8) });
+  brick("Plate 4 × 3 (hood top)", "black", 4, 3, PH, 0, BH * 1.2, -0.5 * S, head, { noStuds: true, ex: new V3(0, 3.3, 0) });
+  slope("Slope 45° 2 × 2 (hood)", "black", 2, 2, BH * 0.7, 0.0, BH * 1.2 + PH, -1.0 * S, head, Math.PI, new V3(0, 3.9, -0.6));
+  var tipPiece = slope("Slope 45° 1 × 1 (hood tip)", "black", 1, 1, BH * 0.7, 0.4 * S, BH * 1.9 + PH, -1.5 * S, head, Math.PI * 0.8, new V3(0.6, 4.6, -1.0)); tipPiece.rotation.x = -0.35;
+  // ball accessory on a stand stud
+  var ballG = new THREE.Group(); fig.add(ballG);
+  var ball = new THREE.Mesh(new THREE.SphereGeometry(0.62, 32, 20), plastic(0xffffff, { map: ballT, roughness: 0.5, clearcoat: 0.3 })); ball.castShadow = true; ballG.add(ball);
+  counts["Round 2 × 2 dome (B1 ball print)|orange"] = 1;
+  var ballHome = new V3(1.55, PH + 0.62 + 0.17, 1.45); ballG.position.copy(ballHome); parts.push({ g: ballG, built: ballHome.clone(), ex: new V3(1.6, 0.4, 1.2) });
+
+  // ---------- packaging box ----------
+  var boxG = new THREE.Group(); scene.add(boxG); boxG.visible = false;
+  var boxArt = printed(512, 720, function (g, w, h) { g.fillStyle = "#16161A"; g.fillRect(0, 0, w, h); g.fillStyle = "#B3221B"; g.fillRect(0, 0, w, 90); g.font = "900 54px Archivo, Arial Black, sans-serif"; g.fillStyle = "#F3EEE2"; g.textAlign = "center"; g.fillText("HOOPLIFE", w / 2, 64);
+    g.font = "800 30px JetBrains Mono, monospace"; g.fillStyle = "#D8B36A"; g.fillText("BRICK NINJA · NO. 01", w / 2, h - 60); g.font = "600 20px JetBrains Mono, monospace"; g.fillStyle = "#A5A79E"; g.fillText("COLLECTIBLE · 47 PIECES · AGES 8+", w / 2, h - 28); });
+  var boxMat = [plastic(0x16161a), plastic(0x16161a), plastic(0xb3221b), plastic(0x16161a), plastic(0xffffff, { map: boxArt, roughness: 0.6, clearcoat: 0.2 }), plastic(0x16161a)];
+  var back = new THREE.Mesh(new THREE.BoxGeometry(7.4, 10.4, 0.2), boxMat); back.position.set(0, 5.2, -2.9); back.castShadow = true; boxG.add(back);
+  var win = new THREE.Mesh(new THREE.BoxGeometry(7.4, 10.4, 5.8), new THREE.MeshPhysicalMaterial({ color: 0xffffff, transparent: true, opacity: 0.12, roughness: 0.05, transmission: 0.6 })); win.position.set(0, 5.2, 0); boxG.add(win);
+  var floor = new THREE.Mesh(new THREE.CircleGeometry(9, 48), new THREE.MeshStandardMaterial({ color: 0x1c1a16, roughness: 0.9 })); floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+
+  // ---------- parts list ----------
+  var total = 0, rows = Object.keys(counts).map(function (k) { var p = k.split("|"); total += counts[k]; return '<tr><td>' + p[0] + '</td><td><span class="sw" style="background:#' + new THREE.Color(C[p[1]]).getHexString() + '"></span>' + p[1] + '</td><td class="n">' + counts[k] + '</td></tr>'; });
+  document.getElementById("parts").innerHTML = rows.join(""); document.getElementById("pieceCount").textContent = total + " pieces: bricks, plates, slopes and printed tiles. Clutch-fit studs.";
+
+  // ---------- views, poses, mask ----------
+  var view = "built", poseName = "stance", explode = 0, t0 = performance.now();
+  function press(sel, b) { document.querySelectorAll(sel).forEach(function (o) { o.setAttribute("aria-pressed", String(o === b)); }); }
+  document.querySelectorAll("[data-view]").forEach(function (b) { b.addEventListener("click", function () { press("[data-view]", b); view = b.getAttribute("data-view"); boxG.visible = view === "box"; }); });
+  document.querySelectorAll("[data-pose]").forEach(function (b) { b.addEventListener("click", function () { press("[data-pose]", b); poseName = b.getAttribute("data-pose"); t0 = performance.now(); }); });
+  document.querySelectorAll("[data-mask]").forEach(function (b) { b.addEventListener("click", function () { press("[data-mask]", b); var red = b.getAttribute("data-mask") === "red"; maskMat.map = maskT(red ? "#B3221B" : "#16161A"); maskMat.needsUpdate = true; }); });
+  controls.addEventListener("start", function () { document.getElementById("hint").hidden = true; });
+  var h = location.hash.slice(1); if (h === "explode" || h === "box") document.getElementById("v-" + h).click(); if (h === "spin" || h === "shot") document.getElementById("p-" + h).click(); if (h === "red") document.getElementById("m-red").click();
+
+  function resize() { var w = stage.clientWidth, hh = stage.clientHeight; renderer.setSize(w, hh, false); camera.aspect = w / hh; camera.fov = w < 600 ? 40 : 30; camera.updateProjectionMatrix(); }
+  window.addEventListener("resize", resize); resize();
+  var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function frame(now) {
+    requestAnimationFrame(frame);
+    var t = (now - t0) / 1000;
+    explode += ((view === "explode" ? 1 : 0) - explode) * 0.08;
+    parts.forEach(function (p) { p.g.position.copy(p.built).addScaledVector(p.ex, explode * 1.4); });
+    // poses
+    LA.piv.rotation.set(0, 0, 0.08); RA.piv.rotation.set(0, 0, -0.08); head.rotation.set(0, 0, 0); fig.position.y = 0;
+    if (poseName === "spin") { RA.piv.rotation.set(-2.6, 0, -0.15); head.rotation.y = still ? 0 : Math.sin(t * 0.8) * 0.25;
+      if (explode < 0.05) { RA.hand.updateWorldMatrix(true, false); var hp = new V3(); RA.hand.getWorldPosition(hp); fig.worldToLocal(hp); ballG.position.set(hp.x, hp.y + 1.25, hp.z); ball.rotation.y = still ? 0 : t * 9; } }
+    else if (poseName === "shot") { var j = still ? 0.5 : (Math.sin(t * 2.2) * 0.5 + 0.5); LA.piv.rotation.set(-2.9, 0, 0.1); RA.piv.rotation.set(-2.9, 0, -0.1); fig.position.y = j * 0.6;
+      if (explode < 0.05) ballG.position.set(0, headY + PH + BH * 1.2 + 1.9 + j * 0.6 - fig.position.y, 0.5); }
+    else if (explode < 0.05) { ballG.position.copy(ballHome); ball.rotation.y = 0.6; }
+    if (view !== "explode" && !still) fig.rotation.y = Math.sin(t * 0.4) * 0.25;
+    controls.update(); renderer.render(scene, camera);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>

@@ -1,0 +1,153 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}.hl-back{position:fixed;right:max(12px,env(safe-area-inset-right,0px));bottom:max(12px,env(safe-area-inset-bottom,0px));z-index:99;font:600 12px system-ui,sans-serif;color:#F4F4F2;background:rgba(11,11,12,.85);border:1px solid #444;border-radius:999px;padding:8px 14px;text-decoration:none}.hl-back:hover{border-color:#D7262E}</style></head><body><title>HoopLife Pulse Logo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+  /* Layout: black intro stage where the logo draws itself, then a white sheet: idea, lockups, icons, ownership. Single deliberate look. */
+  :root {
+    --paper: #FFFFFF;
+    --ink: #0B0B0C;
+    --stage: #0B0B0C;
+    --rule: #E4E4E6;
+    --muted: #6B6B72;
+    --red: #D7262E;
+    --body: "Archivo", "Segoe UI", system-ui, sans-serif;
+    --mono: "JetBrains Mono", Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+  .in { max-width: 1040px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .label { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  h2 { font-size: clamp(22px, 3vw, 28px); font-weight: 700; letter-spacing: -.01em; margin: 0; text-wrap: balance; }
+  p { margin: 0; max-width: 60ch; }
+
+  .stage { background: var(--stage); color: #FFFFFF; }
+  .stage .in { padding-block: 72px 56px; display: grid; gap: 36px; justify-items: center; text-align: center; }
+  .stage .top { width: 100%; display: flex; justify-content: space-between; gap: 16px; color: #8C8C93; }
+  .stage svg { width: min(100%, 760px); height: auto; overflow: visible; }
+  .sub { font-family: var(--mono); font-size: 13px; letter-spacing: .4em; text-transform: uppercase; color: #BDBDC2; }
+  .replay { font: 500 13px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: #FFFFFF; background: transparent; border: 1px solid #3A3A40; border-radius: 999px; padding: 10px 18px; cursor: pointer; }
+  .replay:hover { border-color: var(--red); }
+  .replay:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
+
+  .play .d { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw .8s cubic-bezier(.6,0,.2,1) forwards; animation-delay: calc(var(--i) * 110ms + 200ms); }
+  .play .pulse { transform-box: fill-box; transform-origin: center; animation: draw .5s ease-out .5s forwards, beat .7s ease-in-out 2.1s 2; }
+  .play .sub { animation: fade .8s 1.9s both; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+  @keyframes beat { 0%, 100% { transform: none; } 30% { transform: scaleY(1.45); } 55% { transform: scaleY(.9); } }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .play .d, .play .pulse, .play .sub { animation: none; stroke-dasharray: none; stroke-dashoffset: 0; } }
+
+  main .in { padding-block: 64px 80px; display: grid; gap: 64px; }
+  .idea { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 32px 48px; align-items: center; }
+  @media (max-width: 720px) { .idea { grid-template-columns: minmax(0, 1fr); } }
+  .idea .icon-big { max-width: 300px; width: 100%; color: var(--ink); }
+  .idea ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 18px; counter-reset: s; }
+  .idea li { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 12px; counter-increment: s; }
+  .idea li::before { content: counter(s); font-family: var(--mono); font-size: 13px; color: var(--red); padding-top: 3px; }
+  .idea b { display: block; }
+  .idea span { color: var(--muted); }
+
+  .set { display: grid; gap: 16px; }
+  .set-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 24px; border-top: 1px solid var(--ink); padding-top: 14px; }
+  .pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 640px) { .pair { grid-template-columns: minmax(0, 1fr); } }
+  .tile { border: 1px solid var(--rule); display: grid; place-items: center; padding: 40px 28px; aspect-ratio: 16 / 10; max-width: 100%; }
+  .tile svg { width: 100%; height: auto; max-height: 100%; max-width: 440px; }
+  .tile.tall svg { max-width: 300px; }
+  .tile.dark { background: var(--stage); border-color: var(--stage); color: #FFFFFF; }
+  .tile.light { background: var(--paper); color: var(--ink); }
+
+  .icons { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 560px) { .icons { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .icon { display: grid; gap: 10px; justify-items: center; }
+  .av { width: min(100%, 170px); aspect-ratio: 1; border-radius: 50%; overflow: hidden; display: grid; place-items: center; }
+  .av svg { width: 100%; height: 100%; }
+  .av.dark { background: var(--stage); color: #FFFFFF; }
+  .av.light { background: var(--paper); color: var(--ink); border: 1px solid var(--rule); }
+  .av.red { background: var(--red); color: #FFFFFF; }
+  .av.red .pulse { stroke: #0B0B0C; }
+
+  .own { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 20px 32px; }
+  .own div { display: grid; gap: 4px; align-content: start; }
+  .own b { font-weight: 700; }
+  .own span { color: var(--muted); }
+  .note { font-size: 14px; color: var(--muted); }
+
+  .ask { border: 1px solid var(--ink); padding: 24px; display: grid; gap: 10px; }
+  .ask ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+</style>
+
+<section class="stage play" id="stage" aria-label="Logo intro">
+  <div class="in">
+    <div class="top label"><span>HoopLife Community</span><span>Intro · 3 sec</span></div>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="-40 -40 712 180"><g class="word" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path class="d" style="--i:3" pathLength="1" transform="translate(0,0)" d="M0,0 V100 M52,0 V100 M0,50 H52"/><path class="d" style="--i:4" pathLength="1" transform="translate(80,0)" d="M42,0 A42,50 0 1 0 42.01,0"/><g class="mark" transform="translate(187,-10) scale(0.6)" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="15"><circle class="d" style="--i:0" pathLength="1" cx="100" cy="100" r="84" stroke="currentColor" transform="rotate(-90 100 100)"/><path class="d" style="--i:1" pathLength="1" d="M44,40 C72,76 72,124 44,160" stroke="currentColor"/><path class="d" style="--i:1" pathLength="1" d="M156,40 C128,76 128,124 156,160" stroke="currentColor"/><polyline class="d pulse" style="--i:2" pathLength="1" points="65,100 80,100 89,74 100,126 109,100 135,100" stroke="#D7262E"/></g><path class="d" style="--i:5" pathLength="1" transform="translate(330,0)" d="M0,100 V0 H26 A26,26 0 0 1 26,52 H0"/><path class="d" style="--i:6" pathLength="1" transform="translate(410,0)" d="M0,0 V100 H46"/><path class="d" style="--i:7" pathLength="1" transform="translate(484,0)" d="M0,0 V100"/><path class="d" style="--i:8" pathLength="1" transform="translate(512,0)" d="M46,0 H0 V100 M0,50 H38"/><path class="d" style="--i:9" pathLength="1" transform="translate(586,0)" d="M46,0 H0 V100 H46 M0,50 H38"/></g></svg>
+    <div class="sub">Community · Chennai</div>
+    <button class="replay" id="replay" type="button">Replay intro</button>
+  </div>
+</section>
+
+<main>
+  <div class="in">
+    <div class="idea">
+      <div class="icon-big"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><g class="mark" transform="" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="12"><circle class="d" style="--i:0" pathLength="1" cx="100" cy="100" r="84" stroke="currentColor" transform="rotate(-90 100 100)"/><path class="d" style="--i:1" pathLength="1" d="M44,40 C72,76 72,124 44,160" stroke="currentColor"/><path class="d" style="--i:1" pathLength="1" d="M156,40 C128,76 128,124 156,160" stroke="currentColor"/><polyline class="d pulse" style="--i:2" pathLength="1" points="65,100 80,100 89,74 100,126 109,100 135,100" stroke="#D7262E"/></g></svg></div>
+      <div style="display:grid; gap:20px;">
+        <div class="label">Round 4 · The Pulse H</div>
+        <h2>A basketball that spells H and has a heartbeat.</h2>
+        <ol>
+          <li><div><b>The H is hidden in the ball</b><span>Remove the vertical seam, and the two side seams and the middle line form an H.</span></div></li>
+          <li><div><b>The middle line is a pulse</b><span>Hoop + Life. The red heartbeat is the only colour, and it beats in every intro.</span></div></li>
+          <li><div><b>The missing seam is the signature</b><span>Every basketball has that seam. Ours doesn't, so the mark is recognisable as HoopLife at a glance.</span></div></li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="set">
+      <div class="set-head"><h2>Wordmark</h2><span class="label">Custom-drawn letters, ball as the second O</span></div>
+      <div class="pair"><div class="tile light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-40 -40 712 180"><g class="word" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path class="d" style="--i:3" pathLength="1" transform="translate(0,0)" d="M0,0 V100 M52,0 V100 M0,50 H52"/><path class="d" style="--i:4" pathLength="1" transform="translate(80,0)" d="M42,0 A42,50 0 1 0 42.01,0"/><g class="mark" transform="translate(187,-10) scale(0.6)" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="15"><circle class="d" style="--i:0" pathLength="1" cx="100" cy="100" r="84" stroke="currentColor" transform="rotate(-90 100 100)"/><path class="d" style="--i:1" pathLength="1" d="M44,40 C72,76 72,124 44,160" stroke="currentColor"/><path class="d" style="--i:1" pathLength="1" d="M156,40 C128,76 128,124 156,160" stroke="currentColor"/><polyline class="d pulse" style="--i:2" pathLength="1" points="65,100 80,100 89,74 100,126 109,100 135,100" stroke="#D7262E"/></g><path class="d" style="--i:5" pathLength="1" transform="translate(330,0)" d="M0,100 V0 H26 A26,26 0 0 1 26,52 H0"/><path class="d" style="--i:6" pathLength="1" transform="translate(410,0)" d="M0,0 V100 H46"/><path class="d" style="--i:7" pathLength="1" transform="translate(484,0)" d="M0,0 V100"/><path class="d" style="--i:8" pathLength="1" transform="translate(512,0)" d="M46,0 H0 V100 M0,50 H38"/><path class="d" style="--i:9" pathLength="1" transform="translate(586,0)" d="M46,0 H0 V100 H46 M0,50 H38"/></g></svg></div><div class="tile dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-40 -40 712 180"><g class="word" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path class="d" style="--i:3" pathLength="1" transform="translate(0,0)" d="M0,0 V100 M52,0 V100 M0,50 H52"/><path class="d" style="--i:4" pathLength="1" transform="translate(80,0)" d="M42,0 A42,50 0 1 0 42.01,0"/><g class="mark" transform="translate(187,-10) scale(0.6)" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="15"><circle class="d" style="--i:0" pathLength="1" cx="100" cy="100" r="84" stroke="currentColor" transform="rotate(-90 100 100)"/><path class="d" style="--i:1" pathLength="1" d="M44,40 C72,76 72,124 44,160" stroke="currentColor"/><path class="d" style="--i:1" pathLength="1" d="M156,40 C128,76 128,124 156,160" stroke="currentColor"/><polyline class="d pulse" style="--i:2" pathLength="1" points="65,100 80,100 89,74 100,126 109,100 135,100" stroke="#D7262E"/></g><path class="d" style="--i:5" pathLength="1" transform="translate(330,0)" d="M0,100 V0 H26 A26,26 0 0 1 26,52 H0"/><path class="d" style="--i:6" pathLength="1" transform="translate(410,0)" d="M0,0 V100 H46"/><path class="d" style="--i:7" pathLength="1" transform="translate(484,0)" d="M0,0 V100"/><path class="d" style="--i:8" pathLength="1" transform="translate(512,0)" d="M46,0 H0 V100 M0,50 H38"/><path class="d" style="--i:9" pathLength="1" transform="translate(586,0)" d="M46,0 H0 V100 H46 M0,50 H38"/></g></svg></div></div>
+    </div>
+
+    <div class="set">
+      <div class="set-head"><h2>Stacked</h2><span class="label">Posters, jerseys, stage backdrops</span></div>
+      <div class="pair"><div class="tile light tall"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -30 726 400"><g class="mark" transform="translate(203,0)" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="12"><circle class="d" style="--i:0" pathLength="1" cx="100" cy="100" r="84" stroke="currentColor" transform="rotate(-90 100 100)"/><path class="d" style="--i:1" pathLength="1" d="M44,40 C72,76 72,124 44,160" stroke="currentColor"/><path class="d" style="--i:1" pathLength="1" d="M156,40 C128,76 128,124 156,160" stroke="currentColor"/><polyline class="d pulse" style="--i:2" pathLength="1" points="65,100 80,100 89,74 100,126 109,100 135,100" stroke="#D7262E"/></g><g transform="translate(0,250)"><g class="word" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path class="d" style="--i:3" pathLength="1" transform="translate(0,0)" d="M0,0 V100 M52,0 V100 M0,50 H52"/><path class="d" style="--i:4" pathLength="1" transform="translate(80,0)" d="M42,0 A42,50 0 1 0 42.01,0"/><path class="d" style="--i:5" pathLength="1" transform="translate(192,0)" d="M42,0 A42,50 0 1 0 42.01,0"/><path class="d" style="--i:6" pathLength="1" transform="translate(304,0)" d="M0,100 V0 H26 A26,26 0 0 1 26,52 H0"/><path class="d" style="--i:7" pathLength="1" transform="translate(384,0)" d="M0,0 V100 H46"/><path class="d" style="--i:8" pathLength="1" transform="translate(458,0)" d="M0,0 V100"/><path class="d" style="--i:9" pathLength="1" transform="translate(486,0)" d="M46,0 H0 V100 M0,50 H38"/><path class="d" style="--i:10" pathLength="1" transform="translate(560,0)" d="M46,0 H0 V100 H46 M0,50 H38"/></g></g></svg></div><div class="tile dark tall"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -30 726 400"><g class="mark" transform="translate(203,0)" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="12"><circle class="d" style="--i:0" pathLength="1" cx="100" cy="100" r="84" stroke="currentColor" transform="rotate(-90 100 100)"/><path class="d" style="--i:1" pathLength="1" d="M44,40 C72,76 72,124 44,160" stroke="currentColor"/><path class="d" style="--i:1" pathLength="1" d="M156,40 C128,76 128,124 156,160" stroke="currentColor"/><polyline class="d pulse" style="--i:2" pathLength="1" points="65,100 80,100 89,74 100,126 109,100 135,100" stroke="#D7262E"/></g><g transform="translate(0,250)"><g class="word" fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path class="d" style="--i:3" pathLength="1" transform="translate(0,0)" d="M0,0 V100 M52,0 V100 M0,50 H52"/><path class="d" style="--i:4" pathLength="1" transform="translate(80,0)" d="M42,0 A42,50 0 1 0 42.01,0"/><path class="d" style="--i:5" pathLength="1" transform="translate(192,0)" d="M42,0 A42,50 0 1 0 42.01,0"/><path class="d" style="--i:6" pathLength="1" transform="translate(304,0)" d="M0,100 V0 H26 A26,26 0 0 1 26,52 H0"/><path class="d" style="--i:7" pathLength="1" transform="translate(384,0)" d="M0,0 V100 H46"/><path class="d" style="--i:8" pathLength="1" transform="translate(458,0)" d="M0,0 V100"/><path class="d" style="--i:9" pathLength="1" transform="translate(486,0)" d="M46,0 H0 V100 M0,50 H38"/><path class="d" style="--i:10" pathLength="1" transform="translate(560,0)" d="M46,0 H0 V100 H46 M0,50 H38"/></g></g></svg></div></div>
+    </div>
+
+    <div class="set">
+      <div class="set-head"><h2>Profile icons</h2><span class="label">Instagram · WhatsApp · YouTube</span></div>
+      <div class="icons">
+        <div class="icon"><div class="av dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -30 260 260"><g class="mark" transform="" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="12"><circle class="d" style="--i:0" pathLength="1" cx="100" cy="100" r="84" stroke="currentColor" transform="rotate(-90 100 100)"/><path class="d" style="--i:1" pathLength="1" d="M44,40 C72,76 72,124 44,160" stroke="currentColor"/><path class="d" style="--i:1" pathLength="1" d="M156,40 C128,76 128,124 156,160" stroke="currentColor"/><polyline class="d pulse" style="--i:2" pathLength="1" points="65,100 80,100 89,74 100,126 109,100 135,100" stroke="#D7262E"/></g></svg></div><span class="label">On black</span></div>
+        <div class="icon"><div class="av light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -30 260 260"><g class="mark" transform="" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="12"><circle class="d" style="--i:0" pathLength="1" cx="100" cy="100" r="84" stroke="currentColor" transform="rotate(-90 100 100)"/><path class="d" style="--i:1" pathLength="1" d="M44,40 C72,76 72,124 44,160" stroke="currentColor"/><path class="d" style="--i:1" pathLength="1" d="M156,40 C128,76 128,124 156,160" stroke="currentColor"/><polyline class="d pulse" style="--i:2" pathLength="1" points="65,100 80,100 89,74 100,126 109,100 135,100" stroke="#D7262E"/></g></svg></div><span class="label">On white</span></div>
+        <div class="icon"><div class="av red"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -30 260 260"><g class="mark" transform="" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="12"><circle class="d" style="--i:0" pathLength="1" cx="100" cy="100" r="84" stroke="currentColor" transform="rotate(-90 100 100)"/><path class="d" style="--i:1" pathLength="1" d="M44,40 C72,76 72,124 44,160" stroke="currentColor"/><path class="d" style="--i:1" pathLength="1" d="M156,40 C128,76 128,124 156,160" stroke="currentColor"/><polyline class="d pulse" style="--i:2" pathLength="1" points="65,100 80,100 89,74 100,126 109,100 135,100" stroke="#D7262E"/></g></svg></div><span class="label">On red</span></div>
+      </div>
+    </div>
+
+    <div class="set">
+      <div class="set-head"><h2>Making it only yours</h2><span class="label">Design + legal</span></div>
+      <div class="own">
+        <div><b>Original construction</b><span>Every letter and the mark are drawn from scratch. No font or template is used, so nobody can download the same thing.</span></div>
+        <div><b>Use ™ from day one</b><span>Add ™ next to the logo on every post. It tells people you claim it as your mark.</span></div>
+        <div><b>Register the trademark</b><span>File with IP India (ipindia.gov.in) in Lawrance's name. Class 41 covers sports and events, Class 25 covers clothing.</span></div>
+        <div><b>Then use ®</b><span>Only after registration is granted. It lets you take action against copies.</span></div>
+      </div>
+      <p class="note">No design can be made impossible to copy. Registration is what makes copying illegal and gives you the power to stop it. Before filing, run a trademark search on the IP India site to confirm nothing similar exists.</p>
+    </div>
+
+    <div class="ask">
+      <div class="label">For Lawrance</div>
+      <ul>
+        <li>Does the Pulse H feel like HoopLife?</li>
+        <li>Which profile icon: black, white or red?</li>
+        <li>Who should own the trademark: Lawrance personally, or a registered business?</li>
+      </ul>
+    </div>
+  </div>
+</main>
+
+<script>
+  document.getElementById("replay").addEventListener("click", function () {
+    var s = document.getElementById("stage");
+    s.classList.remove("play"); void s.offsetWidth; s.classList.add("play");
+  });
+</script>
+<a class="hl-back" href="./index.html">&larr; HoopLife showcase</a></body></html>

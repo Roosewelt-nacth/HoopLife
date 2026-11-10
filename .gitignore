@@ -1,0 +1,8 @@
+# local-only backups (git history is the checkpoint now)
+CHECKPOINTS/
+# tooling
+.claude/
+__pycache__/
+*.pyc
+Thumbs.db
+.DS_Store

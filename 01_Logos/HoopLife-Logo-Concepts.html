@@ -1,0 +1,400 @@
+<title>HoopLife Logo Concepts</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600&display=swap">
+<style>
+  /* Layout: one column of three concept "lockers", each a big dark court tile beside its notes; brand kit strip at the end. Single dark look by choice. */
+  :root {
+    --ink: #0B0B0C;
+    --court: #141416;
+    --line: #2A2A2E;
+    --chalk: #F4F4F2;
+    --muted: #A3A3A8;
+    --red: #D7262E;
+    --gold: #C9A24A;
+    --display: "Anton", Impact, "Arial Black", sans-serif;
+    --body: "Barlow", "Segoe UI", system-ui, sans-serif;
+    --label: "Barlow Condensed", "Arial Narrow", sans-serif;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--ink); color: var(--chalk); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding-block: 48px 72px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 56px; }
+  .eyebrow { font-family: var(--label); font-weight: 600; letter-spacing: .18em; text-transform: uppercase; font-size: 13px; color: var(--gold); }
+  h1, h2 { font-family: var(--display); font-weight: 400; text-transform: uppercase; line-height: 1; margin: 0; text-wrap: balance; letter-spacing: .01em; }
+  h1 { font-size: clamp(44px, 9vw, 92px); }
+  h1 span { color: var(--red); }
+  h2 { font-size: clamp(30px, 5vw, 44px); }
+  p { margin: 0; max-width: 62ch; }
+  header { display: grid; gap: 16px; border-bottom: 1px solid var(--line); padding-bottom: 32px; }
+  .meta { display: flex; flex-wrap: wrap; gap: 8px 24px; font-family: var(--label); font-size: 15px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .meta b { color: var(--chalk); font-weight: 600; }
+
+  .concept { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+  @media (max-width: 760px) { .concept { grid-template-columns: minmax(0, 1fr); } }
+  .tiles { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; }
+  .tile { border-radius: 6px; display: grid; place-items: center; padding: 20px; aspect-ratio: 1; max-width: 100%; }
+  .tile svg { width: 100%; height: 100%; max-height: 420px; }
+  .tile.dark { background: var(--court); border: 1px solid var(--line); grid-row: span 2; color: var(--chalk); }
+  .tile.light { background: var(--chalk); color: var(--ink); }
+  .tile.avatar { background: var(--court); border: 1px solid var(--line); }
+  .avatar-ring { width: 72%; aspect-ratio: 1; border-radius: 50%; overflow: hidden; background: var(--ink); outline: 2px solid var(--gold); outline-offset: 3px; display: grid; place-items: center; color: var(--chalk); }
+  .avatar-ring svg { width: 100%; height: 100%; }
+  .tile-cap { font-family: var(--label); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+
+  .notes { display: grid; gap: 18px; }
+  .tag { display: inline-flex; width: fit-content; font-family: var(--label); font-weight: 600; letter-spacing: .14em; text-transform: uppercase; font-size: 13px; color: var(--ink); background: var(--gold); padding: 3px 10px; border-radius: 3px; }
+  dl { margin: 0; display: grid; gap: 12px; }
+  dl div { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; border-top: 1px solid var(--line); padding-top: 12px; }
+  dt { font-family: var(--label); font-weight: 600; letter-spacing: .12em; text-transform: uppercase; font-size: 13px; color: var(--muted); padding-top: 2px; }
+  dd { margin: 0; }
+
+  .kit { display: grid; gap: 24px; border-top: 1px solid var(--line); padding-top: 40px; }
+  .swatches { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 560px) { .swatches { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .sw { border-radius: 6px; padding: 16px; min-height: 120px; display: flex; flex-direction: column; justify-content: flex-end; gap: 2px; border: 1px solid var(--line); }
+  .sw b { font-family: var(--label); font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+  .sw code { font-size: 13px; font-variant-numeric: tabular-nums; }
+  .taglines { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; }
+  .taglines li { font-family: var(--display); text-transform: uppercase; font-size: 22px; line-height: 1.1; padding: 18px; border: 1px solid var(--line); border-radius: 6px; background: var(--court); }
+  .ask { background: var(--court); border: 1px solid var(--line); border-left: 4px solid var(--red); border-radius: 6px; padding: 24px; display: grid; gap: 10px; }
+  .ask ol { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Round 1 · For Lawrance's review</div>
+    <h1>HoopLife <span>Community</span><br>Logo Concepts</h1>
+    <p>Three directions in the black, red and gold palette. Each one is shown on dark, on light, and cropped as an Instagram profile picture.</p>
+    <div class="meta"><span>Date <b>10 Nov 2026</b></span><span>Launch target <b>24 Nov 2026</b></span><span>Handle <b>@hooplife.community</b></span></div>
+  </header>
+
+  <section class="concept" aria-labelledby="c-a">
+    <div class="tiles">
+      <div class="tile dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="HoopLife Community, masked ninja logo">
+  
+  <defs>
+    <clipPath id="a-ball"><circle cx="200" cy="165" r="110"/></clipPath>
+  </defs>
+  <!-- headband tails (behind ball) -->
+  <path d="M296,124 C326,112 350,92 378,96 L370,110 C348,108 330,126 304,138 Z" fill="#D7262E"/>
+  <path d="M298,136 C332,142 348,162 372,176 L358,184 C338,170 322,154 300,148 Z" fill="#A81C23"/>
+  <!-- ball -->
+  <circle cx="200" cy="165" r="110" fill="#C9A24A"/>
+  <g clip-path="url(#a-ball)">
+    <g fill="none" stroke="#0B0B0C" stroke-width="5" stroke-linecap="round">
+      <line x1="200" y1="50" x2="200" y2="280"/>
+      <line x1="85" y1="232" x2="315" y2="232"/>
+      <path d="M112,96 C152,136 152,206 112,246"/>
+      <path d="M288,96 C248,136 248,206 288,246"/>
+    </g>
+    <!-- headband -->
+    <rect x="80" y="112" width="240" height="26" fill="#D7262E"/>
+    <!-- mask -->
+    <rect x="80" y="144" width="240" height="54" fill="#0B0B0C"/>
+    <path d="M136,164 L190,174 L186,188 L144,183 Z" fill="#FFFFFF"/>
+    <path d="M264,164 L210,174 L214,188 L256,183 Z" fill="#FFFFFF"/>
+  </g>
+  <!-- knot -->
+  <circle cx="302" cy="132" r="9" fill="#A81C23"/>
+  <!-- wordmark -->
+  <text x="200" y="345" text-anchor="middle" font-family="Anton, Impact, 'Arial Black', sans-serif" font-size="60" letter-spacing="2" fill="currentColor">HOOPLIFE</text>
+  <text x="200" y="378" text-anchor="middle" font-family="Anton, Impact, 'Arial Black', sans-serif" font-size="17" letter-spacing="11" fill="#C9A24A">COMMUNITY</text>
+</svg>
+</div>
+      <div class="tile light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" role="img" aria-label="HoopLife Community, masked ninja logo">
+  
+  <defs>
+    <clipPath id="a-ball"><circle cx="200" cy="165" r="110"/></clipPath>
+  </defs>
+  <!-- headband tails (behind ball) -->
+  <path d="M296,124 C326,112 350,92 378,96 L370,110 C348,108 330,126 304,138 Z" fill="#D7262E"/>
+  <path d="M298,136 C332,142 348,162 372,176 L358,184 C338,170 322,154 300,148 Z" fill="#A81C23"/>
+  <!-- ball -->
+  <circle cx="200" cy="165" r="110" fill="#C9A24A"/>
+  <g clip-path="url(#a-ball)">
+    <g fill="none" stroke="#0B0B0C" stroke-width="5" stroke-linecap="round">
+      <line x1="200" y1="50" x2="200" y2="280"/>
+      <line x1="85" y1="232" x2="315" y2="232"/>
+      <path d="M112,96 C152,136 152,206 112,246"/>
+      <path d="M288,96 C248,136 248,206 288,246"/>
+    </g>
+    <!-- headband -->
+    <rect x="80" y="112" width="240" height="26" fill="#D7262E"/>
+    <!-- mask -->
+    <rect x="80" y="144" width="240" height="54" fill="#0B0B0C"/>
+    <path d="M136,164 L190,174 L186,188 L144,183 Z" fill="#FFFFFF"/>
+    <path d="M264,164 L210,174 L214,188 L256,183 Z" fill="#FFFFFF"/>
+  </g>
+  <!-- knot -->
+  <circle cx="302" cy="132" r="9" fill="#A81C23"/>
+  <!-- wordmark -->
+  <text x="200" y="345" text-anchor="middle" font-family="Anton, Impact, 'Arial Black', sans-serif" font-size="60" letter-spacing="2" fill="currentColor">HOOPLIFE</text>
+  <text x="200" y="378" text-anchor="middle" font-family="Anton, Impact, 'Arial Black', sans-serif" font-size="17" letter-spacing="11" fill="#C9A24A">COMMUNITY</text>
+</svg>
+</div>
+      <div class="tile avatar"><div class="avatar-ring"><svg xmlns="http://www.w3.org/2000/svg" viewBox="55 0 330 330" role="img" aria-label="HoopLife Community, masked ninja logo">
+  
+  <defs>
+    <clipPath id="a-ball-m"><circle cx="200" cy="165" r="110"/></clipPath>
+  </defs>
+  <!-- headband tails (behind ball) -->
+  <path d="M296,124 C326,112 350,92 378,96 L370,110 C348,108 330,126 304,138 Z" fill="#D7262E"/>
+  <path d="M298,136 C332,142 348,162 372,176 L358,184 C338,170 322,154 300,148 Z" fill="#A81C23"/>
+  <!-- ball -->
+  <circle cx="200" cy="165" r="110" fill="#C9A24A"/>
+  <g clip-path="url(#a-ball-m)">
+    <g fill="none" stroke="#0B0B0C" stroke-width="5" stroke-linecap="round">
+      <line x1="200" y1="50" x2="200" y2="280"/>
+      <line x1="85" y1="232" x2="315" y2="232"/>
+      <path d="M112,96 C152,136 152,206 112,246"/>
+      <path d="M288,96 C248,136 248,206 288,246"/>
+    </g>
+    <!-- headband -->
+    <rect x="80" y="112" width="240" height="26" fill="#D7262E"/>
+    <!-- mask -->
+    <rect x="80" y="144" width="240" height="54" fill="#0B0B0C"/>
+    <path d="M136,164 L190,174 L186,188 L144,183 Z" fill="#FFFFFF"/>
+    <path d="M264,164 L210,174 L214,188 L256,183 Z" fill="#FFFFFF"/>
+  </g>
+  <!-- knot -->
+  <circle cx="302" cy="132" r="9" fill="#A81C23"/>
+  <!-- wordmark -->
+  
+  
+</svg>
+</div></div>
+    </div>
+    <div class="notes">
+      <span class="tag">Concept A</span>
+      <h2 id="c-a">Masked Ninja</h2>
+      <p>The ball becomes the face: a black mask with sharp eye slits and a red headband with tails. It nods to Lawrance's masked 🥷 persona without copying any existing character.</p>
+      <dl>
+        <div><dt>Feels</dt><dd>Bold, fun, memorable. Works well as a mascot and on merch.</dd></div>
+        <div><dt>Best for</dt><dd>Jerseys, stickers, reel intros, a mascot people can dress up as at events.</dd></div>
+        <div><dt>Watch</dt><dd>Leans playful. Less corporate for big sponsors.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="concept" aria-labelledby="c-b">
+    <div class="tiles">
+      <div class="tile dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 460" role="img" aria-label="HoopLife Community, HL monogram logo">
+  
+  <defs>
+    <clipPath id="b-ring"><circle cx="200" cy="190" r="138"/></clipPath>
+  </defs>
+  <circle cx="200" cy="190" r="150" fill="#0B0B0C" stroke="#C9A24A" stroke-width="8"/>
+  <circle cx="200" cy="190" r="138" fill="none" stroke="#C9A24A" stroke-width="1.5" opacity="0.6"/>
+  <!-- ball seams -->
+  <g clip-path="url(#b-ring)" fill="none" stroke="#C9A24A" stroke-width="2" opacity="0.28">
+    <line x1="200" y1="40" x2="200" y2="340"/>
+    <line x1="50" y1="190" x2="350" y2="190"/>
+    <path d="M95,85 C150,140 150,240 95,295"/>
+    <path d="M305,85 C250,140 250,240 305,295"/>
+  </g>
+  <!-- monogram -->
+  <g transform="translate(200,190) skewX(-8) scale(0.8) translate(-220,-200)">
+    <rect x="110" y="115" width="38" height="170" fill="#FFFFFF"/>
+    <rect x="196" y="115" width="38" height="170" fill="#FFFFFF"/>
+    <rect x="148" y="182" width="48" height="32" fill="#FFFFFF"/>
+    <path d="M252,115 H290 V251 H330 V285 H252 Z" fill="#D7262E"/>
+  </g>
+  <text x="200" y="405" text-anchor="middle" font-family="Anton, Impact, 'Arial Black', sans-serif" font-size="46" letter-spacing="2" fill="currentColor">HOOPLIFE</text>
+  <text x="200" y="437" text-anchor="middle" font-family="Anton, Impact, 'Arial Black', sans-serif" font-size="15" letter-spacing="10" fill="#C9A24A">COMMUNITY</text>
+</svg>
+</div>
+      <div class="tile light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 460" role="img" aria-label="HoopLife Community, HL monogram logo">
+  
+  <defs>
+    <clipPath id="b-ring"><circle cx="200" cy="190" r="138"/></clipPath>
+  </defs>
+  <circle cx="200" cy="190" r="150" fill="#0B0B0C" stroke="#C9A24A" stroke-width="8"/>
+  <circle cx="200" cy="190" r="138" fill="none" stroke="#C9A24A" stroke-width="1.5" opacity="0.6"/>
+  <!-- ball seams -->
+  <g clip-path="url(#b-ring)" fill="none" stroke="#C9A24A" stroke-width="2" opacity="0.28">
+    <line x1="200" y1="40" x2="200" y2="340"/>
+    <line x1="50" y1="190" x2="350" y2="190"/>
+    <path d="M95,85 C150,140 150,240 95,295"/>
+    <path d="M305,85 C250,140 250,240 305,295"/>
+  </g>
+  <!-- monogram -->
+  <g transform="translate(200,190) skewX(-8) scale(0.8) translate(-220,-200)">
+    <rect x="110" y="115" width="38" height="170" fill="#FFFFFF"/>
+    <rect x="196" y="115" width="38" height="170" fill="#FFFFFF"/>
+    <rect x="148" y="182" width="48" height="32" fill="#FFFFFF"/>
+    <path d="M252,115 H290 V251 H330 V285 H252 Z" fill="#D7262E"/>
+  </g>
+  <text x="200" y="405" text-anchor="middle" font-family="Anton, Impact, 'Arial Black', sans-serif" font-size="46" letter-spacing="2" fill="currentColor">HOOPLIFE</text>
+  <text x="200" y="437" text-anchor="middle" font-family="Anton, Impact, 'Arial Black', sans-serif" font-size="15" letter-spacing="10" fill="#C9A24A">COMMUNITY</text>
+</svg>
+</div>
+      <div class="tile avatar"><div class="avatar-ring"><svg xmlns="http://www.w3.org/2000/svg" viewBox="40 30 320 320" role="img" aria-label="HoopLife Community, HL monogram logo">
+  
+  <defs>
+    <clipPath id="b-ring-m"><circle cx="200" cy="190" r="138"/></clipPath>
+  </defs>
+  <circle cx="200" cy="190" r="150" fill="#0B0B0C" stroke="#C9A24A" stroke-width="8"/>
+  <circle cx="200" cy="190" r="138" fill="none" stroke="#C9A24A" stroke-width="1.5" opacity="0.6"/>
+  <!-- ball seams -->
+  <g clip-path="url(#b-ring-m)" fill="none" stroke="#C9A24A" stroke-width="2" opacity="0.28">
+    <line x1="200" y1="40" x2="200" y2="340"/>
+    <line x1="50" y1="190" x2="350" y2="190"/>
+    <path d="M95,85 C150,140 150,240 95,295"/>
+    <path d="M305,85 C250,140 250,240 305,295"/>
+  </g>
+  <!-- monogram -->
+  <g transform="translate(200,190) skewX(-8) scale(0.8) translate(-220,-200)">
+    <rect x="110" y="115" width="38" height="170" fill="#FFFFFF"/>
+    <rect x="196" y="115" width="38" height="170" fill="#FFFFFF"/>
+    <rect x="148" y="182" width="48" height="32" fill="#FFFFFF"/>
+    <path d="M252,115 H290 V251 H330 V285 H252 Z" fill="#D7262E"/>
+  </g>
+  
+  
+</svg>
+</div></div>
+    </div>
+    <div class="notes">
+      <span class="tag">Concept B</span>
+      <h2 id="c-b">HL Monogram</h2>
+      <p>A slanted white H and red L inside a gold-ringed ball, with faint ball seams behind them. It's clean and premium, like a pro team mark.</p>
+      <dl>
+        <div><dt>Feels</dt><dd>Premium, clean, sponsor-ready.</dd></div>
+        <div><dt>Best for</dt><dd>Profile picture, sponsor decks, caps, watermarks on reels.</dd></div>
+        <div><dt>Watch</dt><dd>Less personality on its own. Content carries the fun.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="concept" aria-labelledby="c-c">
+    <div class="tiles">
+      <div class="tile dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 460" role="img" aria-label="HoopLife Community, street-court badge logo">
+  
+  <path d="M200,30 L340,70 L340,250 C340,340 270,395 200,428 C130,395 60,340 60,250 L60,70 Z" fill="#0B0B0C" stroke="#C9A24A" stroke-width="6" stroke-linejoin="round"/>
+  <path transform="translate(200,228) scale(0.92) translate(-200,-228)" d="M200,30 L340,70 L340,250 C340,340 270,395 200,428 C130,395 60,340 60,250 L60,70 Z" fill="none" stroke="#C9A24A" stroke-width="1.5" opacity="0.6"/>
+  <!-- backboard -->
+  <rect x="140" y="86" width="120" height="72" rx="4" fill="none" stroke="#FFFFFF" stroke-width="5"/>
+  <rect x="178" y="116" width="44" height="30" fill="none" stroke="#D7262E" stroke-width="4"/>
+  <!-- net -->
+  <g fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round">
+    <path d="M168,166 L182,218"/>
+    <path d="M184,170 L191,218"/>
+    <path d="M200,172 L200,218"/>
+    <path d="M216,170 L209,218"/>
+    <path d="M232,166 L218,218"/>
+    <path d="M172,184 L228,184"/>
+    <path d="M177,201 L223,201"/>
+    <path d="M182,218 L218,218"/>
+  </g>
+  <!-- rim -->
+  <ellipse cx="200" cy="166" rx="34" ry="7" fill="none" stroke="#D7262E" stroke-width="5"/>
+  <!-- banner -->
+  <path d="M52,256 L18,256 L34,275 L18,294 L52,294 Z" fill="#A81C23"/>
+  <path d="M348,256 L382,256 L366,275 L382,294 L348,294 Z" fill="#A81C23"/>
+  <rect x="44" y="246" width="312" height="52" fill="#D7262E"/>
+  <text x="200" y="289" text-anchor="middle" font-family="Anton, Impact, 'Arial Black', sans-serif" font-size="42" letter-spacing="3" fill="#FFFFFF">HOOPLIFE</text>
+  <text x="200" y="336" text-anchor="middle" font-family="Anton, Impact, 'Arial Black', sans-serif" font-size="19" letter-spacing="9" fill="#C9A24A">COMMUNITY</text>
+  <text x="200" y="360" text-anchor="middle" font-family="Anton, Impact, 'Arial Black', sans-serif" font-size="11" letter-spacing="3" fill="#FFFFFF" opacity="0.85">CHENNAI · EST. 2026</text>
+</svg>
+</div>
+      <div class="tile light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 460" role="img" aria-label="HoopLife Community, street-court badge logo">
+  
+  <path d="M200,30 L340,70 L340,250 C340,340 270,395 200,428 C130,395 60,340 60,250 L60,70 Z" fill="#0B0B0C" stroke="#C9A24A" stroke-width="6" stroke-linejoin="round"/>
+  <path transform="translate(200,228) scale(0.92) translate(-200,-228)" d="M200,30 L340,70 L340,250 C340,340 270,395 200,428 C130,395 60,340 60,250 L60,70 Z" fill="none" stroke="#C9A24A" stroke-width="1.5" opacity="0.6"/>
+  <!-- backboard -->
+  <rect x="140" y="86" width="120" height="72" rx="4" fill="none" stroke="#FFFFFF" stroke-width="5"/>
+  <rect x="178" y="116" width="44" height="30" fill="none" stroke="#D7262E" stroke-width="4"/>
+  <!-- net -->
+  <g fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round">
+    <path d="M168,166 L182,218"/>
+    <path d="M184,170 L191,218"/>
+    <path d="M200,172 L200,218"/>
+    <path d="M216,170 L209,218"/>
+    <path d="M232,166 L218,218"/>
+    <path d="M172,184 L228,184"/>
+    <path d="M177,201 L223,201"/>
+    <path d="M182,218 L218,218"/>
+  </g>
+  <!-- rim -->
+  <ellipse cx="200" cy="166" rx="34" ry="7" fill="none" stroke="#D7262E" stroke-width="5"/>
+  <!-- banner -->
+  <path d="M52,256 L18,256 L34,275 L18,294 L52,294 Z" fill="#A81C23"/>
+  <path d="M348,256 L382,256 L366,275 L382,294 L348,294 Z" fill="#A81C23"/>
+  <rect x="44" y="246" width="312" height="52" fill="#D7262E"/>
+  <text x="200" y="289" text-anchor="middle" font-family="Anton, Impact, 'Arial Black', sans-serif" font-size="42" letter-spacing="3" fill="#FFFFFF">HOOPLIFE</text>
+  <text x="200" y="336" text-anchor="middle" font-family="Anton, Impact, 'Arial Black', sans-serif" font-size="19" letter-spacing="9" fill="#C9A24A">COMMUNITY</text>
+  <text x="200" y="360" text-anchor="middle" font-family="Anton, Impact, 'Arial Black', sans-serif" font-size="11" letter-spacing="3" fill="#FFFFFF" opacity="0.85">CHENNAI · EST. 2026</text>
+</svg>
+</div>
+      <div class="tile avatar"><div class="avatar-ring"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 30 400 400" role="img" aria-label="HoopLife Community, street-court badge logo">
+  
+  <path d="M200,30 L340,70 L340,250 C340,340 270,395 200,428 C130,395 60,340 60,250 L60,70 Z" fill="#0B0B0C" stroke="#C9A24A" stroke-width="6" stroke-linejoin="round"/>
+  <path transform="translate(200,228) scale(0.92) translate(-200,-228)" d="M200,30 L340,70 L340,250 C340,340 270,395 200,428 C130,395 60,340 60,250 L60,70 Z" fill="none" stroke="#C9A24A" stroke-width="1.5" opacity="0.6"/>
+  <!-- backboard -->
+  <rect x="140" y="86" width="120" height="72" rx="4" fill="none" stroke="#FFFFFF" stroke-width="5"/>
+  <rect x="178" y="116" width="44" height="30" fill="none" stroke="#D7262E" stroke-width="4"/>
+  <!-- net -->
+  <g fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round">
+    <path d="M168,166 L182,218"/>
+    <path d="M184,170 L191,218"/>
+    <path d="M200,172 L200,218"/>
+    <path d="M216,170 L209,218"/>
+    <path d="M232,166 L218,218"/>
+    <path d="M172,184 L228,184"/>
+    <path d="M177,201 L223,201"/>
+    <path d="M182,218 L218,218"/>
+  </g>
+  <!-- rim -->
+  <ellipse cx="200" cy="166" rx="34" ry="7" fill="none" stroke="#D7262E" stroke-width="5"/>
+  <!-- banner -->
+  <path d="M52,256 L18,256 L34,275 L18,294 L52,294 Z" fill="#A81C23"/>
+  <path d="M348,256 L382,256 L366,275 L382,294 L348,294 Z" fill="#A81C23"/>
+  <rect x="44" y="246" width="312" height="52" fill="#D7262E"/>
+  <text x="200" y="289" text-anchor="middle" font-family="Anton, Impact, 'Arial Black', sans-serif" font-size="42" letter-spacing="3" fill="#FFFFFF">HOOPLIFE</text>
+  <text x="200" y="336" text-anchor="middle" font-family="Anton, Impact, 'Arial Black', sans-serif" font-size="19" letter-spacing="9" fill="#C9A24A">COMMUNITY</text>
+  <text x="200" y="360" text-anchor="middle" font-family="Anton, Impact, 'Arial Black', sans-serif" font-size="11" letter-spacing="3" fill="#FFFFFF" opacity="0.85">CHENNAI · EST. 2026</text>
+</svg>
+</div></div>
+    </div>
+    <div class="notes">
+      <span class="tag">Concept C</span>
+      <h2 id="c-c">Street-Court Badge</h2>
+      <p>A gold-edged shield with a backboard, rim and net, a red HoopLife banner, and "Chennai · Est. 2026". It reads like a club crest.</p>
+      <dl>
+        <div><dt>Feels</dt><dd>Official, rooted in Chennai, built to last.</dd></div>
+        <div><dt>Best for</dt><dd>Tournaments, certificates, jersey chest crest, event banners.</dd></div>
+        <div><dt>Watch</dt><dd>Detail gets small as a profile picture. Pair with a simpler icon.</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="kit" aria-labelledby="kit">
+    <div class="eyebrow">Brand kit, draft</div>
+    <h2 id="kit">Colours &amp; Taglines</h2>
+    <div class="swatches">
+      <div class="sw" style="background: var(--ink); color: var(--chalk);"><b>Court Black</b><code>#0B0B0C</code></div>
+      <div class="sw" style="background: var(--red); color: var(--chalk);"><b>Hoop Red</b><code>#D7262E</code></div>
+      <div class="sw" style="background: var(--gold); color: var(--ink);"><b>Trophy Gold</b><code>#C9A24A</code></div>
+      <div class="sw" style="background: var(--chalk); color: var(--ink);"><b>Chalk White</b><code>#F4F4F2</code></div>
+    </div>
+    <p>Tagline shortlist. Pick one to sit under the logo.</p>
+    <ul class="taglines">
+      <li>Passion. Purpose. Hoops.</li>
+      <li>Chennai Runs Here.</li>
+      <li>More Than a Game.</li>
+      <li>Built on the Blacktop.</li>
+      <li>One Court. One Family.</li>
+    </ul>
+    <div class="ask">
+      <div class="eyebrow">What we need from you</div>
+      <ol>
+        <li>Your favourite concept (A, B or C), or the parts you like from each.</li>
+        <li>Any changes to colours, shapes or wording.</li>
+        <li>Your pick from the taglines.</li>
+      </ol>
+      <p>Once you choose, we'll finalise the logo files and start the profile and launch posts.</p>
+    </div>
+  </section>
+</div>

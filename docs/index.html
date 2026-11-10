@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HoopLife Community Showcase</title>
+<meta name="description" content="Brand, merch, mascot and games for HoopLife Community, ready for Lawrance's approval.">
+<link rel="icon" href="media/icon-b1-dark.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+  /* Layout: a black brand header with the logo, then one section per area (logo, merch, mascot, games) as a grid of thumbnail cards, then an approval checklist. Single deliberate dark look. */
+  :root {
+    --bg: #0B0B0C;
+    --panel: #141416;
+    --line: #2A2A2E;
+    --fg: #F4F4F2;
+    --muted: #A3A3A8;
+    --red: #D7262E;
+    --gold: #C9A24A;
+    --body: "Archivo", "Segoe UI", system-ui, sans-serif;
+    --mono: "JetBrains Mono", Consolas, monospace;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+  :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .in { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .label { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  header .in { padding-block: 56px 40px; display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 32px; align-items: center; }
+  @media (max-width: 760px) { header .in { grid-template-columns: minmax(0, 1fr); } }
+  header img { width: 100%; max-width: 520px; height: auto; }
+  h1 { font-size: clamp(34px, 6vw, 60px); font-weight: 900; letter-spacing: -.03em; line-height: 1; margin: 10px 0 14px; text-wrap: balance; }
+  h1 span { color: var(--red); }
+  .lede { color: var(--muted); max-width: 56ch; margin: 0; }
+  .status { display: inline-flex; gap: 8px; align-items: center; margin-top: 18px; font: 700 12px var(--mono); letter-spacing: .1em; text-transform: uppercase; border: 1px solid var(--gold); color: var(--gold); border-radius: 999px; padding: 6px 12px; }
+  .status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--gold); }
+  section { border-top: 1px solid var(--line); }
+  section .in { padding-block: 40px; display: grid; gap: 20px; }
+  .head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 24px; }
+  h2 { font-size: clamp(24px, 3.4vw, 32px); font-weight: 900; letter-spacing: -.02em; margin: 0; }
+  .head p { margin: 0; color: var(--muted); max-width: 60ch; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .card { display: grid; grid-template-rows: auto 1fr; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; color: inherit; text-decoration: none; transition: border-color .2s, transform .2s; }
+  .card:hover, .card:focus-visible { border-color: var(--red); transform: translateY(-2px); outline: none; }
+  .thumb { aspect-ratio: 3 / 2; background: #1c1c20 center / cover no-repeat; border-bottom: 1px solid var(--line); }
+  .card div.txt { padding: 14px 16px 16px; display: grid; gap: 4px; align-content: start; }
+  .card b { font-size: 17px; font-weight: 800; }
+  .card span { color: var(--muted); font-size: 14px; }
+  .pill { justify-self: start; font: 700 10px var(--mono); letter-spacing: .12em; text-transform: uppercase; padding: 3px 8px; border-radius: 4px; background: var(--red); color: #fff; margin-bottom: 4px; }
+  .pill.alt { background: transparent; border: 1px solid var(--line); color: var(--muted); }
+  .downloads { display: flex; flex-wrap: wrap; gap: 10px; }
+  .downloads a { font: 600 13px var(--body); color: var(--fg); text-decoration: none; border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; }
+  .downloads a:hover { border-color: var(--gold); }
+  .check { display: grid; gap: 10px; padding: 0; margin: 0; list-style: none; }
+  .check li { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 10px; align-items: start; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; }
+  .check li::before { content: ""; width: 18px; height: 18px; border: 2px solid var(--gold); border-radius: 4px; margin-top: 2px; }
+  .check b { font-weight: 800; }
+  .check span { color: var(--muted); display: block; font-size: 14px; }
+  footer .in { padding-block: 28px 56px; color: var(--muted); font-size: 14px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; border-top: 1px solid var(--line); }
+  footer a { color: var(--fg); }
+  @media (prefers-reduced-motion: reduce) { .card { transition: none; } .card:hover { transform: none; } }
+</style>
+</head>
+<body>
+<header><div class="in">
+  <div>
+    <div class="label">HoopLife Community · Chennai · Review kit</div>
+    <h1>Brand, merch &amp; <span>games</span> for approval</h1>
+    <p class="lede">Everything made for HoopLife so far, in one place. Each card opens a live page: logos you can compare, 3D merch you can turn, and games you can play. The checklist at the bottom lists what needs Lawrance's sign-off.</p>
+    <div class="status">Awaiting Lawrance's approval</div>
+  </div>
+  <img src="media/word-b1-dark.svg" alt="HOOPLIFE wordmark with the Pulse H basketball as the second O" width="520" height="140">
+</div></header>
+
+<section id="logo"><div class="in">
+  <div class="head"><h2>1 · Logo</h2><p>The Pulse H: basketball seams that form an H, with a red heartbeat as the middle line. B1 is the approved basketball version.</p></div>
+  <div class="grid">
+    <a class="card" href="logo-final-b1.html"><div class="thumb" style="background-image:url(thumbs/logo-final-b1.png)"></div><div class="txt"><i class="pill">Final</i><b>Basketball seams B1</b><span>The approved logo, with B2 shown for comparison and tiny-size tests.</span></div></a>
+    <a class="card" href="logo-pulse-h.html"><div class="thumb" style="background-image:url(thumbs/logo-pulse-h.png)"></div><div class="txt"><i class="pill alt">Concept</i><b>The Pulse H</b><span>The idea, the custom wordmark, the draw-on intro, and how to protect it with a trademark.</span></div></a>
+    <a class="card" href="logo-refinements.html"><div class="thumb" style="background-image:url(thumbs/logo-refinements.png)"></div><div class="txt"><i class="pill alt">Options</i><b>Refinements</b><span>Weight, spacing, line hierarchy and a solid icon.</span></div></a>
+    <a class="card" href="logo-ninja-options.html"><div class="thumb" style="background-image:url(thumbs/logo-ninja-options.png)"></div><div class="txt"><i class="pill alt">History</i><b>Ninja in the logo</b><span>Explored and set aside. The ninja lives in motion instead.</span></div></a>
+    <a class="card" href="logo-round3.html"><div class="thumb" style="background-image:url(thumbs/logo-round3.png)"></div><div class="txt"><i class="pill alt">History</i><b>Round 3 · Shot clock</b><span>Block-letter direction.</span></div></a>
+    <a class="card" href="logo-round1.html"><div class="thumb" style="background-image:url(thumbs/logo-round1.png)"></div><div class="txt"><i class="pill alt">History</i><b>Round 1 · First concepts</b><span>Masked ninja, HL monogram, court badge.</span></div></a>
+  </div>
+  <div class="downloads">
+    <a href="media/icon-b1-dark.svg" download>Icon · dark (SVG)</a><a href="media/icon-b1-light.svg" download>Icon · light (SVG)</a>
+    <a href="media/word-b1-dark.svg" download>Wordmark · dark (SVG)</a><a href="media/word-b1-light.svg" download>Wordmark · light (SVG)</a>
+  </div>
+</div></section>
+
+<section id="merch"><div class="in">
+  <div class="head"><h2>2 · Merch</h2><p>A 3D-printable mini-basketball keychain with a jersey jock tag and ticket packaging, plus a brick-built ninja collectible.</p></div>
+  <div class="grid">
+    <a class="card" href="merch-ball-keychain.html"><div class="thumb" style="background-image:url(thumbs/merch-ball-keychain.png)"></div><div class="txt"><i class="pill">Lead item</i><b>Ball keychain + jock tag</b><span>40 mm B1 ball with HOOPLIFE and Est. 2026 panels, court jock tag, ticket card, 6 colourways.</span></div></a>
+    <a class="card" href="merch-brick-ninja.html"><div class="thumb" style="background-image:url(thumbs/merch-brick-ninja.png)"></div><div class="txt"><i class="pill alt">Collectible</i><b>Brick Ninja</b><span>Brick-built figure with exploded parts, window box and parts list.</span></div></a>
+    <a class="card" href="merch-disc-keychain.html"><div class="thumb" style="background-image:url(thumbs/merch-disc-keychain.png)"></div><div class="txt"><i class="pill alt">Option</i><b>Disc keychain</b><span>Enamel and metal disc in chrome, gold or black nickel.</span></div></a>
+  </div>
+  <div class="downloads"><a href="media/jock-tag-v4.png" download>Jock tag v4 artwork (PNG)</a><a href="https://github.com/Roosewelt-nacth/HoopLife/tree/main/02_Merch/keychain-ball/print">3D print files (STL) on GitHub</a></div>
+</div></section>
+
+<section id="mascot"><div class="in">
+  <div class="head"><h2>3 · Mascot</h2><p>The HoopLife Ninja, an original character. A 3D stand-in now, with a sculpt package ready for the final model.</p></div>
+  <div class="grid">
+    <a class="card" href="mascot-figure.html"><div class="thumb" style="background-image:url(thumbs/mascot-figure.png)"></div><div class="txt"><i class="pill alt">Stand-in</i><b>Ninja figure</b><span>Pointed hood, cowl mask (black or red), 5 moves.</span></div></a>
+    <a class="card" href="media/turnaround-sheet.png"><div class="thumb" style="background-image:url(media/turnaround-sheet.png)"></div><div class="txt"><i class="pill alt">Sculpt brief</i><b>Turnaround sheet</b><span>Front, side, back and ¾ for the 3D artist or AI tool.</span></div></a>
+  </div>
+</div></section>
+
+<section id="games"><div class="in">
+  <div class="head"><h2>4 · Games</h2><p>Play in the browser. Watch mode plays itself (good for reels). Play mode lets you control the Ninja.</p></div>
+  <div class="grid">
+    <a class="card" href="game-5v5.html"><div class="thumb" style="background-image:url(thumbs/game-5v5.png)"></div><div class="txt"><i class="pill">Featured</i><b>Ninja Court 5v5 · 3D</b><span>Cherry blossom park, lakeside sunset or graffiti street. Full tactics, 5 cameras.</span></div></a>
+    <a class="card" href="game-8bit.html"><div class="thumb" style="background-image:url(thumbs/game-8bit.png)"></div><div class="txt"><i class="pill">New</i><b>Ninja Court 8-Bit</b><span>Side-view arcade 5v5 with realistic pixel athletes and chiptune sound.</span></div></a>
+    <a class="card" href="game-3v3.html"><div class="thumb" style="background-image:url(thumbs/game-3v3.png)"></div><div class="txt"><i class="pill alt">First version</i><b>Ninja Court 3v3</b><span>The original half-court street game.</span></div></a>
+  </div>
+</div></section>
+
+<section id="approve"><div class="in">
+  <div class="head"><h2>For Lawrance: what to approve</h2><p>Reply on WhatsApp with "yes" or the changes for each item.</p></div>
+  <ul class="check">
+    <li><div><b>Logo B1 as the official HoopLife logo</b><span>Then we file the trademark in your name (Classes 41 and 25).</span></div></li>
+    <li><div><b>Intro and outro video</b><span>Sent separately as an MP4.</span></div></li>
+    <li><div><b>Ball keychain: first-drop colourway</b><span>Court Orange is recommended. Jock tag v4 and ticket packaging included.</span></div></li>
+    <li><div><b>Brick Ninja collectible</b><span>Limited run for members.</span></div></li>
+    <li><div><b>Mascot direction</b><span>Before ordering the sculpted final model.</span></div></li>
+    <li><div><b>Game to feature on Instagram</b><span>5v5 3D or 8-Bit, and the launch scene.</span></div></li>
+  </ul>
+</div></section>
+
+<footer><div class="in"><span>HoopLife Community · Nov 2026 · Original designs, not affiliated with any league or brand.</span><a href="https://github.com/Roosewelt-nacth/HoopLife">Source on GitHub</a></div></footer>
+</body>
+</html>

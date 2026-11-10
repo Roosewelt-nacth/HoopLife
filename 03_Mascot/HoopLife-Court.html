@@ -1,0 +1,602 @@
+<title>HoopLife Ninja Court</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+  /* Layout: a full-width game stage (court + HUD overlays), mode and camera controls under it, then how-to-play. Single deliberate dark look. */
+  :root {
+    --bg: #0E0E10;
+    --line: #2C2C31;
+    --fg: #F4F4F2;
+    --muted: #9A9AA1;
+    --red: #D7262E;
+    --gold: #C9A24A;
+    --body: "Archivo", "Segoe UI", system-ui, sans-serif;
+    --mono: "JetBrains Mono", Consolas, monospace;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.5; }
+  .in { max-width: 1200px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .label { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  header .in { padding-block: 28px 14px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 8px 24px; }
+  h1 { font-size: clamp(26px, 4.4vw, 42px); font-weight: 900; letter-spacing: -.02em; line-height: 1; margin: 4px 0 0; }
+  .stage { position: relative; height: min(80vh, 780px); min-height: 460px; background: #0b0c10; border-block: 1px solid var(--line); overflow: hidden; user-select: none; -webkit-user-select: none; }
+  .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+  .board { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); display: flex; align-items: stretch; background: rgba(10,10,12,.86); border: 1px solid #34343a; border-radius: 10px; overflow: hidden; font-variant-numeric: tabular-nums; pointer-events: none; }
+  .team { display: grid; gap: 0; padding: 6px 14px; min-width: 118px; text-align: center; }
+  .team b { font: 900 30px var(--body); line-height: 1; }
+  .team span { font: 700 11px var(--mono); letter-spacing: .14em; text-transform: uppercase; }
+  .team.home span { color: var(--red); }
+  .team.away span { color: var(--gold); }
+  .mid { display: grid; place-items: center; padding: 0 10px; border-inline: 1px solid #34343a; font: 700 10px var(--mono); letter-spacing: .12em; color: var(--muted); text-align: center; }
+  .poss { width: 8px; height: 8px; border-radius: 50%; background: var(--fg); margin: 0 auto 3px; }
+  .caption { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); max-width: calc(100% - 32px); background: rgba(10,10,12,.82); border: 1px solid #34343a; border-left: 3px solid var(--red); border-radius: 8px; padding: 8px 14px; font: 800 15px var(--body); letter-spacing: .02em; pointer-events: none; transition: opacity .3s; text-align: center; }
+  .banner { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+  .banner div { background: rgba(10,10,12,.9); border: 1px solid var(--gold); border-radius: 12px; padding: 18px 28px; text-align: center; font: 900 clamp(22px, 4vw, 38px) var(--body); }
+  .banner small { display: block; font: 700 12px var(--mono); letter-spacing: .14em; color: var(--muted); margin-top: 6px; }
+  .pad { position: absolute; inset: auto 0 64px 0; display: flex; justify-content: space-between; align-items: end; padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px)); pointer-events: none; }
+  .stick { width: 128px; height: 128px; border-radius: 50%; background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.18); position: relative; pointer-events: auto; touch-action: none; }
+  .knob { position: absolute; left: 50%; top: 50%; width: 52px; height: 52px; margin: -26px 0 0 -26px; border-radius: 50%; background: rgba(255,255,255,.22); }
+  .acts { display: grid; grid-template-columns: repeat(2, 68px); gap: 10px; pointer-events: auto; }
+  .acts button { height: 56px; border-radius: 14px; border: 1px solid rgba(255,255,255,.22); background: rgba(10,10,12,.7); color: var(--fg); font: 800 12px var(--body); letter-spacing: .04em; text-transform: uppercase; touch-action: manipulation; }
+  .acts button:active { background: var(--red); }
+  .acts button:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+  .fallback { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); padding: 24px; text-align: center; }
+  .controls .in { padding-block: 16px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 14px 28px; }
+  .group { display: grid; gap: 8px; align-content: start; }
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pills button { font: 600 13px var(--body); color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 9px 16px; cursor: pointer; }
+  .pills button[aria-pressed="true"] { border-color: var(--red); background: rgba(215,38,46,.12); }
+  .pills button:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+  .how .in { padding-block: 18px 64px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px 28px; border-top: 1px solid var(--line); }
+  .how div { display: grid; gap: 4px; align-content: start; }
+  .how b { font-weight: 800; }
+  .how span { color: var(--muted); font-size: 14px; }
+  kbd { font: 700 12px var(--mono); border: 1px solid #44444c; border-bottom-width: 2px; border-radius: 4px; padding: 0 5px; color: var(--fg); }
+</style>
+
+<header><div class="in">
+  <div><div class="label">HoopLife · Ninja street court · Beta</div><h1>Ninja Court 3v3</h1></div>
+  <div class="label">Watch the AI game or take control</div>
+</div></header>
+
+<section class="stage" id="stage" aria-label="HoopLife 3v3 street basketball game">
+  <div class="board" aria-live="polite">
+    <div class="team home"><span>Team Ninja</span><b id="s0">0</b></div>
+    <div class="mid"><div><div class="poss" id="possDot"></div>FIRST<br>TO 21</div></div>
+    <div class="team away"><span>Rivals</span><b id="s1">0</b></div>
+  </div>
+  <div class="caption" id="caption">Tip-off on the HoopLife court</div>
+  <div class="banner" id="banner" hidden><div id="bannerText">GAME<small>NEW GAME IN 4</small></div></div>
+  <div class="pad" id="pad" hidden>
+    <div class="stick" id="stick" aria-label="Move"><div class="knob" id="knob"></div></div>
+    <div class="acts">
+      <button type="button" id="b-stunt">Stunt</button><button type="button" id="b-vanish">Vanish</button>
+      <button type="button" id="b-pass">Pass</button><button type="button" id="b-shoot">Shoot</button>
+    </div>
+  </div>
+</section>
+
+<section class="controls"><div class="in">
+  <div class="group"><span class="label">Mode</span>
+    <div class="pills" role="group" aria-label="Mode">
+      <button type="button" id="mode-watch" data-mode="watch" aria-pressed="true">Watch AI game</button>
+      <button type="button" id="mode-play" data-mode="play" aria-pressed="false">Play as the Ninja</button>
+    </div>
+  </div>
+  <div class="group"><span class="label">Camera</span>
+    <div class="pills" role="group" aria-label="Camera">
+      <button type="button" id="cam-tv" data-cam="tv" aria-pressed="true">Broadcast</button>
+      <button type="button" id="cam-ninja" data-cam="ninja" aria-pressed="false">Follow Ninja</button>
+      <button type="button" id="cam-free" data-cam="free" aria-pressed="false">Free</button>
+    </div>
+  </div>
+  <div class="group"><span class="label">Game</span>
+    <div class="pills">
+      <button type="button" id="g-highlight">Ninja highlight now</button>
+      <button type="button" id="g-reset">New game</button>
+    </div>
+  </div>
+</div></section>
+
+<section class="how"><div class="in">
+  <div><b>The game</b><span>Street 3v3 on one hoop. Inside the arc scores 1, beyond it 2. After a steal or a defensive rebound the ball must be cleared past the arc. First to 21.</span></div>
+  <div><b>The Ninja's moves</b><span>Crossover, behind-the-back, spin move, dunk, step-back three, and the ninja vanish steal.</span></div>
+  <div><b>Keyboard</b><span><kbd>WASD</kbd>/<kbd>arrows</kbd> move · <kbd>Space</kbd> shoot or steal · <kbd>E</kbd> pass or call for the ball · <kbd>Q</kbd> stunt · <kbd>F</kbd> vanish</span></div>
+  <div><b>Touch</b><span>Use the stick and the four buttons that appear in Play mode.</span></div>
+</div></section>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/environments/RoomEnvironment.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/geometries/RoundedBoxGeometry.js"></script>
+<script>
+(function () {
+  "use strict";
+  var stage = document.getElementById("stage");
+  function fail() { stage.insertAdjacentHTML("beforeend", '<div class="fallback"><p>The 3D court could not start on this device. Try a recent Chrome, Edge or Safari.</p></div>'); }
+  if (!window.THREE || !THREE.OrbitControls) { fail(); return; }
+  var renderer;
+  try { renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); } catch (e) { fail(); return; }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.95;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  stage.insertBefore(renderer.domElement, stage.firstChild);
+  var V3 = THREE.Vector3, rand = Math.random;
+  var scene = new THREE.Scene(); scene.background = new THREE.Color(0x0b0c10); scene.fog = new THREE.Fog(0x0b0c10, 22, 48);
+  scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new THREE.RoomEnvironment(), 0.04).texture;
+  var camera = new THREE.PerspectiveCamera(38, 1, 0.1, 120); camera.position.set(0, 8, 15);
+  var controls = new THREE.OrbitControls(camera, renderer.domElement); controls.enableDamping = true; controls.enabled = false; controls.maxPolarAngle = Math.PI * 0.47; controls.minDistance = 4; controls.maxDistance = 30;
+  scene.add(new THREE.HemisphereLight(0x8ea2c8, 0x1a1410, 0.55));
+  var sun = new THREE.DirectionalLight(0xffe3c4, 1.15); sun.position.set(6, 14, 8); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+  Object.assign(sun.shadow.camera, { left: -11, right: 11, top: 11, bottom: -11, near: 1, far: 40 }); scene.add(sun);
+
+  // ---------- helpers ----------
+  function std(c, o) { return new THREE.MeshPhysicalMaterial(Object.assign({ color: c, roughness: 0.55, clearcoat: 0.3, clearcoatRoughness: 0.5, envMapIntensity: 0.4 }, o || {})); }
+  function cvs(w, h) { var c = document.createElement("canvas"); c.width = w; c.height = h; return c; }
+  function tex(c) { var t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; t.anisotropy = 8; return t; }
+  function rbox(w, h, d, r) { return THREE.RoundedBoxGeometry ? new THREE.RoundedBoxGeometry(w, h, d, 4, r) : new THREE.BoxGeometry(w, h, d); }
+  function add(geo, mat, parent, x, y, z) { var m = new THREE.Mesh(geo, mat); m.position.set(x || 0, y || 0, z || 0); m.castShadow = true; parent.add(m); return m; }
+  function joint(parent, x, y, z) { var g = new THREE.Group(); g.position.set(x, y, z); parent.add(g); return g; }
+  function clamp(x, a, b) { return Math.max(a, Math.min(b, x)); }
+  function ease(x) { x = clamp(x, 0, 1); return x * x * (3 - 2 * x); }
+  function d2(a, b) { var dx = a.x - b.x, dz = a.z - b.z; return Math.sqrt(dx * dx + dz * dz); }
+  var GL = [[0, "M0,0 V100 M52,0 V100 M0,50 H52"], [80, "M42,0 A42,50 0 1 0 42.01,0"], [192, "M42,0 A42,50 0 1 0 42.01,0"], [304, "M0,100 V0 H26 A26,26 0 0 1 26,52 H0"], [384, "M0,0 V100 H46"], [458, "M0,0 V100"], [486, "M46,0 H0 V100 M0,50 H38"], [560, "M46,0 H0 V100 H46 M0,50 H38"]];
+  function wordmark(g, x, y, width, ink, lw) { g.save(); var k = width / 606; g.translate(x, y); g.scale(k, k); g.strokeStyle = ink; g.lineWidth = lw; g.lineCap = g.lineJoin = "round"; GL.forEach(function (q) { g.save(); g.translate(q[0], 0); g.stroke(new Path2D(q[1])); g.restore(); }); g.restore(); }
+  function markB1(g, cx, cy, s, ink, acc) { g.save(); g.translate(cx - 100 * s, cy - 100 * s); g.scale(s, s); g.lineWidth = 12; g.lineCap = g.lineJoin = "round"; g.strokeStyle = ink; g.beginPath(); g.arc(100, 100, 84, 0, 7); g.stroke(); g.stroke(new Path2D("M42,42 C64,76 64,124 42,158 M158,42 C136,76 136,124 158,158 M16,100 H58 M142,100 H184 M100,16 V60 M100,140 V184")); g.strokeStyle = acc; g.stroke(new Path2D("M58,100 L81,100 L90,72 L100,128 L110,100 L142,100")); g.restore(); }
+
+  // ---------- the court ----------
+  var RIM = new V3(0, 3.05, -5.6), ARC = 5.9, HALF = 7.2, SIDE = 7.6, BASE = -7.0;
+  (function court() {
+    var S = 2048, U = S / 18, c = cvs(S, S), g = c.getContext("2d");      // canvas spans x -9..9, z -9..9
+    function X(x) { return (x + 9) * U; } function Z(z) { return (z + 9) * U; }
+    g.fillStyle = "#15171c"; g.fillRect(0, 0, S, S);
+    for (var i = 0; i < 26000; i++) { g.fillStyle = "rgba(255,255,255," + (rand() * 0.035) + ")"; g.fillRect(rand() * S, rand() * S, 2, 2); }
+    g.fillStyle = "#1d2129"; g.fillRect(X(-SIDE), Z(BASE), (2 * SIDE) * U, (HALF - BASE) * U);   // playing surface
+    g.fillStyle = "rgba(179,18,26,.55)"; g.fillRect(X(-2.45), Z(BASE), 4.9 * U, 5.8 * U);       // the key
+    g.strokeStyle = "#EDEBE6"; g.lineWidth = 0.07 * U; g.lineCap = "butt";
+    g.strokeRect(X(-SIDE), Z(BASE), 2 * SIDE * U, (HALF - BASE) * U);
+    g.strokeRect(X(-2.45), Z(BASE), 4.9 * U, 5.8 * U);
+    g.beginPath(); g.arc(X(0), Z(BASE + 5.8), 1.8 * U, 0, Math.PI); g.stroke();
+    g.setLineDash([0.3 * U, 0.25 * U]); g.beginPath(); g.arc(X(0), Z(BASE + 5.8), 1.8 * U, Math.PI, 2 * Math.PI); g.stroke(); g.setLineDash([]);
+    // three-point line: corners + arc around the rim
+    var corner = Math.sqrt(ARC * ARC - 6.6 * 6.6 < 0 ? 0 : 0), cx = 6.6, zc = RIM.z + Math.sqrt(ARC * ARC - cx * cx);
+    g.beginPath(); g.moveTo(X(-cx), Z(BASE)); g.lineTo(X(-cx), Z(zc)); g.arc(X(0), Z(RIM.z), ARC * U, Math.PI - Math.asin((zc - RIM.z) / ARC), Math.asin((zc - RIM.z) / ARC), true); g.lineTo(X(cx), Z(BASE)); g.stroke();
+    g.strokeStyle = "#C9A24A"; g.beginPath(); g.arc(X(0), Z(HALF), 1.8 * U, Math.PI, 2 * Math.PI); g.stroke();
+    g.beginPath(); g.arc(X(0), Z(RIM.z), 1.25 * U, 0, Math.PI); g.stroke();                 // restricted arc
+    markB1(g, X(0), Z(2.6), 0.0105 * U, "rgba(237,235,230,.85)", "#D7262E");                 // B1 mark at the top of the court
+    g.save(); g.translate(X(0), Z(HALF + 0.9)); g.rotate(Math.PI); wordmark(g, -2.6 * U, -0.3 * U, 5.2 * U, "rgba(237,235,230,.75)", 13); g.restore();
+    wordmark(g, X(-2.2), Z(BASE - 1.2), 4.4 * U, "rgba(237,235,230,.6)", 13);
+    var floor = new THREE.Mesh(new THREE.PlaneGeometry(18, 18), new THREE.MeshStandardMaterial({ map: tex(c), roughness: 0.9, metalness: 0 }));
+    floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+    var out = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.MeshStandardMaterial({ color: 0x0d0e12, roughness: 1 })); out.rotation.x = -Math.PI / 2; out.position.y = -0.01; out.receiveShadow = true; scene.add(out);
+    // chain-link fence
+    var fc = cvs(64, 64), fg = fc.getContext("2d"); fg.strokeStyle = "rgba(170,175,185,.55)"; fg.lineWidth = 2; fg.beginPath(); fg.moveTo(0, 32); fg.lineTo(32, 0); fg.lineTo(64, 32); fg.lineTo(32, 64); fg.closePath(); fg.stroke();
+    var ft = tex(fc); ft.wrapS = ft.wrapT = THREE.RepeatWrapping;
+    function fence(w, x, z, ry) { var t2 = ft.clone(); t2.needsUpdate = true; t2.repeat.set(w * 2.2, 3.5 * 2.2); var m = new THREE.Mesh(new THREE.PlaneGeometry(w, 3.5), new THREE.MeshStandardMaterial({ map: t2, transparent: true, side: THREE.DoubleSide, roughness: 0.6, metalness: 0.4, depthWrite: false })); m.position.set(x, 1.75, z); m.rotation.y = ry; scene.add(m);
+      for (var k = 0; k <= Math.round(w / 3); k++) { var p = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 3.6, 8), std(0x55575e, { metalness: 0.6, roughness: 0.4 })); var off = -w / 2 + k * (w / Math.round(w / 3)); p.position.set(x + Math.cos(ry) * off, 1.8, z - Math.sin(ry) * off); scene.add(p); } }
+    fence(18, 0, -9, 0); fence(18, -9, 0, Math.PI / 2); fence(18, 9, 0, Math.PI / 2);
+    // street lights with warm pools
+    [[-8.4, -8.4], [8.4, -8.4], [-8.4, 7.5], [8.4, 7.5]].forEach(function (p) {
+      var pole = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.09, 6.5, 10), std(0x3a3c42, { metalness: 0.5 })); pole.position.set(p[0], 3.25, p[1]); scene.add(pole);
+      var lamp = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.15, 0.3), new THREE.MeshStandardMaterial({ color: 0xfff1d6, emissive: 0xffd9a0, emissiveIntensity: 1.6 })); lamp.position.set(p[0] * 0.95, 6.5, p[1] * 0.95); scene.add(lamp);
+      var l = new THREE.PointLight(0xffc98a, 0.55, 18, 2); l.position.copy(lamp.position); scene.add(l);
+    });
+  })();
+  // hoop: pole, padded arm, backboard with HoopLife mark, rim, net
+  var netGroup = new THREE.Group();
+  (function hoop() {
+    var g = new THREE.Group(); scene.add(g);
+    add(new THREE.CylinderGeometry(0.11, 0.13, 3.9, 16), std(0x16171b, { metalness: 0.4 }), g, 0, 1.95, -7.9);
+    add(new THREE.BoxGeometry(0.2, 0.2, 1.3), std(0x16171b, { metalness: 0.4 }), g, 0, 3.75, -7.25);
+    var bc = cvs(512, 300), bg = bc.getContext("2d"); bg.fillStyle = "rgba(240,244,250,.18)"; bg.fillRect(0, 0, 512, 300);
+    bg.strokeStyle = "#F4F4F2"; bg.lineWidth = 10; bg.strokeRect(5, 5, 502, 290); bg.strokeStyle = "#D7262E"; bg.strokeRect(186, 150, 140, 110); markB1(bg, 256, 82, 0.32, "#F4F4F2", "#D7262E");
+    var board = add(new THREE.BoxGeometry(1.8, 1.05, 0.05), [std(0xeeeeee), std(0xeeeeee), std(0xeeeeee), std(0xeeeeee), new THREE.MeshPhysicalMaterial({ map: tex(bc), transparent: true, roughness: 0.1, transmission: 0.2 }), std(0x222222, { transparent: true, opacity: 0.5 })], g, 0, 3.55, -6.55);
+    var rim = add(new THREE.TorusGeometry(0.24, 0.022, 10, 40), std(0xd7262e, { metalness: 0.5, roughness: 0.3 }), g, RIM.x, RIM.y, RIM.z); rim.rotation.x = Math.PI / 2;
+    add(new THREE.BoxGeometry(0.06, 0.04, 0.6), std(0xd7262e), g, 0, RIM.y, -6.2);
+    var pts = [];
+    for (var i = 0; i < 14; i++) { var a = i / 14 * Math.PI * 2, b = (i + 0.5) / 14 * Math.PI * 2; pts.push(Math.cos(a) * 0.24, 0, Math.sin(a) * 0.24, Math.cos(b) * 0.15, -0.45, Math.sin(b) * 0.15); }
+    [0.16, 0.32].forEach(function (y) { var r = 0.24 - y * 0.2; for (var i = 0; i < 24; i++) { var a = i / 24 * Math.PI * 2, b = (i + 1) / 24 * Math.PI * 2; pts.push(Math.cos(a) * r, -y, Math.sin(a) * r, Math.cos(b) * r, -y, Math.sin(b) * r); } });
+    var ng = new THREE.BufferGeometry(); ng.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
+    var net = new THREE.LineSegments(ng, new THREE.LineBasicMaterial({ color: 0xf2f2f2 })); netGroup.add(net); netGroup.position.copy(RIM); scene.add(netGroup);
+  })();
+
+  // ---------- ball ----------
+  var ballC = cvs(512, 256);
+  (function () { var g = ballC.getContext("2d"); g.fillStyle = "#C8581F"; g.fillRect(0, 0, 512, 256);
+    for (var i = 0; i < 3000; i++) { g.fillStyle = "rgba(0,0,0," + rand() * 0.12 + ")"; g.fillRect(rand() * 512, rand() * 256, 2, 2); }
+    g.strokeStyle = "#1B1411"; g.lineWidth = 5; [0, 128, 256, 384].forEach(function (x) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, 256); g.stroke(); }); g.beginPath(); g.moveTo(0, 128); g.lineTo(512, 128); g.stroke();
+    g.beginPath(); for (var x = 0; x <= 512; x += 4) { var y = 128 + Math.sin(x / 512 * Math.PI * 2) * 90; x ? g.lineTo(x, y) : g.moveTo(x, y); } g.stroke();
+    g.strokeStyle = "#F4F4F2"; g.lineWidth = 6; g.lineJoin = "round"; g.beginPath(); [[180, 128], [226, 128], [238, 104], [256, 152], [268, 128], [332, 128]].forEach(function (p, i) { g[i ? "lineTo" : "moveTo"](p[0], p[1]); }); g.stroke(); })();
+  var ballMesh = add(new THREE.SphereGeometry(0.21, 32, 20), new THREE.MeshPhysicalMaterial({ map: tex(ballC), roughness: 0.7, clearcoat: 0.15 }), scene);
+  var ballShadow = new THREE.Mesh(new THREE.CircleGeometry(0.22, 24), new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.35, depthWrite: false })); ballShadow.rotation.x = -Math.PI / 2; ballShadow.position.y = 0.012; scene.add(ballShadow);
+
+  // ---------- Funko-style figures ----------
+  // Big rounded-box head, mini body, stubby limbs, mitten hands, black oval eyes.
+  function jerseyMat(base, trim, num, ink) {
+    var c = cvs(256, 256), g = c.getContext("2d"); g.fillStyle = base; g.fillRect(0, 0, 256, 256); g.fillStyle = trim; g.fillRect(0, 0, 256, 18); g.fillRect(0, 238, 256, 18);
+    g.font = "900 150px Archivo, 'Arial Black', sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.lineWidth = 12; g.strokeStyle = trim; g.strokeText(num, 128, 140); g.fillStyle = ink; g.fillText(num, 128, 140);
+    return new THREE.MeshPhysicalMaterial({ map: tex(c), roughness: 0.6, clearcoat: 0.2, envMapIntensity: 0.35 });
+  }
+  function makeFigure(o) {
+    var root = new THREE.Group(); scene.add(root);
+    var body = joint(root, 0, 0, 0);
+    var hips = joint(body, 0, 0.36, 0);
+    var skin = std(o.skin, { roughness: 0.5 }), cloth = std(o.base, { roughness: 0.75, clearcoat: 0.1 }), trim = std(o.trim), shoe = std(o.shoe || 0x111113, { clearcoat: 0.6 });
+    function leg(s) { var hp = joint(hips, s * 0.11, 0, 0); add(new THREE.CapsuleGeometry(0.085, 0.16, 6, 12), o.ninja ? cloth : skin, hp, 0, -0.14, 0);
+      add(new THREE.CylinderGeometry(0.1, 0.1, 0.1, 16), o.ninja ? cloth : cloth, hp, 0, -0.04, 0);
+      var ft = joint(hp, 0, -0.3, 0); add(rbox(0.17, 0.1, 0.28, 0.04), shoe, ft, 0, -0.02, 0.04); add(new THREE.BoxGeometry(0.17, 0.025, 0.28), trim, ft, 0, -0.07, 0.04); return { hp: hp, ft: ft }; }
+    var LL = leg(1), RL = leg(-1);
+    var chest = joint(hips, 0, 0.02, 0);
+    var torso = add(rbox(0.42, 0.42, 0.28, 0.08), o.jersey ? [cloth, cloth, cloth, cloth, o.jersey, o.jerseyBack || o.jersey] : cloth, chest, 0, 0.22, 0);
+    add(rbox(0.44, 0.1, 0.3, 0.04), o.ninja ? std(0x3b3731, { roughness: 0.9 }) : cloth, chest, 0, 0.02, 0);   // waist / shorts band
+    if (o.ninja) { add(new THREE.BoxGeometry(0.445, 0.015, 0.305), std(0xd7262e), chest, 0, 0.05, 0); add(rbox(0.09, 0.08, 0.05, 0.02), std(0x3b3731), chest, 0.03, 0.01, 0.16);
+      var lap = add(new THREE.BoxGeometry(0.07, 0.44, 0.02), std(0x2a2a2f, { roughness: 0.9 }), chest, 0.02, 0.24, 0.145); lap.rotation.z = 0.62; }
+    function arm(s) { var sh = joint(chest, s * 0.25, 0.37, 0); add(new THREE.SphereGeometry(0.075, 16, 12), o.ninja || o.sleeves ? cloth : skin, sh);
+      add(new THREE.CapsuleGeometry(0.06, 0.14, 6, 12), skin, sh, 0, -0.12, 0);
+      if (o.ninja) add(new THREE.CylinderGeometry(0.068, 0.068, 0.07, 12), std(0x26262b, { roughness: 0.9 }), sh, 0, -0.18, 0);
+      var hand = joint(sh, 0, -0.26, 0); add(new THREE.SphereGeometry(0.075, 16, 12), skin, hand); return { sh: sh, hand: hand }; }
+    var LA = arm(1), RA = arm(-1);
+    var neck = joint(chest, 0, 0.44, 0), head = joint(neck, 0, 0.3, 0);
+    var eyeMat = std(0x050506, { roughness: 0.15, clearcoat: 1, envMapIntensity: 0.9 });
+    if (o.ninja) {
+      add(rbox(0.68, 0.6, 0.6, 0.2), std(0x101012, { roughness: 0.7, clearcoat: 0.15 }), head);       // hood + mask, all black
+      add(rbox(0.5, 0.2, 0.06, 0.06), skin, head, 0, 0.03, 0.28);                                       // face opening
+      [-1, 1].forEach(function (s) { var e = add(new THREE.SphereGeometry(0.06, 16, 12), eyeMat, head, s * 0.12, 0.02, 0.315); e.scale.set(1, 1.1, 0.45);
+        var w = add(new THREE.SphereGeometry(0.016, 8, 6), std(0xffffff), head, s * 0.12 - 0.02, 0.05, 0.34);
+        var b = add(new THREE.BoxGeometry(0.15, 0.035, 0.03), std(0x101012), head, s * 0.12, 0.115, 0.31); b.rotation.z = s * 0.42; });
+      var tipJ = joint(head, 0.12, 0.26, -0.18); tipJ.rotation.set(-0.7, 0, -0.9); add(new THREE.ConeGeometry(0.12, 0.4, 16), std(0x101012, { roughness: 0.7 }), tipJ, 0, 0.18, 0).scale.set(1, 1, 0.55);
+      var cowl = add(new THREE.CylinderGeometry(0.2, 0.3, 0.1, 24), std(0x101012, { roughness: 0.8 }), neck, 0, 0.01, 0.01);
+      root.userData.tip = tipJ;
+    } else {
+      add(rbox(0.62, 0.56, 0.56, 0.18), skin, head);
+      [-1, 1].forEach(function (s) { var e = add(new THREE.SphereGeometry(0.055, 16, 12), eyeMat, head, s * 0.12, 0.0, 0.27); e.scale.set(1, 1.15, 0.45); });
+      add(new THREE.BoxGeometry(0.1, 0.02, 0.02), std(0x3a2418), head, 0, -0.13, 0.28);
+      if (o.hair === "cap") { add(rbox(0.64, 0.2, 0.58, 0.08), trim, head, 0, 0.22, 0); add(new THREE.BoxGeometry(0.4, 0.03, 0.22), trim, head, 0, 0.13, 0.36); }
+      else if (o.hair === "band") { add(rbox(0.66, 0.16, 0.6, 0.07), std(o.hairColor || 0x1a120d), head, 0, 0.23, -0.02); add(new THREE.BoxGeometry(0.64, 0.07, 0.58), trim, head, 0, 0.12, 0); }
+      else { add(rbox(0.65, 0.22, 0.6, 0.1), std(o.hairColor || 0x1a120d), head, 0, 0.21, -0.02); }
+    }
+    root.traverse(function (m) { if (m.isMesh) m.castShadow = true; });
+    return { root: root, body: body, hips: hips, chest: chest, head: head, LA: LA, RA: RA, LL: LL, RL: RL };
+  }
+
+  // ---------- teams ----------
+  var TEAMS = [
+    { name: "Team Ninja", base: 0x141416, trim: 0xd7262e, ink: "#F4F4F2", col: "#141416", trimCss: "#D7262E" },
+    { name: "Rivals", base: 0xeeebe3, trim: 0xc9a24a, ink: "#141416", col: "#EEEBE3", trimCss: "#C9A24A" }
+  ];
+  var ROSTER = [
+    [{ name: "Ninja", ninja: true, skin: 0xf2c9a8, num: "01" }, { name: "Kai", skin: 0x8d5a3b, num: "07", hair: "band" }, { name: "Jay", skin: 0xc68a62, num: "23", hair: "cap" }],
+    [{ name: "Rook", skin: 0x5a3626, num: "3", hair: "cap" }, { name: "Vince", skin: 0xe9b995, num: "11", hair: "band", hairColor: 0x6b4423 }, { name: "Dre", skin: 0xa8704c, num: "30" }]
+  ];
+  var players = [];
+  ROSTER.forEach(function (list, ti) {
+    list.forEach(function (r, i) {
+      var T = TEAMS[ti], jm = jerseyMat(T.col, T.trimCss, r.num, T.ink);
+      var o = r.ninja ? { ninja: true, skin: r.skin, base: 0x141416, trim: 0xd7262e, jersey: null, shoe: 0x0c0c0e } : { skin: r.skin, base: T.base, trim: T.trim, jersey: jm, hair: r.hair, hairColor: r.hairColor };
+      if (r.ninja) { var back = jerseyMat("#141416", "#141416", "01", "#9E1018"); o.jerseyBack = back; o.jersey = std(0x141416, { roughness: 0.75 }); }
+      var f = makeFigure(o);
+      players.push({ f: f, team: ti, idx: i, name: r.name, ninja: !!r.ninja, pos: new V3(), vel: new V3(), yaw: 0, jy: 0, phase: rand() * 6, state: "run", t: 0, stagger: 0, cut: 0, cutT: 3 + rand() * 4, cool: 0, hidden: 0 });
+    });
+  });
+  var ninja = players[0];
+  function team(t) { return players.filter(function (p) { return p.team === t; }); }
+
+  // ---------- smoke ----------
+  var puffs = [];
+  for (var i = 0; i < 40; i++) { var pm = new THREE.Mesh(new THREE.SphereGeometry(0.2, 12, 8), new THREE.MeshStandardMaterial({ color: 0x9ea1a8, transparent: true, opacity: 0, roughness: 1, depthWrite: false })); scene.add(pm); puffs.push({ m: pm, life: 0, v: new V3() }); }
+  function smoke(at) { var n = 0; puffs.forEach(function (p) { if (p.life <= 0 && n < 14) { n++; p.life = 1; p.m.position.set(at.x + (rand() - 0.5) * 0.4, 0.3 + rand() * 1.1, at.z + (rand() - 0.5) * 0.4); p.v.set((rand() - 0.5) * 1.6, 0.6 + rand(), (rand() - 0.5) * 1.6); } }); }
+
+  // ---------- game state ----------
+  var G = { score: [0, 0], poss: 0, clear: false, mode: "watch", cam: "tv", over: 0, dead: 0, caption: "", capT: 0, combo: [], comboPlan: null, flash: 0 };
+  var ball = { pos: new V3(0, 1, 4), vel: new V3(), mode: "held", holder: null, side: 1, phase: 0, move: null, flight: null };
+  var SPOTS = [[new V3(0, 0, 4.4), new V3(-4.6, 0, 0.6), new V3(4.6, 0, 0.6)], [new V3(0, 0, 4.4), new V3(-4.6, 0, 0.6), new V3(4.6, 0, 0.6)]];
+  function caption(txt, hold) { G.caption = txt; G.capT = hold || 2.6; var el = document.getElementById("caption"); el.textContent = txt; el.style.opacity = 1; }
+  function setScoreUI() { document.getElementById("s0").textContent = G.score[0]; document.getElementById("s1").textContent = G.score[1]; document.getElementById("possDot").style.background = G.poss ? "#C9A24A" : "#D7262E"; }
+  function giveBall(p, how) {
+    ball.mode = "held"; ball.holder = p; ball.flight = null; ball.move = null; ball.side = 1;
+    if (p.team !== G.poss) { G.poss = p.team; G.clear = how !== "inbound"; G.combo = []; G.comboPlan = null; }
+    if (p.ninja && G.mode === "watch") planNinja();
+    setScoreUI();
+  }
+  function resetPositions(offTeam) {
+    team(offTeam).forEach(function (p, i) { p.pos.copy(SPOTS[0][i]).add(new V3(0, 0, i === 0 ? 0.8 : 0)); });
+    team(1 - offTeam).forEach(function (p, i) { p.pos.copy(SPOTS[0][i]).lerp(RIM.clone().setY(0), 0.25); });
+    players.forEach(function (p) { p.vel.set(0, 0, 0); p.state = "run"; p.jy = 0; p.hidden = 0; });
+  }
+  function newGame() { G.score = [0, 0]; G.over = 0; document.getElementById("banner").hidden = true; G.poss = 0; resetPositions(0); giveBall(ninja, "inbound"); caption("Tip-off on the HoopLife court"); }
+
+  // ---------- ninja highlight planner (watch mode) ----------
+  var STUNTS = ["cross", "btb", "spin"], STUNT_NAME = { cross: "Crossover", btb: "Behind-the-back", spin: "Spin move" };
+  function planNinja() {
+    var a = STUNTS[Math.floor(rand() * 3)], b = STUNTS[Math.floor(rand() * 3)]; if (b === a) b = STUNTS[(STUNTS.indexOf(a) + 1) % 3];
+    G.combo = [a, b]; G.comboPlan = rand() < 0.45 ? "step3" : "dunk"; G.comboText = [];
+  }
+  function startMove(p, type) {
+    if (ball.holder !== p || ball.move) return false;
+    ball.move = { type: type, t: 0, dur: type === "spin" ? 0.6 : type === "btb" ? 0.5 : 0.42, s0: ball.side };
+    var def = defenderOf(p); if (def && d2(def.pos, p.pos) < 2.4) def.stagger = 0.9;
+    if (p.ninja) { G.comboText = (G.comboText || []).concat(STUNT_NAME[type]); caption(G.comboText.join("  →  "), 1.6); }
+    return true;
+  }
+  function defenderOf(p) { return players.find(function (q) { return q.team !== p.team && q.idx === p.idx; }); }
+  function nearestOpp(p) { var best = null, bd = 1e9; players.forEach(function (q) { if (q.team !== p.team) { var d = d2(q.pos, p.pos); if (d < bd) { bd = d; best = q; } } }); return { p: best, d: bd }; }
+  function isThree(p) { return d2(p, RIM) > ARC + 0.1; }
+
+  // ---------- shooting, passing, dunks, steals ----------
+  function handPoint(p, up) { var f = new V3(Math.sin(p.yaw), 0, Math.cos(p.yaw)); return p.pos.clone().addScaledVector(f, 0.18).setY(p.jy + (up ? 1.55 : 0.9)); }
+  function shoot(p, kind) {
+    if (ball.holder !== p || p.state === "shoot" || p.state === "dunk") return;
+    p.state = "shoot"; p.t = 0; p.shotKind = kind || (isThree(p.pos) ? "three" : d2(p.pos, RIM) < 2 ? "layup" : "mid");
+  }
+  function release(p) {
+    var kind = p.shotKind, dist = d2(p.pos, RIM), opp = nearestOpp(p);
+    var prob = kind === "layup" ? 0.72 : kind === "three" || kind === "step3" ? 0.36 : 0.5;
+    if (p.ninja) prob += kind === "step3" ? 0.32 : 0.15;
+    if (opp.d < 1.2 && !(p.ninja && kind === "step3")) prob *= 0.6;
+    var make = rand() < prob, from = handPoint(p, true), to = RIM.clone().add(new V3(0, 0.12, 0));
+    if (!make) to.add(new V3((rand() - 0.5) * 0.5, 0.05, 0.22));
+    ball.mode = "shot"; ball.holder = null; ball.move = null;
+    ball.flight = { from: from, to: to, t: 0, T: 0.75 + dist * 0.05, h: 1.4 + dist * 0.16, make: make, shooter: p, pts: isThree(p.pos) ? 2 : 1, kind: kind };
+    p.state = "follow"; p.t = 0;
+  }
+  function pass(p, to) {
+    if (ball.holder !== p || !to) return;
+    ball.mode = "pass"; ball.holder = null; ball.move = null;
+    ball.flight = { from: handPoint(p, false), to: to, t: 0, T: 0.42 + d2(p.pos, to.pos) * 0.03, h: 0.4, target: to };
+  }
+  function openTeammate(p) { var best = null, bs = -1; team(p.team).forEach(function (q) { if (q === p) return; var s = nearestOpp(q).d - (isThree(q.pos) ? 0 : 0.2); if (s > bs) { bs = s; best = q; } }); return best; }
+  function startDunk(p) { if (ball.holder !== p) return; p.state = "dunk"; p.t = 0; p.dunkFrom = p.pos.clone(); ball.move = null; }
+  function vanish(p) {
+    if (p.cool > 0) return;
+    p.cool = 5; smoke(p.pos); p.hidden = 0.45;
+    var h = ball.holder;
+    if (h && h.team !== p.team && d2(h.pos, p.pos) < 6) {
+      p.vanishTo = h.pos.clone().add(new V3(Math.sin(h.yaw) * 0.7, 0, Math.cos(h.yaw) * 0.7)); p.vanishSteal = h;
+    } else if (ball.holder === p) {
+      var dir = RIM.clone().setY(0).sub(p.pos).setY(0).normalize(); p.vanishTo = p.pos.clone().addScaledVector(dir, Math.min(2.4, d2(p.pos, RIM) - 1)); p.vanishSteal = null;
+    } else { p.vanishTo = p.pos.clone(); p.vanishSteal = null; }
+    caption("Ninja vanish", 1.4);
+  }
+  function trySteal(p) {
+    var h = ball.holder; if (!h || h.team === p.team || d2(h.pos, p.pos) > 1.2 || ball.move) return;
+    if (rand() < (p.ninja ? 0.55 : 0.3)) { looseBall(h.pos.clone().setY(0.6), new V3(p.pos.x - h.pos.x, 2, p.pos.z - h.pos.z).multiplyScalar(1.2)); caption(p.name + " pokes it loose", 1.6); }
+  }
+  function looseBall(at, vel) { ball.mode = "loose"; ball.holder = null; ball.move = null; ball.flight = null; ball.pos.copy(at); ball.vel.copy(vel); }
+  function scored(f) {
+    G.score[f.shooter.team] += f.pts;
+    var how = f.kind === "dunk" ? "DUNK!" : f.kind === "step3" ? "Step-back three!" : f.pts === 2 ? "From deep!" : f.kind === "layup" ? "Lay-up" : "Buckets";
+    var lead = f.shooter.ninja && G.comboText && G.comboText.length ? G.comboText.join("  →  ") + "  →  " : "";
+    caption(lead + f.shooter.name + ": " + how + "  +" + f.pts, 2.8); G.comboText = [];
+    G.flash = 1; setScoreUI();
+    team(f.shooter.team).forEach(function (q) { q.celebrate = 1.2; });
+    if (G.score[f.shooter.team] >= 21) { G.over = 4.5; document.getElementById("bannerText").innerHTML = TEAMS[f.shooter.team].name.toUpperCase() + " WIN " + G.score[0] + "–" + G.score[1] + "<small>NEW GAME IN A MOMENT</small>"; document.getElementById("banner").hidden = false; }
+    G.dead = 1.3; G.nextPoss = 1 - f.shooter.team;
+  }
+
+  // ---------- input ----------
+  var keys = {}, stick = { x: 0, y: 0 };
+  window.addEventListener("keydown", function (e) {
+    if (G.mode !== "play") return; var k = e.key.toLowerCase();
+    if (["arrowup", "arrowdown", "arrowleft", "arrowright", " "].indexOf(k) >= 0) e.preventDefault();
+    if (!keys[k]) act(k); keys[k] = true;
+  });
+  window.addEventListener("keyup", function (e) { keys[e.key.toLowerCase()] = false; });
+  var stunIdx = 0;
+  function act(k) {
+    if (G.dead > 0 || G.over > 0) return;
+    if (k === " ") { if (ball.holder === ninja) { if (d2(ninja.pos, RIM) < 2.2) startDunk(ninja); else shoot(ninja, isThree(ninja.pos) ? "three" : "mid"); } else trySteal(ninja); }
+    if (k === "e") { if (ball.holder === ninja) pass(ninja, openTeammate(ninja)); else if (ball.holder && ball.holder.team === 0) pass(ball.holder, ninja); }
+    if (k === "q") { if (startMove(ninja, STUNTS[stunIdx % 3])) stunIdx++; }
+    if (k === "f") vanish(ninja);
+  }
+  [["b-shoot", " "], ["b-pass", "e"], ["b-stunt", "q"], ["b-vanish", "f"]].forEach(function (b) { document.getElementById(b[0]).addEventListener("pointerdown", function (e) { e.preventDefault(); act(b[1]); }); });
+  (function () {
+    var el = document.getElementById("stick"), knob = document.getElementById("knob"), id = null;
+    function move(e) { var r = el.getBoundingClientRect(), x = (e.clientX - r.left) / r.width * 2 - 1, y = (e.clientY - r.top) / r.height * 2 - 1, m = Math.hypot(x, y); if (m > 1) { x /= m; y /= m; } stick.x = x; stick.y = y; knob.style.transform = "translate(" + x * 38 + "px," + y * 38 + "px)"; }
+    el.addEventListener("pointerdown", function (e) { id = e.pointerId; el.setPointerCapture(id); move(e); });
+    el.addEventListener("pointermove", function (e) { if (e.pointerId === id) move(e); });
+    function up() { id = null; stick.x = stick.y = 0; knob.style.transform = ""; }
+    el.addEventListener("pointerup", up); el.addEventListener("pointercancel", up);
+  })();
+  function inputDir() {
+    var x = (keys["d"] || keys["arrowright"] ? 1 : 0) - (keys["a"] || keys["arrowleft"] ? 1 : 0) + stick.x;
+    var y = (keys["s"] || keys["arrowdown"] ? 1 : 0) - (keys["w"] || keys["arrowup"] ? 1 : 0) + stick.y;
+    var fwd = new V3(); camera.getWorldDirection(fwd); fwd.y = 0; fwd.normalize(); var right = new V3(-fwd.z, 0, fwd.x);
+    var v = right.multiplyScalar(x).addScaledVector(fwd, -y); if (v.length() > 1) v.normalize(); return v;
+  }
+
+  // ---------- AI ----------
+  var RIM0 = RIM.clone().setY(0);
+  function think(p, dt) {
+    var off = p.team === G.poss, target = p.pos.clone(), speed = p.ninja ? 4.6 : 4.1, face = null, h = ball.holder;
+    if (G.dead > 0 || G.over > 0) { target.copy(off ? SPOTS[0][p.idx] : SPOTS[0][p.idx].clone().lerp(RIM0, 0.3)); return { target: target, speed: speed * 0.6 }; }
+    if (ball.mode === "loose") { var near = players.slice().sort(function (a, b) { return d2(a.pos, ball.pos) - d2(b.pos, ball.pos); }); if (near.indexOf(p) < 3) target.copy(ball.pos).setY(0); else target.copy(SPOTS[0][p.idx]); return { target: target, speed: speed }; }
+    if (ball.mode === "shot") { var land = RIM0.clone().add(new V3((p.idx - 1) * 1.6, 0, 1.6)); target.copy(off && p !== (ball.flight && ball.flight.shooter) ? land : off ? p.pos : land.clone().lerp(RIM0, 0.4)); return { target: target, speed: speed * 0.85 }; }
+    if (off) {
+      if (h === p) {
+        var dRim = d2(p.pos, RIM), opp = nearestOpp(p);
+        if (G.clear) { target.set(p.pos.x * 0.6, 0, 5.2); if (dRim > ARC + 0.6) { G.clear = false; } return { target: target, speed: speed }; }
+        if (p.state === "dunk" || p.state === "shoot") return { target: p.pos.clone(), speed: 0 };
+        if (p.ninja && G.mode === "watch") {
+          if (!G.comboPlan) planNinja();
+          p.decide = (p.decide || 0) - dt;
+          if (G.combo.length && !ball.move && p.decide <= 0) { startMove(p, G.combo.shift()); p.decide = 0.75; }
+          if (G.comboPlan === "step3") {
+            var spot = new V3(p.idx === 0 ? -1.2 : 0, 0, 4.6);
+            if (!G.combo.length && !ball.move && d2(p.pos, spot) < 0.9 && p.decide <= 0) { p.stepBack = 0.32; p.decide = 9; }
+            if (p.stepBack > 0) { p.stepBack -= dt; target.copy(p.pos).add(p.pos.clone().sub(RIM0).setY(0).normalize().multiplyScalar(2)); if (p.stepBack <= 0) shoot(p, "step3"); return { target: target, speed: 5.5 }; }
+            return { target: spot, speed: speed };
+          }
+          if (!G.combo.length && !ball.move && dRim < 2.0) startDunk(p);
+          return { target: RIM0.clone().add(new V3(0, 0, 0.9)), speed: speed * (ball.move ? 1.25 : 1) };
+        }
+        p.decide = (p.decide || 0) - dt;
+        if (p.decide <= 0) {
+          p.decide = 0.5 + rand() * 0.7;
+          var lane = opp.d < 1.3 && d2(opp.p.pos, RIM) < dRim;
+          if (dRim < 1.9) shoot(p, "layup");
+          else if (opp.d > 1.6 && dRim < 4.6 && rand() < 0.4) shoot(p, "mid");
+          else if (opp.d > 1.8 && isThree(p.pos) && rand() < 0.3) shoot(p, "three");
+          else if (lane && rand() < 0.65) { var mate = G.mode === "watch" && rand() < 0.55 ? ninja.team === p.team ? ninja : openTeammate(p) : openTeammate(p); pass(p, mate); }
+        }
+        return { target: RIM0.clone().add(new V3(0, 0, 1.0)), speed: speed * 0.92 };
+      }
+      // off-ball: hold your spot, cut now and then
+      p.cutT -= dt; if (p.cutT <= 0) { p.cut = p.cut ? 0 : 1; p.cutT = p.cut ? 1.4 : 3 + rand() * 4; }
+      target.copy(p.cut ? RIM0.clone().add(new V3((p.idx === 1 ? -1 : 1) * 1.3, 0, 1.4)) : SPOTS[0][p.idx]);
+      return { target: target, speed: speed * 0.8 };
+    }
+    // defense: stay between your man and the rim
+    var man = players.find(function (q) { return q.team !== p.team && q.idx === p.idx; }), gap = man === h ? 0.85 : 1.3;
+    target.copy(man.pos).add(RIM0.clone().sub(man.pos).setY(0).normalize().multiplyScalar(gap));
+    face = man.pos;
+    if (h && man === h && d2(p.pos, h.pos) < 1.05 && !ball.move && rand() < dt * 0.12) trySteal(p);
+    if (p.ninja && G.mode === "watch" && h && p.cool <= 0 && d2(p.pos, h.pos) < 5 && rand() < dt * 0.35) vanish(p);
+    return { target: target, speed: speed * (p.stagger > 0 ? 0.35 : 0.95), face: face };
+  }
+
+  // ---------- simulation ----------
+  function step(dt) {
+    if (G.over > 0) { G.over -= dt; if (G.over <= 0) newGame(); }
+    if (G.capT > 0) { G.capT -= dt; if (G.capT <= 0) document.getElementById("caption").style.opacity = 0.35; }
+    if (G.dead > 0) { G.dead -= dt; if (G.dead <= 0 && G.over <= 0) { var t = G.nextPoss; resetPositions(t); G.poss = t; giveBall(team(t)[0], "inbound"); G.clear = false; caption(TEAMS[t].name + " ball, check it up top", 1.6); } }
+    players.forEach(function (p) {
+      p.cool = Math.max(0, p.cool - dt); p.stagger = Math.max(0, p.stagger - dt); p.celebrate = Math.max(0, (p.celebrate || 0) - dt);
+      // vanish: hidden, then reappear somewhere else in a puff
+      if (p.hidden > 0) { p.hidden -= dt; if (p.hidden <= 0) { p.pos.copy(p.vanishTo); smoke(p.pos); if (p.vanishSteal && ball.holder === p.vanishSteal) { giveBall(p, "steal"); caption("Ninja vanish steal!", 2.2); } } p.f.root.visible = p.hidden <= 0; return; }
+      p.f.root.visible = true;
+      var plan;
+      if (p === ninja && G.mode === "play") {
+        var dir = inputDir(); plan = { target: p.pos.clone().addScaledVector(dir, 2), speed: dir.length() * 4.8 * (ball.move && ball.holder === p ? 1.25 : 1) };
+        if (p.state === "dunk" || p.state === "shoot") plan.speed = 0;
+      } else plan = think(p, dt);
+      if (p.state === "dunk") {
+        p.t += dt / 1.0; var k = p.t, under = RIM0.clone().add(new V3(0, 0, 0.5));
+        p.pos.lerpVectors(p.dunkFrom, under, ease(k / 0.55)); p.jy = Math.sin(Math.PI * clamp(k / 0.9, 0, 1)) * 1.55; p.yaw = Math.atan2(RIM.x - p.pos.x, RIM.z - p.pos.z);
+        if (k >= 0.5 && ball.holder === p) { ball.mode = "shot"; ball.holder = null; ball.flight = { from: handPoint(p, true), to: RIM.clone().add(new V3(0, 0.05, 0)), t: 0, T: 0.12, h: 0.05, make: true, shooter: p, pts: 1, kind: "dunk" }; }
+        if (k >= 1) { p.state = "run"; p.jy = 0; }
+        return;
+      }
+      if (p.state === "shoot") { p.t += dt; p.jy = Math.sin(Math.PI * clamp(p.t / 0.7, 0, 1)) * (p.shotKind === "layup" ? 0.6 : 0.45); p.yaw = Math.atan2(RIM.x - p.pos.x, RIM.z - p.pos.z); if (p.t >= 0.32 && ball.holder === p) release(p); if (p.t >= 0.7) { p.state = "run"; p.jy = 0; } return; }
+      if (p.state === "follow") { p.t += dt; p.jy = Math.max(0, p.jy - dt * 2); if (p.t > 0.5) p.state = "run"; }
+      var to = plan.target.clone().sub(p.pos).setY(0), dist = to.length(), want = dist > 0.08 ? to.normalize().multiplyScalar(Math.min(plan.speed, dist * 4)) : new V3();
+      p.vel.lerp(want, clamp(dt * 8, 0, 1)); p.pos.addScaledVector(p.vel, dt);
+      p.pos.x = clamp(p.pos.x, -SIDE + 0.3, SIDE - 0.3); p.pos.z = clamp(p.pos.z, BASE + 0.4, HALF + 0.4);
+      var sp = p.vel.length();
+      if (plan.face) p.yaw = lerpAngle(p.yaw, Math.atan2(plan.face.x - p.pos.x, plan.face.z - p.pos.z), dt * 8);
+      else if (sp > 0.3) p.yaw = lerpAngle(p.yaw, Math.atan2(p.vel.x, p.vel.z), dt * 10);
+      p.phase += dt * (4 + sp * 3.2);
+      p.jy = p.celebrate > 0 ? Math.abs(Math.sin(p.celebrate * 9)) * 0.35 : p.state === "follow" ? p.jy : 0;
+    });
+    // keep players from overlapping
+    for (var a = 0; a < players.length; a++) for (var b = a + 1; b < players.length; b++) { var A = players[a], B = players[b], dx = B.pos.x - A.pos.x, dz = B.pos.z - A.pos.z, d = Math.hypot(dx, dz); if (d > 0 && d < 0.62) { var push = (0.62 - d) / 2; dx /= d; dz /= d; A.pos.x -= dx * push; A.pos.z -= dz * push; B.pos.x += dx * push; B.pos.z += dz * push; } }
+    stepBall(dt);
+  }
+  function lerpAngle(a, b, t) { var d = ((b - a + Math.PI * 3) % (Math.PI * 2)) - Math.PI; return a + d * clamp(t, 0, 1); }
+  function stepBall(dt) {
+    var p = ball.holder;
+    if (ball.mode === "held" && p) {
+      var f = new V3(Math.sin(p.yaw), 0, Math.cos(p.yaw)), r = new V3(Math.cos(p.yaw), 0, -Math.sin(p.yaw));
+      ball.phase += dt * Math.PI * 2 * 2.3;
+      var side = ball.side, low = 0, behind = 0, k;
+      if (ball.move) {
+        ball.move.t += dt; k = clamp(ball.move.t / ball.move.dur, 0, 1);
+        if (ball.move.type === "cross") { side = ball.move.s0 * Math.cos(Math.PI * ease(k)); low = Math.sin(Math.PI * k); }
+        else if (ball.move.type === "btb") { side = ball.move.s0 * Math.cos(Math.PI * ease(k)); behind = Math.sin(Math.PI * ease(k)); low = 0.5; }
+        else if (ball.move.type === "spin") { p.yaw += dt * Math.PI * 2 / ball.move.dur; }
+        if (k >= 1) { if (ball.move.type !== "spin") ball.side = -ball.move.s0; ball.move = null; }
+      }
+      if (p.state === "shoot" || p.state === "dunk") { ball.pos.copy(handPoint(p, true)); }
+      else {
+        var hgt = 0.12 + (0.62 - 0.12) * Math.abs(Math.cos(ball.phase)) * (1 - 0.6 * low);
+        ball.pos.copy(p.pos).addScaledVector(r, side * 0.34).addScaledVector(f, 0.2 - behind * 0.5).setY(hgt + p.jy * 0.5);
+      }
+      ball.lastHolder = p;
+    } else if ((ball.mode === "shot" || ball.mode === "pass") && ball.flight) {
+      var fl = ball.flight; fl.t += dt / fl.T; var k2 = clamp(fl.t, 0, 1);
+      var to = fl.target ? handPoint(fl.target, false) : fl.to;
+      ball.pos.lerpVectors(fl.from, to, k2); ball.pos.y += Math.sin(Math.PI * k2) * fl.h;
+      if (fl.target) { var thief = players.find(function (q) { return q.team !== fl.target.team && q.pos.distanceTo(new V3(ball.pos.x, 0, ball.pos.z)) < 0.4 && rand() < 0.02; }); if (thief) { giveBall(thief, "steal"); caption(thief.name + " picks off the pass", 1.6); return; } }
+      if (k2 >= 1) {
+        if (fl.target) { giveBall(fl.target, "pass"); }
+        else if (fl.make) { ball.mode = "swish"; ball.vel.set(0, -1.5, 0); ball.pos.copy(RIM); scored(fl); G.net = 1; }
+        else { looseBall(ball.pos.clone(), new V3((rand() - 0.5) * 3, 2.6 + rand(), 2 + rand() * 2.5)); caption("Off the rim", 1.2); }
+      }
+    } else if (ball.mode === "swish" || ball.mode === "loose" || ball.mode === "dead") {
+      ball.vel.y -= 9.8 * dt; ball.pos.addScaledVector(ball.vel, dt);
+      if (ball.pos.y < 0.21) { ball.pos.y = 0.21; ball.vel.y = Math.abs(ball.vel.y) * 0.62; ball.vel.x *= 0.85; ball.vel.z *= 0.85; if (ball.mode === "swish") ball.mode = "dead"; }
+      ball.pos.x = clamp(ball.pos.x, -SIDE, SIDE); ball.pos.z = clamp(ball.pos.z, BASE + 0.2, HALF + 1);
+      if (ball.mode === "loose" && ball.pos.y < 1.3) { var grab = players.find(function (q) { return q.hidden <= 0 && d2(q.pos, ball.pos) < 0.45; }); if (grab) { var def = grab.team !== G.poss; giveBall(grab, "rebound"); caption(grab.name + (def ? " grabs the board" : " offensive board"), 1.4); } }
+    }
+    ballMesh.position.copy(ball.pos); ballMesh.rotation.x += dt * (ball.mode === "held" ? 6 : 10);
+    ballShadow.position.set(ball.pos.x, 0.012, ball.pos.z); ballShadow.scale.setScalar(1 - Math.min(0.6, ball.pos.y * 0.15));
+  }
+
+  // ---------- pose the figures ----------
+  function pose(p) {
+    var F = p.f, s = Math.sin(p.phase), sp = p.vel.length() / 4.5, off = p.team === G.poss, hold = ball.holder === p;
+    F.root.position.set(p.pos.x, p.jy, p.pos.z); F.root.rotation.y = p.yaw;
+    F.LL.hp.rotation.x = s * 0.9 * sp; F.RL.hp.rotation.x = -s * 0.9 * sp;
+    F.LA.sh.rotation.set(-s * 0.8 * sp, 0, 0.12); F.RA.sh.rotation.set(s * 0.8 * sp, 0, -0.12);
+    F.body.position.y = Math.abs(Math.cos(p.phase)) * 0.05 * sp; F.chest.rotation.x = 0.12 * sp; F.head.rotation.set(0, 0, 0);
+    if (!off && G.dead <= 0) { F.LA.sh.rotation.set(-0.3, 0, 1.15); F.RA.sh.rotation.set(-0.3, 0, -1.15); F.hips.position.y = 0.32; F.LL.hp.rotation.z = 0.25; F.RL.hp.rotation.z = -0.25; }
+    else { F.hips.position.y = 0.36; F.LL.hp.rotation.z = 0; F.RL.hp.rotation.z = 0; }
+    if (hold && p.state !== "shoot" && p.state !== "dunk") {
+      var drib = ball.side > 0 ? F.RA : F.LA;   // note: the figure's right is -x locally, so mirror for the hand that dribbles
+      drib = (ball.side > 0) ? F.LA : F.RA;
+      drib.sh.rotation.x = -0.5 - 0.5 * Math.abs(Math.cos(ball.phase)); drib.sh.rotation.z = (ball.side > 0 ? 0.35 : -0.35);
+      F.chest.rotation.x = 0.22; F.hips.position.y = 0.33;
+    }
+    if (p.state === "shoot") { var lift = clamp(p.t / 0.32, 0, 1); F.LA.sh.rotation.set(-2.9 * lift, 0, 0.15); F.RA.sh.rotation.set(-2.9 * lift, 0, -0.15); F.LL.hp.rotation.x = F.RL.hp.rotation.x = 0; }
+    if (p.state === "dunk") { F.LA.sh.rotation.set(-3.0, 0, 0.1); F.RA.sh.rotation.set(-2.2, 0, -0.4); F.LL.hp.rotation.x = 0.6; F.RL.hp.rotation.x = -0.4; }
+    if (p.celebrate > 0) { F.LA.sh.rotation.set(-2.8, 0, 0.5); F.RA.sh.rotation.set(-2.8, 0, -0.5); }
+    if (F.root.userData.tip) { F.root.userData.tip.rotation.x = -0.7 - sp * 0.5 + Math.sin(p.phase * 0.5) * 0.08; }
+  }
+
+  // ---------- camera ----------
+  var camT = new V3(0, 1, 0), camP = new V3(0, 8, 15);
+  function stepCamera(dt) {
+    var focus = (G.cam === "ninja" ? ninja.pos.clone() : ball.pos.clone().setY(0)).lerp(RIM0, G.cam === "ninja" ? 0.15 : 0.3).setY(1.1);
+    if (G.cam === "free") { controls.target.lerp(focus, clamp(dt * 2, 0, 1)); controls.update(); return; }
+    camT.lerp(focus, clamp(dt * 3, 0, 1));
+    var want = G.cam === "ninja" ? camT.clone().add(new V3(ninja.pos.x * 0.15, 4.2, 7.2)) : camT.clone().add(new V3(camT.x * 0.25, 7.2, 12.5));
+    camP.lerp(want, clamp(dt * 2.5, 0, 1)); camera.position.copy(camP); camera.lookAt(camT);
+  }
+
+  // ---------- UI wiring ----------
+  function press(sel, btn) { document.querySelectorAll(sel).forEach(function (o) { o.setAttribute("aria-pressed", String(o === btn)); }); }
+  document.querySelectorAll("[data-mode]").forEach(function (b) { b.addEventListener("click", function () { press("[data-mode]", b); G.mode = b.getAttribute("data-mode"); document.getElementById("pad").hidden = G.mode !== "play" || !matchMedia("(pointer: coarse)").matches; caption(G.mode === "play" ? "You're the Ninja. WASD to move, Space to shoot" : "Watching the AI game", 2.4); if (G.mode === "play") renderer.domElement.focus(); }); });
+  document.querySelectorAll("[data-cam]").forEach(function (b) { b.addEventListener("click", function () { press("[data-cam]", b); G.cam = b.getAttribute("data-cam"); controls.enabled = G.cam === "free"; if (G.cam === "free") { controls.target.copy(camT); } }); });
+  document.getElementById("g-reset").addEventListener("click", newGame);
+  document.getElementById("g-highlight").addEventListener("click", function () { if (G.dead > 0 || G.over > 0) return; resetPositions(0); G.poss = 0; giveBall(ninja, "inbound"); G.clear = false; planNinja(); if (G.mode === "play") { press("[data-mode]", document.getElementById("mode-watch")); G.mode = "watch"; document.getElementById("pad").hidden = true; } caption("Ninja highlight", 1.4); });
+  renderer.domElement.tabIndex = 0;
+
+  function resize() { var w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w < 640 ? 52 : 38; camera.updateProjectionMatrix(); }
+  window.addEventListener("resize", resize); resize();
+
+  newGame();
+  // Deep links for review: #play, #ninja-cam, #highlight
+  if (location.hash === "#play") document.getElementById("mode-play").click();
+  if (location.hash === "#ninja-cam") document.getElementById("cam-ninja").click();
+  if (location.hash === "#highlight") document.getElementById("g-highlight").click();
+
+  var last = performance.now(), acc = 0;
+  function frame(now) {
+    requestAnimationFrame(frame);
+    var dt = Math.min(0.05, (now - last) / 1000); last = now; acc += dt;
+    try {
+      while (acc >= 1 / 60) { step(1 / 60); acc -= 1 / 60; }
+      players.forEach(pose);
+    } catch (err) { acc = 0; if (!frame.warned) { frame.warned = true; console.error("HL-ERR " + (err && err.stack || err)); } }
+    puffs.forEach(function (p) { if (p.life > 0) { p.life -= dt * 1.1; p.m.position.addScaledVector(p.v, dt); p.v.multiplyScalar(0.96); p.m.scale.setScalar(1 + (1 - p.life) * 1.8); p.m.material.opacity = Math.max(0, p.life) * 0.7; } else p.m.material.opacity = 0; });
+    if (G.net > 0) { G.net -= dt * 2.5; netGroup.scale.y = 1 + Math.sin(G.net * 9) * 0.25 * G.net; } else netGroup.scale.y = 1;
+    stepCamera(dt);
+    renderer.render(scene, camera);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>

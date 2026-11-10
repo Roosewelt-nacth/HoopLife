@@ -1,0 +1,539 @@
+<title>HoopLife Ball Keychain</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700;800;900&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+  /* Layout: a product stage with the live 3D keychain; controls (colourway with codes, attachment, slogan, view, hand photo) below; then print specs. Single deliberate dark look. */
+  :root {
+    --bg: #0E0E10;
+    --stage-a: #26262B;
+    --stage-b: #0B0B0C;
+    --line: #2C2C31;
+    --fg: #F4F4F2;
+    --muted: #9A9AA1;
+    --red: #D7262E;
+    --body: "Archivo", "Segoe UI", system-ui, sans-serif;
+    --mono: "JetBrains Mono", Consolas, monospace;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+  .in { max-width: 1120px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .label { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  header .in { padding-block: 40px 20px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px 24px; }
+  h1 { font-size: clamp(30px, 5vw, 48px); font-weight: 800; letter-spacing: -.02em; line-height: 1; margin: 6px 0 0; }
+  .stage { position: relative; height: min(80vh, 760px); min-height: 480px; background: radial-gradient(70% 70% at 50% 42%, var(--stage-a), var(--stage-b)); border-block: 1px solid var(--line); overflow: hidden; }
+  .stage.photo { background: #000 center / cover no-repeat; }
+  .stage canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; transform-origin: 50% 50%; }
+  .stage canvas:active { cursor: grabbing; }
+  .hint { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); font: 500 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); pointer-events: none; background: rgba(0,0,0,.35); padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+  .fallback { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; padding: 24px; color: var(--muted); }
+  .controls .in { padding-block: 20px; display: grid; gap: 22px; }
+  .row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 18px 32px; }
+  .group { display: grid; gap: 8px; align-content: start; }
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pills button, .file { font: 500 13px var(--body); color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 9px 16px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+  .pills button[aria-pressed="true"] { border-color: var(--red); }
+  .pills button:focus-visible, .file:focus-within { outline: 2px solid var(--red); outline-offset: 2px; }
+  .file input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+  .sw { width: 14px; height: 14px; border-radius: 50%; display: inline-block; border: 1px solid rgba(255,255,255,.25); }
+  .codes { display: flex; flex-wrap: wrap; gap: 8px 16px; font: 500 12px var(--mono); color: var(--muted); }
+  .codes span { display: inline-flex; align-items: center; gap: 6px; }
+  .codes i { width: 12px; height: 12px; border-radius: 3px; display: inline-block; border: 1px solid rgba(255,255,255,.2); }
+  .hand { border: 1px solid var(--line); border-radius: 10px; padding: 16px; display: grid; gap: 14px; }
+  .hand p { margin: 0; color: var(--muted); font-size: 14px; max-width: 70ch; }
+  .sliders { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px 24px; }
+  .sliders label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+  .sliders input { width: 100%; accent-color: var(--red); }
+  .specs .in { padding-block: 24px 72px; display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 20px 32px; border-top: 1px solid var(--line); }
+  .specs div { display: grid; gap: 4px; align-content: start; }
+  .specs b { font-weight: 700; }
+  .specs span { color: var(--muted); font-size: 14px; }
+</style>
+
+<header><div class="in">
+  <div><div class="label">Merch mockup v3 · For Lawrance</div><h1>HoopLife Ball Keychain</h1></div>
+  <div class="label">40 mm mini basketball · B1 logo · branded panel · jock tag</div>
+</div></header>
+
+<section class="stage" id="stage" aria-label="3D ball keychain preview">
+  <div class="hint" id="hint">Drag to turn · Scroll or pinch to zoom</div>
+</section>
+
+<section class="controls"><div class="in">
+  <div class="group"><span class="label">Colourway</span>
+    <div class="pills" role="group" aria-label="Colourway" id="colours"></div>
+    <div class="codes" id="codes"></div>
+  </div>
+  <div class="row">
+    <div class="group"><span class="label">Attachment</span>
+      <div class="pills" role="group" aria-label="Attachment">
+        <button type="button" id="a-jock" data-att="jock" aria-pressed="true">Jersey jock tag</button>
+        <button type="button" id="a-none" data-att="none" aria-pressed="false">Ball only</button>
+        <button type="button" id="t-ticket" data-toggle="ticket" aria-pressed="false">Ticket card</button>
+      </div>
+    </div>
+    <div class="group" hidden><span class="label">Slogan</span>
+      <div class="pills" role="group" aria-label="Slogan" id="slogans"></div>
+    </div>
+    <div class="group"><span class="label">View</span>
+      <div class="pills" role="group" aria-label="View">
+        <button type="button" id="v-front" data-view="front" aria-pressed="true">Logo</button>
+        <button type="button" id="v-brand" data-view="brand" aria-pressed="false">Wordmark</button>
+        <button type="button" id="v-est" data-view="est" aria-pressed="false">Est. side</button>
+        <button type="button" id="v-tag" data-view="tag" aria-pressed="false">Tag</button>
+      </div>
+    </div>
+  </div>
+  <div class="hand">
+    <div class="row">
+      <div class="group"><span class="label">In someone's hand</span>
+        <p>Add a photo of a hand (an open palm works best). The keychain sits on top of it, and you can move, size and light it to match.</p></div>
+      <div class="pills">
+        <label class="file" for="photo">Add hand photo<input type="file" id="photo" accept="image/*"></label>
+        <button type="button" id="clear" hidden>Back to studio</button>
+      </div>
+    </div>
+    <div class="sliders" id="sliders" hidden>
+      <label for="s-size">Size<input type="range" id="s-size" min="0.3" max="2.2" step="0.01" value="1"></label>
+      <label for="s-x">Left / right<input type="range" id="s-x" min="-50" max="50" step="0.5" value="0"></label>
+      <label for="s-y">Up / down<input type="range" id="s-y" min="-50" max="50" step="0.5" value="0"></label>
+      <label for="s-light">Light<input type="range" id="s-light" min="0.4" max="1.6" step="0.01" value="0.9"></label>
+    </div>
+  </div>
+</div></section>
+
+<section class="specs"><div class="in">
+  <div><b>Ball</b><span>40 mm. Front: B1 logo. Left panel: HOOPLIFE hero wordmark. Right panel: Est. 2026.</span></div>
+  <div><b>Branding rule</b><span>One bold wordmark on one panel, never across a seam, small secondary text on the panel below. The same layout the big ball brands use.</span></div>
+  <div><b>Jersey jock tag</b><span>44 × 16 mm one-sided woven label: B1 mark slot, a court with gold arcs and the heartbeat as the half-court line, ONE COURT · ONE FAMILY, HOOPLIFE, a scoreboard member number and EST. 2026.</span></div>
+  <div><b>Ticket card</b><span>Packaging card styled as a game ticket: ADMIT ONE, a tear-off stub with Sec HL · Row 26 · Seat 01 and the member number.</span></div>
+  <div><b>Files</b><span>The print STL and tag artwork are in 02_Merch/keychain-ball/print.</span></div>
+</div></section>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/environments/RoomEnvironment.js"></script>
+<script>
+(function () {
+  var stage = document.getElementById("stage");
+  // Colourways: ball, seams, heartbeat, printed ink, rubber-patch base.
+  var COLOURS = [
+    { id: "court", name: "Court Orange", body: "#C8581F", seam: "#1B1411", pulse: "#FFFFFF", ink: "#1B1411", patch: "#1B1411" },
+    { id: "night", name: "Midnight Pulse", body: "#141417", seam: "#D9D9DC", pulse: "#D7262E", ink: "#D9D9DC", patch: "#141417" },
+    { id: "chalk", name: "Chalk Court", body: "#EEEBE3", seam: "#141416", pulse: "#D7262E", ink: "#141416", patch: "#141416" },
+    { id: "red", name: "Hoop Red", body: "#B3151D", seam: "#121214", pulse: "#FFFFFF", ink: "#121214", patch: "#121214" },
+    { id: "gold", name: "Trophy Gold", body: "#C29A44", seam: "#17140F", pulse: "#D7262E", ink: "#17140F", patch: "#17140F" },
+    { id: "blacktop", name: "Blacktop", body: "#1A1A1D", seam: "#E8702A", pulse: "#FFFFFF", ink: "#E8702A", patch: "#E8702A" }
+  ];
+  var SLOGANS = [
+    { id: "ppp", name: "Passion. Purpose. Hoops.", lines: ["PASSION.", "PURPOSE.", "HOOPS."] },
+    { id: "family", name: "One Court. One Family.", lines: ["ONE", "COURT.", "ONE", "FAMILY."] },
+    { id: "chennai", name: "Chennai Runs Here.", lines: ["CHENNAI", "RUNS", "HERE."] }
+  ];
+  var pills = document.getElementById("colours"), slog = document.getElementById("slogans");
+  COLOURS.forEach(function (c, i) {
+    pills.insertAdjacentHTML("beforeend", '<button type="button" id="c-' + c.id + '" data-c="' + i + '" aria-pressed="' + (i === 0) + '"><span class="sw" style="background:linear-gradient(135deg,' + c.body + ' 60%,' + c.seam + ' 60% 80%,' + c.pulse + ' 80%)"></span>' + c.name + '</button>');
+  });
+  SLOGANS.forEach(function (s, i) { slog.insertAdjacentHTML("beforeend", '<button type="button" id="s-' + s.id + '" data-s="' + i + '" aria-pressed="' + (i === 0) + '">' + s.name + '</button>'); });
+
+  function fallback() {
+    stage.insertAdjacentHTML("beforeend", '<div class="fallback"><p>The 3D preview could not start on this device. Try a recent Chrome, Edge or Safari.</p></div>');
+    document.getElementById("hint").hidden = true;
+  }
+  if (!window.THREE || !THREE.OrbitControls) { fallback(); return; }
+  var renderer;
+  try { renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true }); } catch (e) { fallback(); return; }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 0.9;
+  renderer.setClearColor(0x000000, 0);
+  var canvas = renderer.domElement; stage.insertBefore(canvas, stage.firstChild);
+
+  var scene = new THREE.Scene();
+  var pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new THREE.RoomEnvironment(), 0.04).texture;
+  var camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
+  var TARGET = new THREE.Vector3(0.95, 0.7, 0);
+  camera.position.set(0.95, 0.7, 9.6);
+  var controls = new THREE.OrbitControls(camera, canvas);
+  controls.target.copy(TARGET); controls.enableDamping = true; controls.enablePan = false;
+  controls.minDistance = 2.6; controls.maxDistance = 13;
+  var key = new THREE.DirectionalLight(0xffffff, 0.9); key.position.set(3, 5, 5); scene.add(key);
+  var rim = new THREE.DirectionalLight(0xffffff, 0.5); rim.position.set(-4, 2, -4); scene.add(rim);
+
+  // ---------- Logo seams (B1) ----------
+  var SEAM_W = 6, PULSE_W = 8, N = 1024, S = N / 200;
+  function seams(g, front) {
+    g.lineCap = "round"; g.lineJoin = "round"; g.lineWidth = SEAM_W * S; g.beginPath();
+    [[42, 42, 64, 76, 64, 124, 42, 158], [158, 42, 136, 76, 136, 124, 158, 158]].forEach(function (c) {
+      g.moveTo(c[0] * S, c[1] * S); g.bezierCurveTo(c[2] * S, c[3] * S, c[4] * S, c[5] * S, c[6] * S, c[7] * S);
+    });
+    if (front) { g.moveTo(16 * S, 100 * S); g.lineTo(58 * S, 100 * S); g.moveTo(142 * S, 100 * S); g.lineTo(184 * S, 100 * S); g.moveTo(100 * S, 16 * S); g.lineTo(100 * S, 60 * S); g.moveTo(100 * S, 140 * S); g.lineTo(100 * S, 184 * S); }
+    else { g.moveTo(10 * S, 100 * S); g.lineTo(190 * S, 100 * S); g.moveTo(100 * S, 10 * S); g.lineTo(100 * S, 190 * S); }
+    g.stroke();
+  }
+  function pulse(g) {
+    g.lineCap = "round"; g.lineJoin = "round"; g.lineWidth = PULSE_W * S; g.beginPath();
+    [[58, 100], [81, 100], [90, 72], [100, 128], [110, 100], [142, 100]].forEach(function (p, i) { g[i ? "lineTo" : "moveTo"](p[0] * S, p[1] * S); });
+    g.stroke();
+  }
+  function mask(draw, blur) {
+    var c = document.createElement("canvas"); c.width = c.height = N; var g = c.getContext("2d");
+    g.fillStyle = "#000"; g.fillRect(0, 0, N, N); g.strokeStyle = "#fff";
+    if (blur) g.filter = "blur(" + blur + "px)";
+    draw(g); return g.getImageData(0, 0, N, N).data;
+  }
+  var mSF = mask(function (g) { seams(g, true); }), mSB = mask(function (g) { seams(g, false); }), mP = mask(pulse);
+  var bSF = mask(function (g) { seams(g, true); pulse(g); }, 5), bSB = mask(function (g) { seams(g, false); }, 5);
+
+  // ---------- Panel branding (printed decals) ----------
+  // HOOPLIFE in the brand's own monoline letters, bold for print.
+  var GL = [[0, "M0,0 V100 M52,0 V100 M0,50 H52"], [80, "M42,0 A42,50 0 1 0 42.01,0"], [192, "M42,0 A42,50 0 1 0 42.01,0"], [304, "M0,100 V0 H26 A26,26 0 0 1 26,52 H0"], [384, "M0,0 V100 H46"], [458, "M0,0 V100"], [486, "M46,0 H0 V100 M0,50 H38"], [560, "M46,0 H0 V100 H46 M0,50 H38"]];
+  function textCanvas(w, h, draw) { var c = document.createElement("canvas"); c.width = w; c.height = h; var g = c.getContext("2d"); g.fillStyle = "#000"; g.fillRect(0, 0, w, h); g.fillStyle = g.strokeStyle = "#fff"; draw(g, w, h); return c; }
+  function heroCanvas() {
+    return textCanvas(1024, 256, function (g) {
+      var k = 900 / 620; g.save(); g.translate((1024 - 606 * k) / 2, (256 - 100 * k) / 2); g.scale(k, k);
+      g.lineWidth = 15; g.lineCap = "round"; g.lineJoin = "round";
+      GL.forEach(function (q) { g.save(); g.translate(q[0], 0); g.stroke(new Path2D(q[1])); g.restore(); }); g.restore();
+    });
+  }
+  function lineCanvas(text, size, spacing) {
+    return textCanvas(1024, 128, function (g) {
+      g.font = "800 " + size + "px Archivo, 'Arial Black', sans-serif"; g.textAlign = "center"; g.textBaseline = "middle";
+      if ("letterSpacing" in g) g.letterSpacing = spacing + "px";
+      g.fillText(text, 512, 66);
+    });
+  }
+  var TW = 2048, TH = 1024, count = TW * TH;
+  var dirX = new Float32Array(count), dirY = new Float32Array(count), dirZ = new Float32Array(count);
+  for (var j = 0; j < TH; j++) {
+    var th = (j + 0.5) / TH * Math.PI, st = Math.sin(th), cy = Math.cos(th);
+    for (var i = 0; i < TW; i++) { var ph = (i + 0.5) / TW * 2 * Math.PI, k0 = j * TW + i; dirX[k0] = -Math.cos(ph) * st; dirY[k0] = cy; dirZ[k0] = Math.sin(ph) * st; }
+  }
+  // Gnomonic decal: project a flat canvas onto the ball around a centre direction.
+  function decal(cv, latDeg, side, halfDeg, out) {
+    var la = latDeg * Math.PI / 180, c = [side * Math.cos(la), Math.sin(la), 0];
+    var n = [-c[1] * c[0], 1 - c[1] * c[1], -c[1] * c[2]];   // world up, made tangent to the ball at c
+    var nl = Math.hypot(n[0], n[1], n[2]); n = [n[0] / nl, n[1] / nl, n[2] / nl];
+    var f = [-c[0], -c[1], -c[2]], r = [f[1] * n[2] - f[2] * n[1], f[2] * n[0] - f[0] * n[2], f[0] * n[1] - f[1] * n[0]];
+    var w = cv.width, h = cv.height, d = cv.getContext("2d").getImageData(0, 0, w, h).data, tw = Math.tan(halfDeg * Math.PI / 180), th2 = tw * h / w, lim = Math.cos(halfDeg * 1.4 * Math.PI / 180);
+    for (var q = 0; q < count; q++) {
+      var dot = dirX[q] * c[0] + dirY[q] * c[1] + dirZ[q] * c[2]; if (dot < lim) continue;
+      var a = (dirX[q] * r[0] + dirY[q] * r[1] + dirZ[q] * r[2]) / dot, b = (dirX[q] * n[0] + dirY[q] * n[1] + dirZ[q] * n[2]) / dot;
+      var px = Math.round((a / tw * 0.5 + 0.5) * w), py = Math.round((0.5 - b / th2 * 0.5) * h);
+      if (px < 0 || py < 0 || px >= w || py >= h) continue;
+      var v = d[(py * w + px) * 4] / 255; if (v > out[q]) out[q] = v;
+    }
+  }
+
+  var seamA = new Float32Array(count), pulseA = new Float32Array(count), grooveA = new Float32Array(count), inkA = new Float32Array(count), accA = new Float32Array(count);
+  (function bake() {
+    for (var q = 0; q < count; q++) {
+      var x = dirX[q], y = dirY[q], z = dirZ[q], front = z >= 0, ang = Math.acos(Math.min(1, Math.abs(z))), rho = Math.sqrt(x * x + y * y) || 1e-6;
+      var r = 84 * (0.7 * Math.sin(ang) + 0.3 * ang / (Math.PI / 2)), lx = (front ? x : -x) / rho, ly = y / rho;
+      var px = Math.min(N - 1, Math.max(0, Math.round((100 + r * lx) * S))), py = Math.min(N - 1, Math.max(0, Math.round((100 - r * ly) * S)));
+      var o = (py * N + px) * 4;
+      if (front) { seamA[q] = mSF[o] / 255; pulseA[q] = mP[o] / 255; grooveA[q] = bSF[o] / 255; }
+      else { seamA[q] = mSB[o] / 255; grooveA[q] = bSB[o] / 255; }
+    }
+  })();
+  function bakeBranding() {
+    inkA.fill(0); accA.fill(0);
+    decal(heroCanvas(), 19, -1, 34, inkA);                                   // hero wordmark, left upper panel
+    decal(lineCanvas("EST. 2026", 92, 18), 15, 1, 24, inkA);                 // right upper panel
+  }
+  bakeBranding();
+
+  // Pebbled leather bumps + grooves.
+  var pebble = document.createElement("canvas"); pebble.width = TW; pebble.height = TH;
+  (function () {
+    var g = pebble.getContext("2d"); g.fillStyle = "rgb(120,120,120)"; g.fillRect(0, 0, TW, TH);
+    var seed = 7; function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+    for (var n = 0; n < 90000; n++) {
+      var yy = rnd() * TH, lat = Math.sin((yy / TH) * Math.PI) || 0.05, rr = 1.6 + rnd() * 1.4;
+      g.fillStyle = "rgba(255,255,255," + (0.25 + rnd() * 0.35) + ")";
+      g.beginPath(); g.ellipse(rnd() * TW, yy, rr / Math.max(lat, 0.08), rr, 0, 0, 7); g.fill();
+    }
+  })();
+  var pebD = pebble.getContext("2d").getImageData(0, 0, TW, TH).data;
+  var bumpC = document.createElement("canvas"); bumpC.width = TW; bumpC.height = TH;
+  function bakeBump() {
+    var g = bumpC.getContext("2d"), im = g.createImageData(TW, TH), d = im.data;
+    for (var k = 0; k < count; k++) {
+      var ink = Math.max(inkA[k], accA[k]), v = pebD[k * 4] * (1 - grooveA[k]) * (1 - 0.6 * seamA[k]);
+      v = v + (150 - v) * ink * 0.85;    // printed ink fills the pebbles smooth
+      d[k * 4] = d[k * 4 + 1] = d[k * 4 + 2] = v; d[k * 4 + 3] = 255;
+    }
+    g.putImageData(im, 0, 0);
+  }
+  bakeBump();
+  var colC = document.createElement("canvas"); colC.width = TW; colC.height = TH;
+  var colTex = new THREE.CanvasTexture(colC); colTex.encoding = THREE.sRGBEncoding; colTex.anisotropy = 8;
+  var bumpTex = new THREE.CanvasTexture(bumpC); bumpTex.anisotropy = 8;
+  function hex(h) { return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)]; }
+  function paint(c) {
+    var b = hex(c.body), s = hex(c.seam), p = hex(c.pulse), ik = hex(c.ink), g = colC.getContext("2d"), im = g.createImageData(TW, TH), d = im.data;
+    for (var k = 0; k < count; k++) {
+      var shade = 0.93 + 0.12 * (pebD[k * 4] - 120) / 135, a = seamA[k], q = pulseA[k], t1 = inkA[k], t2 = accA[k];
+      for (var ch = 0; ch < 3; ch++) {
+        var v = b[ch] * shade; v += (ik[ch] - v) * t1; v += (p[ch] - v) * t2; v += (s[ch] - v) * a; v += (p[ch] - v) * q; d[k * 4 + ch] = v;
+      }
+      d[k * 4 + 3] = 255;
+    }
+    g.putImageData(im, 0, 0); colTex.needsUpdate = true;
+  }
+
+  // ---------- Ball and hardware ----------
+  var tag = new THREE.Group(); scene.add(tag);
+  var ballMat = new THREE.MeshPhysicalMaterial({ map: colTex, bumpMap: bumpTex, bumpScale: 0.018, roughness: 0.72, clearcoat: 0.25, clearcoatRoughness: 0.6, envMapIntensity: 0.55 });
+  tag.add(new THREE.Mesh(new THREE.SphereGeometry(1, 192, 128), ballMat));
+  var loopMat = new THREE.MeshPhysicalMaterial({ color: 0x1a1210, roughness: 0.6, envMapIntensity: 0.5 });
+  var loop = new THREE.Mesh(new THREE.TorusGeometry(0.15, 0.055, 20, 48), loopMat); loop.position.set(0, 1.1, 0); tag.add(loop);
+  var metal = new THREE.MeshPhysicalMaterial({ color: 0xd9dadc, metalness: 1, roughness: 0.18 });
+  var jump = new THREE.Mesh(new THREE.TorusGeometry(0.17, 0.028, 16, 48), metal); jump.position.set(0, 1.3, 0); jump.rotation.y = Math.PI / 2; tag.add(jump);
+  [-0.03, 0.03].forEach(function (z) { var s = new THREE.Mesh(new THREE.TorusGeometry(0.52, 0.03, 16, 120), metal); s.position.set(0, 1.95, z); tag.add(s); });
+
+  // ---------- Jersey jock tag v4: compact, one-sided woven label ----------
+  // Grid (design units, 440 x 162): mark slot | court + ONE COURT · ONE FAMILY strip | HOOPLIFE + scoreboard | EST. 2026.
+  var JW = 2.2, JH = 0.81, JX = 2.02, JTOP = 1.5;
+  // Tag colours per ball colourway: base weave, ink, heartbeat, gold arcs, mark slot.
+  var TAGC = {
+    court: { base: "#1B1411", ink: "#F4F4F2", pulse: "#D7262E", gold: "#C9A24A", slot: "#D7262E", slotInk: "#FFFFFF", slotPulse: "#111113" },
+    night: { base: "#141417", ink: "#E6E6E8", pulse: "#D7262E", gold: "#C9A24A", slot: "#D7262E", slotInk: "#FFFFFF", slotPulse: "#111113" },
+    chalk: { base: "#EEEBE3", ink: "#141416", pulse: "#D7262E", gold: "#B8902F", slot: "#D7262E", slotInk: "#FFFFFF", slotPulse: "#141416" },
+    red: { base: "#B3151D", ink: "#FFFFFF", pulse: "#121214", gold: "#E3C574", slot: "#121214", slotInk: "#FFFFFF", slotPulse: "#D7262E" },
+    gold: { base: "#17140F", ink: "#E9D7A6", pulse: "#D7262E", gold: "#E3C574", slot: "#C29A44", slotInk: "#17140F", slotPulse: "#D7262E" },
+    blacktop: { base: "#1A1A1D", ink: "#F4F4F2", pulse: "#D7262E", gold: "#E8702A", slot: "#E8702A", slotInk: "#1A1A1D", slotPulse: "#FFFFFF" }
+  };
+  var attach = new THREE.Group(); tag.add(attach);
+  function cv(w, h) { var c = document.createElement("canvas"); c.width = w; c.height = h; return c; }
+  var SC = 4, PW = 440 * SC, PH = 162 * SC;
+  var cFront = cv(PW, PH), cBack = cv(PW, PH), cBump = cv(PW, PH), ribC = cv(1024, 96), cTicket = cv(680, 1160);
+  function ctex(c, srgb) { var t = new THREE.CanvasTexture(c); if (srgb) t.encoding = THREE.sRGBEncoding; t.anisotropy = 8; return t; }
+  var tFront = ctex(cFront, true), tBack = ctex(cBack, true), tBump = ctex(cBump, false), ribTex = ctex(ribC, true), tTicket = ctex(cTicket, true);
+  function clothMat(o) { return new THREE.MeshPhysicalMaterial(Object.assign({ roughness: 0.9, metalness: 0, sheen: 0.6, sheenRoughness: 0.8 }, o)); }
+  var edgeMat = clothMat({ color: 0x1b1411 });
+  var mFront = clothMat({ map: tFront, bumpMap: tBump, bumpScale: 0.01 }), mBack = clothMat({ map: tBack });
+  var ribMat = clothMat({ map: ribTex, side: THREE.DoubleSide });
+  var hinge = new THREE.Group(); hinge.position.set(JX, JTOP, 0); hinge.rotation.z = 0.03; attach.add(hinge);
+  var pg = new THREE.BoxGeometry(JW, JH, 0.018); pg.translate(0, -JH / 2, 0);
+  hinge.add(new THREE.Mesh(pg, [edgeMat, edgeMat, edgeMat, edgeMat, mFront, mBack]));
+  // Woven ribbon from a D-ring on the split ring to the top centre of the tag.
+  (function () {
+    var curve = new THREE.CatmullRomCurve3([new THREE.Vector3(0.6, 1.79, 0), new THREE.Vector3(1.0, 1.92, 0), new THREE.Vector3(1.55, 1.86, 0), new THREE.Vector3(JX, JTOP + 0.02, 0)]);
+    var n = 48, half = 0.085, pos = [], uv = [], idx = [];
+    for (var q = 0; q <= n; q++) {
+      var p = curve.getPoint(q / n), tg = curve.getTangent(q / n), nx = -tg.y * half, ny = tg.x * half;
+      pos.push(p.x - nx, p.y - ny, 0.004, p.x + nx, p.y + ny, 0.004); uv.push(q / n, 0, q / n, 1);
+      if (q < n) { var a = q * 2; idx.push(a, a + 2, a + 1, a + 1, a + 2, a + 3); }
+    }
+    var g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(idx); g.computeVertexNormals();
+    attach.add(new THREE.Mesh(g, ribMat));
+    var crimp = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.2, 0.05), metal); crimp.position.set(0.61, 1.79, 0); crimp.rotation.z = 0.25; attach.add(crimp);
+    var dring = new THREE.Mesh(new THREE.TorusGeometry(0.085, 0.02, 12, 36), metal); dring.position.set(0.5, 1.74, 0); dring.rotation.y = Math.PI / 2; attach.add(dring);
+  })();
+  // Court-ticket packaging card, behind the keychain.
+  var ticket = new THREE.Mesh(new THREE.PlaneGeometry(3.4, 5.8), new THREE.MeshPhysicalMaterial({ map: tTicket, roughness: 0.55, clearcoat: 0.3, clearcoatRoughness: 0.4 }));
+  ticket.position.set(1.2, 0.72, -1.35); ticket.visible = false; scene.add(ticket);
+
+  var colour = COLOURS[0], slogan = SLOGANS[0], att = "jock";
+  function lum(h) { var c = hex(h); return (0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]) / 255; }
+  function mix(a, b, t) { var x = hex(a), y = hex(b); return "#" + [0, 1, 2].map(function (i) { return ("0" + Math.round(x[i] + (y[i] - x[i]) * t).toString(16)).slice(-2); }).join(""); }
+  function weave(g, w, h, base) {
+    g.fillStyle = base; g.fillRect(0, 0, w, h);
+    for (var y = 0; y < h; y += 4) { g.fillStyle = "rgba(255,255,255,0.05)"; g.fillRect(0, y, w, 2); }
+    for (var x = 0; x < w; x += 4) { g.fillStyle = "rgba(0,0,0,0.10)"; g.fillRect(x, 0, 2, h); }
+  }
+  // Full court seen from above (used by the ticket card).
+  function court(g, x0, y0, w, h, line, gold) {
+    var cx = x0 + w / 2; g.save(); g.lineWidth = 5; g.strokeStyle = line; g.lineCap = "round";
+    g.strokeRect(x0, y0, w, h);
+    g.beginPath(); g.moveTo(x0, y0 + h / 2); g.lineTo(x0 + w, y0 + h / 2); g.stroke();
+    g.beginPath(); g.arc(cx, y0 + h / 2, w * 0.13, 0, 7); g.stroke();
+    [1, -1].forEach(function (dir) {
+      var base = dir > 0 ? y0 : y0 + h, kw = w * 0.36, kd = h * 0.2, rim = base + dir * h * 0.07, r3 = w * 0.42;
+      g.strokeStyle = line; g.lineWidth = 5;
+      g.strokeRect(cx - kw / 2, dir > 0 ? base : base - kd, kw, kd);
+      g.beginPath(); g.arc(cx, base + dir * kd, w * 0.13, dir > 0 ? 0 : Math.PI, dir > 0 ? Math.PI : 2 * Math.PI); g.stroke();
+      g.beginPath(); g.arc(cx, rim, w * 0.035, 0, 7); g.stroke();
+      g.strokeStyle = gold;
+      g.beginPath(); g.moveTo(cx - r3, base); g.lineTo(cx - r3, rim); g.arc(cx, rim, r3, Math.PI, dir > 0 ? 0 : 2 * Math.PI, dir > 0); g.lineTo(cx + r3, base); g.stroke();
+    });
+    g.restore();
+  }
+  function mark(g, cx, cy, s, ink, acc) {
+    g.save(); g.translate(cx - 100 * s, cy - 100 * s); g.scale(s, s); g.lineWidth = 15; g.lineCap = g.lineJoin = "round"; g.strokeStyle = ink;
+    g.beginPath(); g.arc(100, 100, 84, 0, 7); g.stroke();
+    g.stroke(new Path2D("M42,42 C64,76 64,124 42,158 M158,42 C136,76 136,124 158,158 M16,100 H58 M142,100 H184 M100,16 V60 M100,140 V184"));
+    g.strokeStyle = acc; g.stroke(new Path2D("M58,100 L81,100 L90,72 L100,128 L110,100 L142,100")); g.restore();
+  }
+  function wordmark(g, x, y, width, ink, lw) {
+    g.save(); var k = width / 606; g.translate(x, y); g.scale(k, k); g.strokeStyle = ink; g.lineWidth = lw; g.lineCap = g.lineJoin = "round";
+    GL.forEach(function (q) { g.save(); g.translate(q[0], 0); g.stroke(new Path2D(q[1])); g.restore(); }); g.restore();
+  }
+  function centred(g, text, x, y, font, col, spacing) { g.fillStyle = col; g.font = font; g.textAlign = "center"; if ("letterSpacing" in g) g.letterSpacing = (spacing || 0) + "px"; g.fillText(text, x, y); }
+  function fitText(g, text, cx, y, width, font, col) {   // squeeze or stretch a line to an exact width, like SVG textLength
+    g.save(); g.font = font; g.fillStyle = col; g.textAlign = "center"; if ("letterSpacing" in g) g.letterSpacing = "0px";
+    var m = g.measureText(text).width || 1; g.translate(cx, y); g.scale(width / m, 1); g.fillText(text, 0, 0); g.restore();
+  }
+  function rr(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+  // Seven-segment digits for the scoreboard. Segments: a top, b upper right, c lower right, d bottom, e lower left, f upper left, g middle.
+  var DIGITS = { "0": "abcdef", "1": "bc", "2": "abged", "3": "abgcd", "4": "fgbc", "5": "afgcd", "6": "afgedc", "7": "abc", "8": "abcdefg", "9": "abcfgd" };
+  function digit(g, ch, x, y, on, off) {
+    var segs = { a: [7, 0, 22, 7], b: [29, 5, 7, 24], c: [29, 33, 7, 24], d: [7, 55, 22, 7], e: [0, 33, 7, 24], f: [0, 5, 7, 24], g: [7, 27.5, 22, 7] };
+    Object.keys(segs).forEach(function (k) { var s = segs[k]; g.fillStyle = DIGITS[ch].indexOf(k) >= 0 ? on : off; rr(g, x + s[0], y + s[1], s[2], s[3], 3.5); g.fill(); });
+  }
+  function drawFace() {
+    var T = TAGC[colour.id], w = PW, h = PH, tone = mix(T.base, T.ink, 0.2);
+    var g = cFront.getContext("2d"); weave(g, w, h, T.base);
+    g.save(); g.scale(SC, SC);
+    // stitched edge
+    g.save(); g.strokeStyle = mix(T.base, T.ink, 0.25); g.lineWidth = 1.4; g.setLineDash([5, 4]); rr(g, 7, 7, 426, 148, 4); g.stroke(); g.restore();
+    // 1. mark slot
+    g.fillStyle = T.slot; rr(g, 16, 16, 44, 130, 4); g.fill();
+    mark(g, 38, 81, 0.19, T.slotInk, T.slotPulse);
+    // 2. court with mirrored ends; the heartbeat is the half-court line
+    g.save(); g.translate(70, 16);
+    g.fillStyle = mix(T.base, "#000000", 0.25); rr(g, 0, 0, 212, 104, 2); g.fill();
+    g.lineCap = "round"; g.lineJoin = "round";
+    [1, -1].forEach(function (s) {
+      g.save(); if (s < 0) { g.translate(212, 0); g.scale(-1, 1); }
+      g.strokeStyle = tone; g.lineWidth = 1.4;
+      g.strokeRect(0, 34, 36, 36);
+      g.beginPath(); g.arc(36, 52, 12, -Math.PI / 2, Math.PI / 2); g.stroke();
+      g.beginPath(); g.moveTo(7, 44); g.lineTo(7, 60); g.stroke();
+      g.beginPath(); g.arc(11, 52, 2.8, 0, 7); g.stroke();
+      g.strokeStyle = T.gold; g.lineWidth = 2; g.beginPath(); g.moveTo(0, 10); g.lineTo(16, 10); g.arc(16, 52, 42, -Math.PI / 2, Math.PI / 2); g.lineTo(0, 94); g.stroke();
+      g.restore();
+    });
+    g.strokeStyle = tone; g.lineWidth = 1.4; g.beginPath(); g.arc(106, 52, 13, 0, 7); g.stroke();
+    g.strokeStyle = T.pulse; g.lineWidth = 2.6; g.beginPath();
+    [[106, 4], [106, 40], [100, 44], [112, 55], [106, 60], [106, 100]].forEach(function (p, i) { g[i ? "lineTo" : "moveTo"](p[0], p[1]); }); g.stroke();
+    g.strokeStyle = T.ink; g.lineWidth = 1.8; rr(g, 0, 0, 212, 104, 2); g.stroke();
+    g.restore();
+    // slogan strip
+    g.fillStyle = T.ink; rr(g, 70, 128, 212, 18, 2); g.fill();
+    fitText(g, "ONE COURT · ONE FAMILY", 176, 140.6, 186, "700 8.4px 'JetBrains Mono', Consolas, monospace", T.base);
+    // 3. HOOPLIFE + scoreboard
+    wordmark(g, 292, 16, 112, T.ink, 13);
+    g.fillStyle = mix(T.base, "#000000", 0.45); rr(g, 292, 44, 112, 102, 3); g.fill();
+    g.strokeStyle = mix(T.base, T.ink, 0.15); g.lineWidth = 1.2; rr(g, 292, 44, 112, 102, 3); g.stroke();
+    centred(g, "NO.", 348, 58, "700 7px 'JetBrains Mono', Consolas, monospace", mix(T.base, T.ink, 0.55), 2);
+    var lit = lum(T.base) > 0.5 ? "#FFFFFF" : T.ink, unlit = mix(mix(T.base, "#000000", 0.45), lit, 0.08);
+    digit(g, "0", 310, 66, lit, unlit); digit(g, "1", 350, 66, lit, unlit);
+    g.fillStyle = "#D7262E"; g.beginPath(); g.arc(396, 138, 2.2, 0, 7); g.fill();
+    // 4. side strip
+    g.strokeStyle = mix(T.base, T.ink, 0.12); g.lineWidth = 1; g.beginPath(); g.moveTo(414, 16); g.lineTo(414, 146); g.stroke();
+    g.save(); g.translate(425, 81); g.rotate(-Math.PI / 2); centred(g, "EST. 2026", 0, 3, "700 8.5px 'JetBrains Mono', Consolas, monospace", T.ink, 2.2); g.restore();
+    g.restore();
+    tFront.needsUpdate = true;
+    // Raised threads wherever there is print on the weave.
+    var src = g.getImageData(0, 0, w, h).data, bR = hex(T.base), out = cBump.getContext("2d").createImageData(w, h);
+    for (var p = 0; p < w * h; p++) {
+      var dB = Math.abs(src[p * 4] - bR[0]) + Math.abs(src[p * 4 + 1] - bR[1]) + Math.abs(src[p * 4 + 2] - bR[2]);
+      var v = dB > 80 ? 230 : 110 + ((p % w) % 4 < 2 ? 16 : 0) + (Math.floor(p / w) % 4 < 2 ? 10 : 0);
+      out.data[p * 4] = out.data[p * 4 + 1] = out.data[p * 4 + 2] = v; out.data[p * 4 + 3] = 255;
+    }
+    cBump.getContext("2d").putImageData(out, 0, 0); tBump.needsUpdate = true;
+    // One-sided: the back is plain weave.
+    var b2 = cBack.getContext("2d"); weave(b2, w, h, T.base); tBack.needsUpdate = true;
+    var r2 = ribC.getContext("2d"); weave(r2, 1024, 96, T.base); r2.fillStyle = T.gold; r2.fillRect(0, 12, 1024, 6); r2.fillRect(0, 78, 1024, 6); ribTex.needsUpdate = true;
+    edgeMat.color.set(T.base).convertSRGBToLinear();
+    drawTicket(T);
+  }
+  // Court-ticket card: ADMIT ONE up top, the keychain in the middle, a tear-off stub with the member number.
+  function drawTicket(T) {
+    var g = cTicket.getContext("2d"), w = 680, h = 1160, paper = lum(T.base) > 0.5 ? "#F4F1EA" : T.base, ink = lum(paper) > 0.5 ? "#141416" : "#F4F4F2";
+    g.fillStyle = paper; g.fillRect(0, 0, w, h);
+    court(g, 110, 270, 460, 640, mix(paper, ink, 0.08), mix(paper, ink, 0.08));
+    g.strokeStyle = T.gold; g.lineWidth = 6; g.strokeRect(24, 24, w - 48, h - 48);
+    mark(g, 150, 125, 0.36, ink, T.pulse === "#121214" ? "#D7262E" : T.pulse);
+    wordmark(g, 215, 92, 300, ink, 15);
+    centred(g, "ADMIT ONE", 365, 200, "700 26px 'JetBrains Mono', Consolas, monospace", ink, 10);
+    g.fillStyle = T.gold; g.fillRect(215, 222, 300, 4);
+    g.save(); g.strokeStyle = ink; g.lineWidth = 3; g.setLineDash([10, 10]); g.beginPath(); g.moveTo(40, 970); g.lineTo(w - 40, 970); g.stroke(); g.restore();
+    g.fillStyle = "#0E0E10"; [0, w].forEach(function (x) { g.beginPath(); g.arc(x, 970, 22, 0, 7); g.fill(); });
+    centred(g, "SEC HL  \u00b7  ROW 26  \u00b7  SEAT 01", w / 2, 1035, "700 26px 'JetBrains Mono', Consolas, monospace", ink, 4);
+    centred(g, "No. 01", w / 2, 1105, "900 54px Archivo, 'Arial Black', sans-serif", T.gold, 2);
+    tTicket.needsUpdate = true;
+  }
+  function setAttachment(kind) { att = kind; attach.visible = kind !== "none"; if (kind !== "none") drawFace(); }
+
+  function choose(i) {
+    colour = COLOURS[i]; paint(colour); loopMat.color.set(colour.seam).convertSRGBToLinear();
+    document.querySelectorAll("[data-c]").forEach(function (b) { b.setAttribute("aria-pressed", String(+b.getAttribute("data-c") === i)); });
+    document.getElementById("codes").innerHTML = [["Ball", colour.body], ["Seams", colour.seam], ["Heartbeat", colour.pulse], ["Print", colour.ink]].map(function (p) { return '<span><i style="background:' + p[1] + '"></i>' + p[0] + " " + p[1] + "</span>"; }).join("");
+    if (att !== "none") drawFace();
+  }
+  choose(0); setAttachment("jock");
+  pills.addEventListener("click", function (e) { var b = e.target.closest("[data-c]"); if (b) choose(+b.getAttribute("data-c")); });
+  slog.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-s]"); if (!b) return; slogan = SLOGANS[+b.getAttribute("data-s")];
+    slog.querySelectorAll("[data-s]").forEach(function (o) { o.setAttribute("aria-pressed", String(o === b)); }); if (att !== "none") drawFace();
+  });
+  document.querySelectorAll("[data-att]").forEach(function (b) {
+    b.addEventListener("click", function () { document.querySelectorAll("[data-att]").forEach(function (o) { o.setAttribute("aria-pressed", String(o === b)); }); setAttachment(b.getAttribute("data-att")); });
+  });
+  document.querySelectorAll("[data-toggle]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var on = b.getAttribute("aria-pressed") !== "true"; b.setAttribute("aria-pressed", String(on));
+      ticket.visible = on;
+    });
+  });
+  if (location.hash === "#ticket") { ticket.visible = true; document.getElementById("t-ticket").setAttribute("aria-pressed", "true"); }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { bakeBranding(); bakeBump(); bumpTex.needsUpdate = true; paint(colour); if (att !== "none") drawFace(); });
+
+  // ---------- Views ----------
+  var views = { front: [[0.95, 0.7, 9.6], [0.95, 0.7, 0]], brand: [[-6.2, 1.9, 1.4], [0, 0.4, 0]], est: [[5.2, 1.3, -3.4], [0, 0.3, 0]], tag: [[2.3, 1.15, 3.7], [2.02, 1.1, 0]], ticket: [[1.3, 0.8, 11.2], [1.25, 0.72, 0]] }, tween = null;
+  function go(name, instant) {
+    var v = views[name]; if (!v) return;
+    document.querySelectorAll("[data-view]").forEach(function (o) { o.setAttribute("aria-pressed", String(o.getAttribute("data-view") === name)); });
+    if (instant) { camera.position.fromArray(v[0]); controls.target.fromArray(v[1]); return; }
+    tween = { from: camera.position.clone(), to: new THREE.Vector3().fromArray(v[0]), tf: controls.target.clone(), tt: new THREE.Vector3().fromArray(v[1]), t0: performance.now() };
+  }
+  document.querySelectorAll("[data-view]").forEach(function (b) { b.addEventListener("click", function () { go(b.getAttribute("data-view")); }); });
+  go(location.hash.slice(1), true);
+  window.addEventListener("hashchange", function () { go(location.hash.slice(1)); });
+  var userBusy = false;
+  controls.addEventListener("start", function () { userBusy = true; tween = null; document.getElementById("hint").hidden = true; });
+
+  // ---------- In-hand photo ----------
+  var photoMode = false, sliders = document.getElementById("sliders");
+  function place() {
+    var sz = +document.getElementById("s-size").value, x = +document.getElementById("s-x").value, y = +document.getElementById("s-y").value;
+    canvas.style.transform = photoMode ? "translate(" + x + "%," + y + "%) scale(" + sz + ")" : "none";
+    renderer.toneMappingExposure = photoMode ? +document.getElementById("s-light").value : 0.9;
+  }
+  ["s-size", "s-x", "s-y", "s-light"].forEach(function (id) { document.getElementById(id).addEventListener("input", place); });
+  document.getElementById("photo").addEventListener("change", function (e) {
+    var f = e.target.files && e.target.files[0]; if (!f) return;
+    var rd = new FileReader();
+    rd.onload = function () {
+      stage.style.backgroundImage = "url(" + rd.result + ")"; stage.classList.add("photo");
+      photoMode = true; sliders.hidden = false; document.getElementById("clear").hidden = false;
+      document.getElementById("s-size").value = 0.7; place();
+    };
+    rd.readAsDataURL(f);
+  });
+  document.getElementById("clear").addEventListener("click", function () {
+    stage.style.backgroundImage = ""; stage.classList.remove("photo"); photoMode = false; sliders.hidden = true; this.hidden = true; place();
+  });
+
+  function resize() {
+    var w = stage.clientWidth, h = stage.clientHeight;
+    renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w < 600 ? 44 : 30; camera.updateProjectionMatrix();
+  }
+  window.addEventListener("resize", resize); resize();
+  var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches, t0 = performance.now();
+  function frame(now) {
+    var t = (now - t0) / 1000;
+    if (tween) { var k = Math.min(1, (now - tween.t0) / 900), e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2; camera.position.lerpVectors(tween.from, tween.to, e); controls.target.lerpVectors(tween.tf, tween.tt, e); if (k >= 1) tween = null; }
+    if (!userBusy && !still && !photoMode && !tween) { tag.rotation.y = Math.sin(t * 0.6) * 0.3; tag.rotation.z = Math.sin(t * 0.85) * 0.02; }
+    controls.update(); renderer.render(scene, camera); requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>

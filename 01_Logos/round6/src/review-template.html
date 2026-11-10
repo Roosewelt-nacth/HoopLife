@@ -1,0 +1,90 @@
+<title>HoopLife Logo Refinements</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+  /* Layout: a quiet white comparison sheet. Each refinement is one row: icon on black, icon on white, wordmark, and the size test. Single deliberate look. */
+  :root {
+    --paper: #FFFFFF;
+    --ink: #0B0B0C;
+    --rule: #E4E4E6;
+    --muted: #6B6B72;
+    --red: #D7262E;
+    --body: "Archivo", "Segoe UI", system-ui, sans-serif;
+    --mono: "JetBrains Mono", Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+  .in { max-width: 1080px; margin: 0 auto; padding-block: 56px 80px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 48px; }
+  .label { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  h1 { font-size: clamp(28px, 4vw, 40px); font-weight: 700; letter-spacing: -.02em; margin: 0; text-wrap: balance; }
+  h3 { font-size: 20px; font-weight: 700; margin: 0; }
+  p { margin: 0; max-width: 62ch; }
+  header { display: grid; gap: 12px; }
+  .opt { display: grid; gap: 14px; border-top: 1px solid var(--ink); padding-top: 16px; }
+  .opt-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 24px; }
+  .opt-head p { color: var(--muted); }
+  .badge { font: 500 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: #FFFFFF; background: var(--ink); padding: 3px 8px; vertical-align: middle; }
+  .badge.pick { background: var(--red); }
+  .row { display: grid; grid-template-columns: 150px 150px minmax(0, 1fr) 150px; gap: 12px; align-items: stretch; }
+  @media (max-width: 860px) { .row { grid-template-columns: repeat(2, minmax(0, 1fr)); } .row .w { grid-column: 1 / -1; } .row .tiny { grid-column: 1 / -1; } }
+  .tile { --tile: var(--paper); border: 1px solid var(--rule); display: grid; place-items: center; padding: 20px; max-width: 100%; background: var(--tile); color: var(--ink); }
+  .tile.sq { aspect-ratio: 1; }
+  .tile svg { width: 100%; height: auto; max-width: 120px; }
+  .tile.w svg { max-width: 460px; }
+  .tile.dark { --tile: var(--ink); border-color: var(--ink); color: #FFFFFF; }
+  .tiny { display: flex; align-items: center; justify-content: center; gap: 14px; border: 1px solid var(--rule); padding: 12px; }
+  .tiny .av { --tile: var(--ink); border-radius: 50%; overflow: hidden; background: var(--tile); color: #FFFFFF; display: grid; place-items: center; }
+  .tiny .av svg { width: 100%; height: 100%; }
+  .s40 { width: 40px; height: 40px; } .s24 { width: 24px; height: 24px; }
+  .tiny span { font: 500 11px var(--mono); color: var(--muted); }
+  .ask { border: 1px solid var(--ink); padding: 24px; display: grid; gap: 10px; }
+  .ask ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+</style>
+
+<div class="in">
+  <header>
+    <div class="label">Round 6 · Refinements · No ninja in the logo</div>
+    <h1>Four ways to sharpen the Pulse H</h1>
+    <p>Each row changes one thing from the saved checkpoint. The last column shows the icon at real profile-picture sizes (40 px and 24 px), where small differences matter most.</p>
+  </header>
+
+  <section class="opt" aria-labelledby="r0">
+    <div class="opt-head"><h3 id="r0">Checkpoint <span class="badge">Saved</span></h3><p>As approved.</p></div>
+    <div class="row"><div class="tile sq dark">{{icon-base}}</div><div class="tile sq">{{icon-base}}</div><div class="tile w">{{word-base}}</div>
+      <div class="tiny"><div class="av s40">{{icon-base}}</div><div class="av s24">{{icon-base}}</div><span>40 / 24 px</span></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="r1">
+    <div class="opt-head"><h3 id="r1">R1 · Weight</h3><p>Bolder HOOP, lighter LIFE. Reads as two words at a glance.</p></div>
+    <div class="row"><div class="tile sq dark">{{icon-weight}}</div><div class="tile sq">{{icon-weight}}</div><div class="tile w">{{word-weight}}</div>
+      <div class="tiny"><div class="av s40">{{icon-weight}}</div><div class="av s24">{{icon-weight}}</div><span>40 / 24 px</span></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="r2">
+    <div class="opt-head"><h3 id="r2">R2 · Tight</h3><p>Slightly heavier letters set closer together, so the word holds as one solid shape.</p></div>
+    <div class="row"><div class="tile sq dark">{{icon-tight}}</div><div class="tile sq">{{icon-tight}}</div><div class="tile w">{{word-tight}}</div>
+      <div class="tiny"><div class="av s40">{{icon-tight}}</div><div class="av s24">{{icon-tight}}</div><span>40 / 24 px</span></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="r3">
+    <div class="opt-head"><h3 id="r3">R3 · Line hierarchy</h3><p>A heavier ring and lighter seams. The ball reads first, then the H.</p></div>
+    <div class="row"><div class="tile sq dark">{{icon-lines}}</div><div class="tile sq">{{icon-lines}}</div><div class="tile w">{{word-lines}}</div>
+      <div class="tiny"><div class="av s40">{{icon-lines}}</div><div class="av s24">{{icon-lines}}</div><span>40 / 24 px</span></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="r4">
+    <div class="opt-head"><h3 id="r4">R4 · Solid ball <span class="badge pick">Recommended for icon</span></h3><p>A filled ball with the seams cut out. Much stronger as a tiny profile picture.</p></div>
+    <div class="row"><div class="tile sq dark">{{icon-solid}}</div><div class="tile sq">{{icon-solid}}</div><div class="tile w">{{word-solid}}</div>
+      <div class="tiny"><div class="av s40">{{icon-solid}}</div><div class="av s24">{{icon-solid}}</div><span>40 / 24 px</span></div></div>
+  </section>
+
+  <div class="ask">
+    <div class="label">For Lawrance</div>
+    <ul>
+      <li>Keep the checkpoint, or apply any of R1 to R4? They can be combined.</li>
+      <li>Should the solid ball (R4) be the profile icon, with the line version in the wordmark?</li>
+    </ul>
+  </div>
+</div>

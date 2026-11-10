@@ -1,0 +1,78 @@
+<title>HoopLife Basketball Fix</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700&family=JetBrains+Mono:wght@500&display=swap">
+<style>
+  /* Layout: white comparison sheet, one row per ball version: icon dark, icon light, wordmark, tiny sizes. Single deliberate look. */
+  :root {
+    --paper: #FFFFFF;
+    --ink: #0B0B0C;
+    --rule: #E4E4E6;
+    --muted: #6B6B72;
+    --red: #D7262E;
+    --body: "Archivo", "Segoe UI", system-ui, sans-serif;
+    --mono: "JetBrains Mono", Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55; }
+  .in { max-width: 1080px; margin: 0 auto; padding-block: 56px 80px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 48px; }
+  .label { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  h1 { font-size: clamp(28px, 4vw, 40px); font-weight: 700; letter-spacing: -.02em; margin: 0; text-wrap: balance; }
+  h3 { font-size: 20px; font-weight: 700; margin: 0; }
+  p { margin: 0; max-width: 62ch; }
+  header { display: grid; gap: 12px; }
+  .opt { display: grid; gap: 14px; border-top: 1px solid var(--ink); padding-top: 16px; }
+  .opt-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 24px; }
+  .opt-head p { color: var(--muted); }
+  .badge { font: 500 11px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: #FFFFFF; background: var(--ink); padding: 3px 8px; vertical-align: middle; }
+  .badge.pick { background: var(--red); }
+  .row { display: grid; grid-template-columns: 170px 170px minmax(0, 1fr) 150px; gap: 12px; align-items: stretch; }
+  @media (max-width: 860px) { .row { grid-template-columns: repeat(2, minmax(0, 1fr)); } .row .w, .row .tiny { grid-column: 1 / -1; } }
+  .tile { --tile: var(--paper); border: 1px solid var(--rule); display: grid; place-items: center; padding: 20px; max-width: 100%; background: var(--tile); color: var(--ink); }
+  .tile.sq { aspect-ratio: 1; }
+  .tile svg { width: 100%; height: auto; max-width: 130px; }
+  .tile.w svg { max-width: 460px; }
+  .tile.dark { --tile: var(--ink); border-color: var(--ink); color: #FFFFFF; }
+  .tiny { display: flex; align-items: center; justify-content: center; gap: 14px; border: 1px solid var(--rule); padding: 12px; }
+  .tiny .av { --tile: var(--ink); border-radius: 50%; overflow: hidden; background: var(--tile); color: #FFFFFF; display: grid; place-items: center; }
+  .tiny .av svg { width: 100%; height: 100%; }
+  .s40 { width: 40px; height: 40px; } .s24 { width: 24px; height: 24px; }
+  .tiny span { font: 500 11px var(--mono); color: var(--muted); }
+  .ask { border: 1px solid var(--ink); padding: 24px; display: grid; gap: 10px; }
+  .ask ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+</style>
+
+<div class="in">
+  <header>
+    <div class="label">Round 7 · Basketball, not tennis</div>
+    <h1>Adding the seams only a basketball has</h1>
+    <p>A tennis ball has two curved seams. A basketball also has a vertical seam and a full horizontal seam. The red heartbeat stays as the middle of the horizontal seam, so the H and the pulse are still there.</p>
+  </header>
+
+  <section class="opt" aria-labelledby="k0">
+    <div class="opt-head"><h3 id="k0">Before <span class="badge">Checkpoint</span></h3><p>Two seams only. Reads as a tennis ball.</p></div>
+    <div class="row"><div class="tile sq dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 220 220"><g transform="" fill="none" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"><circle cx="100" cy="100" r="84" stroke="currentColor"/><path d="M44,40 C72,76 72,124 44,160" stroke="currentColor"/><path d="M156,40 C128,76 128,124 156,160" stroke="currentColor"/><polyline points="65,100 80,100 89,74 100,126 109,100 135,100" stroke="#D7262E"/></g></svg></div><div class="tile sq"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 220 220"><g transform="" fill="none" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"><circle cx="100" cy="100" r="84" stroke="currentColor"/><path d="M44,40 C72,76 72,124 44,160" stroke="currentColor"/><path d="M156,40 C128,76 128,124 156,160" stroke="currentColor"/><polyline points="65,100 80,100 89,74 100,126 109,100 135,100" stroke="#D7262E"/></g></svg></div><div class="tile w"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-40 -40 712 180"><g fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path transform="translate(0,0)" d="M0,0 V100 M52,0 V100 M0,50 H52"/><path transform="translate(80,0)" d="M42,0 A42,50 0 1 0 42.01,0"/><g transform="translate(187,-10) scale(0.6)" fill="none" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"><circle cx="100" cy="100" r="84" stroke="currentColor"/><path d="M44,40 C72,76 72,124 44,160" stroke="currentColor"/><path d="M156,40 C128,76 128,124 156,160" stroke="currentColor"/><polyline points="65,100 80,100 89,74 100,126 109,100 135,100" stroke="#D7262E"/></g><path transform="translate(330,0)" d="M0,100 V0 H26 A26,26 0 0 1 26,52 H0"/><path transform="translate(410,0)" d="M0,0 V100 H46"/><path transform="translate(484,0)" d="M0,0 V100"/><path transform="translate(512,0)" d="M46,0 H0 V100 M0,50 H38"/><path transform="translate(586,0)" d="M46,0 H0 V100 H46 M0,50 H38"/></g></svg></div>
+      <div class="tiny"><div class="av s40"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 220 220"><g transform="" fill="none" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"><circle cx="100" cy="100" r="84" stroke="currentColor"/><path d="M44,40 C72,76 72,124 44,160" stroke="currentColor"/><path d="M156,40 C128,76 128,124 156,160" stroke="currentColor"/><polyline points="65,100 80,100 89,74 100,126 109,100 135,100" stroke="#D7262E"/></g></svg></div><div class="av s24"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 220 220"><g transform="" fill="none" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"><circle cx="100" cy="100" r="84" stroke="currentColor"/><path d="M44,40 C72,76 72,124 44,160" stroke="currentColor"/><path d="M156,40 C128,76 128,124 156,160" stroke="currentColor"/><polyline points="65,100 80,100 89,74 100,126 109,100 135,100" stroke="#D7262E"/></g></svg></div><span>40 / 24 px</span></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="k1">
+    <div class="opt-head"><h3 id="k1">B1 · Pulse breaks through <span class="badge pick">Recommended</span></h3><p>All four basketball seams. The vertical seam opens where the heartbeat beats through it.</p></div>
+    <div class="row"><div class="tile sq dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 220 220"><g transform="" fill="none" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"><circle cx="100" cy="100" r="84" stroke="currentColor"/><path d="M42,42 C64,76 64,124 42,158" stroke="currentColor"/><path d="M158,42 C136,76 136,124 158,158" stroke="currentColor"/><path d="M16,100 H58" stroke="currentColor"/><path d="M142,100 H184" stroke="currentColor"/><path d="M100,16 V60" stroke="currentColor"/><path d="M100,140 V184" stroke="currentColor"/><polyline points="58,100 81,100 90,72 100,128 110,100 142,100" stroke="#D7262E"/></g></svg></div><div class="tile sq"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 220 220"><g transform="" fill="none" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"><circle cx="100" cy="100" r="84" stroke="currentColor"/><path d="M42,42 C64,76 64,124 42,158" stroke="currentColor"/><path d="M158,42 C136,76 136,124 158,158" stroke="currentColor"/><path d="M16,100 H58" stroke="currentColor"/><path d="M142,100 H184" stroke="currentColor"/><path d="M100,16 V60" stroke="currentColor"/><path d="M100,140 V184" stroke="currentColor"/><polyline points="58,100 81,100 90,72 100,128 110,100 142,100" stroke="#D7262E"/></g></svg></div><div class="tile w"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-40 -40 712 180"><g fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path transform="translate(0,0)" d="M0,0 V100 M52,0 V100 M0,50 H52"/><path transform="translate(80,0)" d="M42,0 A42,50 0 1 0 42.01,0"/><g transform="translate(187,-10) scale(0.6)" fill="none" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"><circle cx="100" cy="100" r="84" stroke="currentColor"/><path d="M42,42 C64,76 64,124 42,158" stroke="currentColor"/><path d="M158,42 C136,76 136,124 158,158" stroke="currentColor"/><path d="M16,100 H58" stroke="currentColor"/><path d="M142,100 H184" stroke="currentColor"/><path d="M100,16 V60" stroke="currentColor"/><path d="M100,140 V184" stroke="currentColor"/><polyline points="58,100 81,100 90,72 100,128 110,100 142,100" stroke="#D7262E"/></g><path transform="translate(330,0)" d="M0,100 V0 H26 A26,26 0 0 1 26,52 H0"/><path transform="translate(410,0)" d="M0,0 V100 H46"/><path transform="translate(484,0)" d="M0,0 V100"/><path transform="translate(512,0)" d="M46,0 H0 V100 M0,50 H38"/><path transform="translate(586,0)" d="M46,0 H0 V100 H46 M0,50 H38"/></g></svg></div>
+      <div class="tiny"><div class="av s40"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 220 220"><g transform="" fill="none" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"><circle cx="100" cy="100" r="84" stroke="currentColor"/><path d="M42,42 C64,76 64,124 42,158" stroke="currentColor"/><path d="M158,42 C136,76 136,124 158,158" stroke="currentColor"/><path d="M16,100 H58" stroke="currentColor"/><path d="M142,100 H184" stroke="currentColor"/><path d="M100,16 V60" stroke="currentColor"/><path d="M100,140 V184" stroke="currentColor"/><polyline points="58,100 81,100 90,72 100,128 110,100 142,100" stroke="#D7262E"/></g></svg></div><div class="av s24"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 220 220"><g transform="" fill="none" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"><circle cx="100" cy="100" r="84" stroke="currentColor"/><path d="M42,42 C64,76 64,124 42,158" stroke="currentColor"/><path d="M158,42 C136,76 136,124 158,158" stroke="currentColor"/><path d="M16,100 H58" stroke="currentColor"/><path d="M142,100 H184" stroke="currentColor"/><path d="M100,16 V60" stroke="currentColor"/><path d="M100,140 V184" stroke="currentColor"/><polyline points="58,100 81,100 90,72 100,128 110,100 142,100" stroke="#D7262E"/></g></svg></div><span>40 / 24 px</span></div></div>
+  </section>
+
+  <section class="opt" aria-labelledby="k2">
+    <div class="opt-head"><h3 id="k2">B2 · Full seam</h3><p>All four seams unbroken. The heartbeat crosses over the vertical seam.</p></div>
+    <div class="row"><div class="tile sq dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 220 220"><g transform="" fill="none" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"><circle cx="100" cy="100" r="84" stroke="currentColor"/><path d="M42,42 C64,76 64,124 42,158" stroke="currentColor"/><path d="M158,42 C136,76 136,124 158,158" stroke="currentColor"/><path d="M16,100 H58" stroke="currentColor"/><path d="M142,100 H184" stroke="currentColor"/><path d="M100,16 V184" stroke="currentColor"/><polyline points="58,100 81,100 90,72 100,128 110,100 142,100" stroke="var(--tile)" stroke-width="22"/><polyline points="58,100 81,100 90,72 100,128 110,100 142,100" stroke="#D7262E"/></g></svg></div><div class="tile sq"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 220 220"><g transform="" fill="none" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"><circle cx="100" cy="100" r="84" stroke="currentColor"/><path d="M42,42 C64,76 64,124 42,158" stroke="currentColor"/><path d="M158,42 C136,76 136,124 158,158" stroke="currentColor"/><path d="M16,100 H58" stroke="currentColor"/><path d="M142,100 H184" stroke="currentColor"/><path d="M100,16 V184" stroke="currentColor"/><polyline points="58,100 81,100 90,72 100,128 110,100 142,100" stroke="var(--tile)" stroke-width="22"/><polyline points="58,100 81,100 90,72 100,128 110,100 142,100" stroke="#D7262E"/></g></svg></div><div class="tile w"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-40 -40 712 180"><g fill="none" stroke="currentColor" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><path transform="translate(0,0)" d="M0,0 V100 M52,0 V100 M0,50 H52"/><path transform="translate(80,0)" d="M42,0 A42,50 0 1 0 42.01,0"/><g transform="translate(187,-10) scale(0.6)" fill="none" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"><circle cx="100" cy="100" r="84" stroke="currentColor"/><path d="M42,42 C64,76 64,124 42,158" stroke="currentColor"/><path d="M158,42 C136,76 136,124 158,158" stroke="currentColor"/><path d="M16,100 H58" stroke="currentColor"/><path d="M142,100 H184" stroke="currentColor"/><path d="M100,16 V184" stroke="currentColor"/><polyline points="58,100 81,100 90,72 100,128 110,100 142,100" stroke="var(--tile)" stroke-width="25"/><polyline points="58,100 81,100 90,72 100,128 110,100 142,100" stroke="#D7262E"/></g><path transform="translate(330,0)" d="M0,100 V0 H26 A26,26 0 0 1 26,52 H0"/><path transform="translate(410,0)" d="M0,0 V100 H46"/><path transform="translate(484,0)" d="M0,0 V100"/><path transform="translate(512,0)" d="M46,0 H0 V100 M0,50 H38"/><path transform="translate(586,0)" d="M46,0 H0 V100 H46 M0,50 H38"/></g></svg></div>
+      <div class="tiny"><div class="av s40"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 220 220"><g transform="" fill="none" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"><circle cx="100" cy="100" r="84" stroke="currentColor"/><path d="M42,42 C64,76 64,124 42,158" stroke="currentColor"/><path d="M158,42 C136,76 136,124 158,158" stroke="currentColor"/><path d="M16,100 H58" stroke="currentColor"/><path d="M142,100 H184" stroke="currentColor"/><path d="M100,16 V184" stroke="currentColor"/><polyline points="58,100 81,100 90,72 100,128 110,100 142,100" stroke="var(--tile)" stroke-width="22"/><polyline points="58,100 81,100 90,72 100,128 110,100 142,100" stroke="#D7262E"/></g></svg></div><div class="av s24"><svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 220 220"><g transform="" fill="none" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"><circle cx="100" cy="100" r="84" stroke="currentColor"/><path d="M42,42 C64,76 64,124 42,158" stroke="currentColor"/><path d="M158,42 C136,76 136,124 158,158" stroke="currentColor"/><path d="M16,100 H58" stroke="currentColor"/><path d="M142,100 H184" stroke="currentColor"/><path d="M100,16 V184" stroke="currentColor"/><polyline points="58,100 81,100 90,72 100,128 110,100 142,100" stroke="var(--tile)" stroke-width="22"/><polyline points="58,100 81,100 90,72 100,128 110,100 142,100" stroke="#D7262E"/></g></svg></div><span>40 / 24 px</span></div></div>
+  </section>
+
+  <div class="ask">
+    <div class="label">For Lawrance</div>
+    <ul>
+      <li>B1 or B2?</li>
+      <li>Once approved, it goes into the intro, the profile icons and the keychain.</li>
+    </ul>
+  </div>
+</div>
