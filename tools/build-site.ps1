@@ -8,6 +8,7 @@ New-Item -ItemType Directory -Force $docs, "$docs\media", "$docs\thumbs" | Out-N
 
 # slug => source page (relative to repo root)
 $pages = [ordered]@{
+  "intro-video"        = "05_Intro-v1\HoopLife-Intro.html"
   "logo-final-b1"      = "01_Logos\round7\HoopLife-Basketball-Fix.html"
   "logo-pulse-h"       = "01_Logos\round4\HoopLife-Pulse-Logo.html"
   "logo-refinements"   = "01_Logos\round6\HoopLife-Logo-Refinements.html"

@@ -53,10 +53,9 @@ Details: [`00_Brand-Research/brand-decisions.md`](00_Brand-Research/brand-decisi
 
 ## 3. Intro and outro video
 
-- Built in Claude's animation tool (private link, owner only): https://claude.ai/artifact/HrjqwpkRsEtFF3aSSU2Z9v
+- **Watch it:** https://roosewelt-nacth.github.io/HoopLife/intro-video.html (public showcase page, with sound). Source: [`05_Intro-v1/HoopLife-Intro.html`](05_Intro-v1/HoopLife-Intro.html), built from the original animation's scenes.
 - Story: two ninja eye slits open in the dark, the camera pushes in, the slits stretch into the B1 seams, the ring and seams draw in, the red heartbeat beats twice, and HOOPLIFE writes itself in. The outro reverses it and ends on @hooplife.community.
 - Vertical 1080 × 1920 (Reels, Shorts, Status), about 13.5 s, with an original score.
-- **To share it:** open the link and choose **Export → MP4**, then add the file to `docs/media/`. The animation page itself can't be made public from GitHub.
 
 ✅ *Approval: intro and outro look and timing.*
 

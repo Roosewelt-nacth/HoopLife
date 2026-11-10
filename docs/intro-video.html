@@ -1,0 +1,359 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}.hl-back{position:fixed;right:max(12px,env(safe-area-inset-right,0px));bottom:max(12px,env(safe-area-inset-bottom,0px));z-index:99;font:600 12px system-ui,sans-serif;color:#F4F4F2;background:rgba(11,11,12,.85);border:1px solid #444;border-radius:999px;padding:8px 14px;text-decoration:none}.hl-back:hover{border-color:#D7262E}</style></head><body><!doctype html>
+<html lang="en">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HoopLife Intro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+  /* Layout: the 9:16 intro centred on a dark page with simple play controls under it. */
+  :root { --bg: #0b0b0c; --line: #2a2b31; --fg: #f3f1ec; --muted: #9c9ea6; --red: #d7262e; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: Inter, system-ui, sans-serif; }
+  :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .wrap { display: grid; justify-items: center; gap: 12px; padding: 18px max(16px, env(safe-area-inset-right, 0px)) 40px max(16px, env(safe-area-inset-left, 0px)); }
+  .label { font: 700 11px "JetBrains Mono", monospace; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); text-align: center; }
+  h1 { margin: 0; font-size: clamp(22px, 3.6vw, 32px); font-weight: 700; letter-spacing: -.02em; text-align: center; }
+  .frame { position: relative; height: min(80vh, 840px); aspect-ratio: 9 / 16; max-width: 100%; overflow: hidden; background: #0b0b0c; border-radius: 14px; box-shadow: 0 0 0 1px var(--line); }
+  #holder { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; transform-origin: 0 0; }
+  .stage { position: absolute; inset: 0; overflow: hidden; }
+  .bar { display: flex; gap: 10px; align-items: center; width: min(460px, 100%); }
+  .bar button { font: 700 13px Inter, sans-serif; color: var(--fg); background: #17181c; border: 1px solid var(--line); border-radius: 999px; padding: 8px 14px; cursor: pointer; white-space: nowrap; }
+  .bar button[aria-pressed="true"] { border-color: var(--red); }
+  .bar button:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+  .bar input { flex: 1; min-width: 0; accent-color: var(--red); }
+  .bar .t { font: 700 12px "JetBrains Mono", monospace; color: var(--muted); font-variant-numeric: tabular-nums; }
+  #stageRoot { --sans: Inter, system-ui, sans-serif; --mono: "JetBrains Mono", ui-monospace, monospace; }
+#stage { --ground:#0B0B0C; --main:#FFFFFF; --second:#E6E6E8; --accent:#D7262E; color:var(--second); font-family:var(--sans, system-ui, sans-serif) }
+#stage { --haze:color-mix(in srgb, var(--accent) 22%, transparent); --dim:color-mix(in srgb, var(--second) 55%, var(--ground)); --edge:color-mix(in srgb, var(--ground) 92%, transparent) }
+#stage { --cloth:color-mix(in srgb, var(--second) 9%, var(--ground)); --fold:color-mix(in srgb, var(--second) 15%, var(--ground)); --open:color-mix(in srgb, var(--second) 4%, var(--ground)) }
+.ground { position:absolute; inset:0; background:var(--ground) }
+.ninja { position:absolute; inset:0 }
+.art { position:absolute; inset:0; width:100%; height:100%; overflow:visible }
+.glow { position:absolute; left:0; top:0; width:900px; height:900px; margin:-450px 0 0 -450px; border-radius:50%; background:radial-gradient(closest-side, var(--haze), transparent) }
+.vig { position:absolute; inset:0; background:radial-gradient(70% 55% at 50% 50%, transparent 50%, var(--edge)) }
+.words { position:absolute; margin:0; display:flex; flex-direction:column; align-items:center; gap:18px; left:90px; right:90px; text-align:center } .words > * { margin:0 }
+.sub { font-family:var(--mono, ui-monospace, monospace); font-size:34px; letter-spacing:.38em; text-transform:uppercase; font-weight:500; color:var(--second) }
+.handle { font-family:var(--mono, ui-monospace, monospace); font-size:44px; letter-spacing:.06em; font-weight:500; color:var(--main) }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="label">HoopLife · Intro &amp; outro · For Lawrance's approval</div>
+  <h1>Ninja eyes → B1 ball → HOOPLIFE</h1>
+  <div class="frame" id="frame"><div id="holder"><div id="stageRoot"></div></div></div>
+  <div class="bar"><button type="button" id="play">Pause</button><input type="range" id="scrub" min="0" max="1" step="0.001" value="0" aria-label="Scrub"><span class="t" id="tm">0.0</span><button type="button" id="snd" aria-pressed="false">Sound off</button></div>
+  <div class="label">Vertical 1080 × 1920 · for Reels, Shorts and WhatsApp Status</div>
+</div>
+<script>
+(function () {
+  "use strict";
+  var SCENES = {"scenes": [{"id": "eyes", "dur": 3}, {"id": "reveal", "dur": 3}, {"id": "logo", "dur": 3.5}, {"id": "outro", "dur": 4}]};
+  var root = document.getElementById("stageRoot"); root.id = "stage";      // the scenes' CSS targets #stage
+  root.style.cssText = "position:absolute;inset:0";
+  // ---------- a small runtime with the same helpers the film's scenes use ----------
+  function clamp01(x) { return Math.max(0, Math.min(1, x)); }
+  var base = {
+    seg: function (t, a, b) { return clamp01((t - a) / (b - a)); },
+    lerp: function (a, b, x) { return a + (b - a) * x; },
+    clamp01: clamp01,
+    eo: function (x) { x = clamp01(x); return 1 - Math.pow(1 - x, 3); },
+    ei: function (x) { x = clamp01(x); return x * x * x; },
+    eio: function (x) { x = clamp01(x); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; },
+    h: function (html) { var d = document.createElement("div"); d.innerHTML = html.trim(); if (d.children.length === 1) return d.firstElementChild; var f = document.createElement("div"); f.style.display = "contents"; while (d.firstChild) f.appendChild(d.firstChild); return f; },
+    W: 1080, H: 1920
+  };
+  var registry = {}, kit = Object.assign({}, base, { scene: function (id, def) { registry[id] = def; } });
+  window.kit = kit;
+(function () {
+// HoopLife rig: the ninja eyes, the Pulse H ball and the wordmark, all in one SVG.
+// Every scene builds its own copy and poses it from t, so scenes join frame to frame.
+window.W = {
+  EYE: [60, 56, 74, 60, 86, 64, 98, 72],
+  SEAM: [42, 42, 64, 76, 64, 124, 42, 158],
+  // Word units: cap height 100. Placed at (98,890) x1.4 on the 1080x1920 stage.
+  GLYPHS: [
+    [0, 'M0,0 V100 M52,0 V100 M0,50 H52'],
+    [80, 'M42,0 A42,50 0 1 0 42.01,0'],
+    [330, 'M0,100 V0 H26 A26,26 0 0 1 26,52 H0'],
+    [410, 'M0,0 V100 H46'],
+    [484, 'M0,0 V100'],
+    [512, 'M46,0 H0 V100 M0,50 H38'],
+    [586, 'M46,0 H0 V100 H46 M0,50 H38'],
+  ],
+  WORD: { x: 98, y: 890, k: 1.4, ballX: 443.8, ballY: 960, ballS: 0.84 },
+  rig(kit, id) {
+    const W0 = window.W;
+    const letters = W0.GLYPHS.map((g, i) => '<path class="' + id + '-l" pathLength="1" transform="translate(' + g[0] + ',0)" d="' + g[1] + '"/>').join('');
+    const svg = '<svg class="art" viewBox="0 0 1080 1920">' +
+      '<g class="' + id + '-word" transform="translate(' + W0.WORD.x + ' ' + W0.WORD.y + ') scale(' + W0.WORD.k + ')" style="fill:none;stroke:var(--main);stroke-width:9;stroke-linecap:round;stroke-linejoin:round">' + letters + '</g>' +
+      '<g class="' + id + '-mark" style="fill:none;stroke-linecap:round;stroke-linejoin:round">' +
+        '<circle class="' + id + '-ring" pathLength="1" cx="100" cy="100" r="84" transform="rotate(-90 100 100)" style="stroke:var(--main)"/>' +
+        '<g class="' + id + '-eyes"><path class="' + id + '-seamL" style="stroke:var(--main)"/><path class="' + id + '-seamR" style="stroke:var(--main)"/></g>' +
+        '<path class="' + id + '-inkH" pathLength="1" d="M16,100 H58 M184,100 H142" style="stroke:var(--main)"/>' +
+        '<path class="' + id + '-inkV" pathLength="1" d="M100,16 V60 M100,184 V140" style="stroke:var(--main)"/>' +
+        '<polyline class="' + id + '-pulse" pathLength="1" points="58,100 81,100 90,72 100,128 110,100 142,100" style="stroke:var(--accent)"/>' +
+      '</g></svg>';
+    const root = kit.h('<div class="ground"><div class="glow ' + id + '-glow"></div>' + svg + '<div class="vig"></div></div>');
+    kit.stage.append(root);
+    const q = (s) => root.querySelector(s);
+    return {
+      root, glow: q('.' + id + '-glow'), word: q('.' + id + '-word'), letters: Array.from(root.querySelectorAll('.' + id + '-l')),
+      mark: q('.' + id + '-mark'), ring: q('.' + id + '-ring'), eyes: q('.' + id + '-eyes'),
+      seamL: q('.' + id + '-seamL'), seamR: q('.' + id + '-seamR'), pulse: q('.' + id + '-pulse'),
+      inkH: q('.' + id + '-inkH'), inkV: q('.' + id + '-inkV'),
+    };
+  },
+  // p: { cx, cy, s, m (0 eyes .. 1 seams), blink (1 open), eyeOp, ring, pulse, beat, sw, glow, letters:[0..1 x7] }
+  pose(R, p) {
+    const W0 = window.W, lerp = (a, b, x) => a + (b - a) * x;
+    R.mark.setAttribute('transform', 'translate(' + p.cx.toFixed(2) + ' ' + p.cy.toFixed(2) + ') scale(' + p.s.toFixed(4) + ') translate(-100 -100)');
+    const pts = W0.EYE.map((e, i) => lerp(e, W0.SEAM[i], p.m));
+    const d = (P) => 'M' + P[0] + ',' + P[1] + ' C' + P[2] + ',' + P[3] + ' ' + P[4] + ',' + P[5] + ' ' + P[6] + ',' + P[7];
+    const mir = pts.map((v, i) => (i % 2 ? v : 200 - v));
+    R.seamL.setAttribute('d', d(pts.map((v) => v.toFixed(2))));
+    R.seamR.setAttribute('d', d(mir.map((v) => v.toFixed(2))));
+    const sw = lerp(9, p.sw, p.m);
+    R.seamL.style.strokeWidth = sw; R.seamR.style.strokeWidth = sw;
+    const ey = lerp(64, 100, p.m);
+    R.eyes.setAttribute('transform', 'translate(0 ' + ey + ') scale(1 ' + p.blink.toFixed(3) + ') translate(0 ' + (-ey) + ')');
+    R.eyes.style.opacity = p.eyeOp;
+    R.ring.style.strokeWidth = p.sw; R.ring.style.strokeDasharray = '1'; R.ring.style.strokeDashoffset = (1 - p.ring).toFixed(4);
+    R.ring.style.opacity = p.ring > 0.001 ? 1 : 0;
+    // The basketball's vertical and horizontal seams grow in behind the ring as it closes.
+    const ink = Math.max(0, Math.min(1, (p.ring - 0.35) / 0.65));
+    [R.inkH, R.inkV].forEach((el) => { el.style.strokeWidth = p.sw; el.style.strokeDasharray = '1'; el.style.strokeDashoffset = (1 - ink).toFixed(4); el.style.opacity = ink > 0.001 ? 1 : 0; });
+    R.pulse.style.strokeWidth = p.sw; R.pulse.style.strokeDasharray = '1'; R.pulse.style.strokeDashoffset = (1 - p.pulse).toFixed(4);
+    R.pulse.style.opacity = p.pulse > 0.001 ? 1 : 0;
+    R.pulse.style.transformBox = 'fill-box'; R.pulse.style.transformOrigin = 'center';
+    R.pulse.style.transform = 'scaleY(' + p.beat.toFixed(3) + ')';
+    R.letters.forEach((el, i) => { const v = p.letters[i] || 0; el.style.strokeDasharray = '1'; el.style.strokeDashoffset = (1 - v).toFixed(4); el.style.opacity = v > 0.001 ? 1 : 0; });
+    const gx = p.cx, gy = p.cy + (ey - 100) * p.s;
+    R.glow.style.transform = 'translate(' + gx.toFixed(1) + 'px,' + gy.toFixed(1) + 'px) scale(' + (p.s / 4.2).toFixed(3) + ')';
+    R.glow.style.opacity = p.glow;
+  },
+  // A single blink: 1 open, dips to 0.08 and back over 0.28 s.
+  blink(t, at) { const x = (t - at) / 0.28; if (x <= 0 || x >= 1) return 1; return 1 - 0.92 * Math.sin(Math.PI * x); },
+  // Heartbeat: two quick lifts of the pulse.
+  beat(t, at) { const x = t - at; if (x < 0 || x > 0.9) return 1; return 1 + 0.4 * Math.exp(-x * 4) * Math.max(0, Math.sin(x * 14)); },
+  none: [0, 0, 0, 0, 0, 0, 0],
+  // The ninja: cloth mask with an angled brow opening, two eyes, red headband. Same 200-unit grid as the ball,
+  // so a fully squinted eye lies exactly where the rig's slit (and later the seam) begins.
+  ninja(kit, id) {
+    const eye = (side) => {
+      const tf = side < 0 ? 'translate(79 64) rotate(22.8)' : 'translate(121 64) scale(-1 1) rotate(22.8)';
+      const c = id + '-clip' + (side < 0 ? 'L' : 'R');
+      return '<g class="' + id + '-eye" transform="' + tf + '">' +
+        '<clipPath id="' + c + '"><path d="M-22,0 Q-6,-15 22,-4 Q6,12 -22,0 Z"/></clipPath>' +
+        '<g clip-path="url(#' + c + ')">' +
+          '<rect x="-26" y="-20" width="52" height="34" style="fill:color-mix(in srgb, var(--second) 86%, var(--ground))"/>' +
+          '<path d="M-24,-2 Q-6,-16 24,-6 L24,-20 L-24,-20 Z" style="fill:color-mix(in srgb, var(--ground) 35%, transparent)"/>' +
+          '<g class="' + id + '-iris"><circle r="9" style="fill:color-mix(in srgb, var(--second) 22%, var(--ground));stroke:var(--accent);stroke-width:1.3"/>' +
+            '<circle r="4.6" style="fill:var(--ground)"/><circle cx="3" cy="-3.4" r="1.9" style="fill:var(--main)"/></g>' +
+          '<rect class="' + id + '-lidT" x="-26" y="-40" width="52" height="40" style="fill:var(--open)"/>' +
+          '<rect class="' + id + '-lidB" x="-26" y="0" width="52" height="40" style="fill:var(--open)"/>' +
+        '</g>' +
+        '<path d="M-22,0 Q-6,-15 22,-4" style="fill:none;stroke:var(--ground);stroke-width:2.6;stroke-linecap:round"/></g>';
+    };
+    const folds = [[-60, 28, 260, 30], [-40, 112, 240, 106], [-80, 150, 280, 160], [-100, -10, 300, -24]].map((f) =>
+      '<path d="M' + f[0] + ',' + f[1] + ' Q100,' + (f[1] + 18) + ' ' + f[2] + ',' + f[3] + '" style="fill:none;stroke:var(--fold);stroke-width:3"/>').join('');
+    const svg = '<svg class="art" viewBox="0 0 1080 1920"><g class="' + id + '-ninja">' +
+      '<rect x="-800" y="-1000" width="1800" height="2200" style="fill:var(--cloth)"/>' + folds +
+      '<g class="' + id + '-band"><rect x="-800" y="2" width="1800" height="20" style="fill:var(--accent)"/><rect x="-800" y="4" width="1800" height="3" style="fill:color-mix(in srgb, var(--main) 30%, var(--accent))"/></g>' +
+      '<path class="' + id + '-opening" d="M30,40 L93,58 Q100,62 107,58 L170,40 L174,64 Q162,92 100,95 Q38,92 26,64 Z" style="fill:var(--open)"/>' +
+      eye(-1) + eye(1) + '</g></svg>';
+    const root = kit.h('<div class="ninja">' + svg + '</div>');
+    kit.stage.append(root);
+    return { root, g: root.querySelector('.' + id + '-ninja'), iris: Array.from(root.querySelectorAll('.' + id + '-iris')),
+      lidT: Array.from(root.querySelectorAll('.' + id + '-lidT')), lidB: Array.from(root.querySelectorAll('.' + id + '-lidB')) };
+  },
+  // p: { cx, cy, s, op, open (0 shut .. 1 open), squint (0 .. 1 slit), look (iris x, eye units) }
+  poseNinja(N, p) {
+    const lerp = (a, b, x) => a + (b - a) * x;
+    N.g.setAttribute('transform', 'translate(' + p.cx.toFixed(2) + ' ' + p.cy.toFixed(2) + ') scale(' + p.s.toFixed(4) + ') translate(-100 -100)');
+    N.root.style.opacity = p.op;
+    const top = lerp(lerp(3, -16, p.open), -4.5, p.squint), bot = lerp(12, 4.5, p.squint);
+    N.lidT.forEach((el) => el.setAttribute('transform', 'translate(0 ' + top.toFixed(2) + ')'));
+    N.lidB.forEach((el) => el.setAttribute('transform', 'translate(0 ' + bot.toFixed(2) + ')'));
+    N.iris.forEach((el, i) => el.setAttribute('transform', 'translate(' + (i ? -p.look : p.look).toFixed(2) + ' -1)'));
+  },
+};
+})();
+(function () {
+const { seg, eio, eo, lerp } = kit;
+kit.scene('eyes', {
+  init(kit) { this.R = W.rig(kit, 'eyes'); },
+  render(t) {
+    // The camera pushes in on the eyes; they are already open at frame 0 for the thumbnail.
+    const push = eio(seg(t, 0.1, 2.6));
+    const s = lerp(2.4, 4.2, push);
+    const breathe = 1 + 0.012 * Math.sin(t * 2.1);
+    W.pose(this.R, {
+      cx: 540, cy: 960 + 36 * s, s: s * breathe, m: 0,
+      blink: W.blink(t, 1.95), eyeOp: lerp(0.75, 1, eo(seg(t, 0, 0.6))),
+      ring: 0, pulse: 0, beat: 1, sw: 12, glow: lerp(0.4, 1, eo(seg(t, 0, 1.4))), letters: W.none,
+    });
+  },
+});
+})();
+(function () {
+const { seg, eio, eo, lerp } = kit;
+kit.scene('reveal', {
+  init(kit) { this.R = W.rig(kit, 'reveal'); },
+  render(t) {
+    // The eye slits stretch and bend into the two side seams; the ball draws round them; the pulse beats.
+    const m = eio(seg(t, 0.15, 1.1));
+    const s = lerp(4.2, 4.0, eio(seg(t, 0, 1.3))) * (1 + 0.012 * eio(seg(t, 1.3, 3)));
+    W.pose(this.R, {
+      cx: 540, cy: 960 + 36 * 4.2 * (1 - m), s, m,
+      blink: 1, eyeOp: 1,
+      ring: eio(seg(t, 0.7, 1.6)), pulse: eo(seg(t, 1.4, 1.9)), beat: W.beat(t, 2.05), sw: 12,
+      glow: lerp(1, 0.35, m), letters: W.none,
+    });
+  },
+});
+})();
+(function () {
+const { seg, eio, eo, lerp } = kit;
+kit.scene('logo', {
+  init(kit) {
+    this.R = W.rig(kit, 'logo');
+    this.R.root.append(kit.h('<div class="words logo-words" style="top:1110px"><p class="sub logo-sub">Community · Chennai</p></div>'));
+    this.svg = this.R.root.querySelector('svg');
+    this.sub = this.R.root.querySelector('.logo-sub');
+  },
+  render(t) {
+    // The ball shrinks into the second O while the letters draw in after it.
+    const go = eio(seg(t, 0, 1.0));
+    const L = W.GLYPHS.map((g, i) => eo(seg(t, 0.55 + i * 0.09, 1.2 + i * 0.09)));
+    W.pose(this.R, {
+      cx: lerp(540, W.WORD.ballX, go), cy: 960, s: lerp(4.048, W.WORD.ballS, go), m: 1,
+      blink: 1, eyeOp: 1, ring: 1, pulse: 1, beat: W.beat(t, 2.3), sw: lerp(12, 15, go),
+      glow: lerp(0.35, 0.18, go), letters: L,
+    });
+    const drift = 1 + 0.015 * eio(seg(t, 1.0, 3.5));
+    this.svg.style.transformOrigin = '540px 960px';
+    this.svg.style.transform = 'scale(' + drift.toFixed(4) + ')';
+    const a = eo(seg(t, 1.5, 2.1));
+    this.sub.style.opacity = a;
+    this.sub.style.transform = 'translateY(' + lerp(26, 0, a).toFixed(1) + 'px)';
+  },
+});
+})();
+(function () {
+const { seg, eio, eo, ei, lerp } = kit;
+kit.scene('outro', {
+  init(kit) {
+    this.R = W.rig(kit, 'outro');
+    this.R.root.append(kit.h('<div><div class="words outro-words" style="top:1110px"><p class="sub outro-sub">Community · Chennai</p></div><div class="words outro-end" style="top:1090px"><p class="handle outro-handle">@hooplife.community</p></div></div>'));
+    this.svg = this.R.root.querySelector('svg');
+    this.sub = this.R.root.querySelector('.outro-sub');
+    this.handle = this.R.root.querySelector('.outro-handle');
+  },
+  render(t) {
+    // Reverse of the intro: letters go, the ball returns, its seams fold back into eyes, the camera pulls away.
+    const L = W.GLYPHS.map((g, i) => 1 - ei(seg(t, 0.05 + (6 - i) * 0.05, 0.55 + (6 - i) * 0.05)));
+    const back = eio(seg(t, 0.4, 1.3));
+    const m = 1 - eio(seg(t, 1.3, 2.0));
+    const away = eio(seg(t, 1.8, 3.5));
+    const s = lerp(lerp(W.WORD.ballS, 3.6, back), 1.5, away) * (1 - 0.01 * seg(t, 3.5, 4));
+    W.pose(this.R, {
+      cx: lerp(W.WORD.ballX, 540, back), cy: 960 + 36 * s * (1 - m), s, m,
+      blink: W.blink(t, 2.75), eyeOp: 1,
+      ring: 1 - eio(seg(t, 1.05, 1.6)), pulse: 1 - eio(seg(t, 0.95, 1.4)), beat: 1, sw: lerp(15, 12, back),
+      glow: lerp(0.18, 0.85, 1 - m), letters: L,
+    });
+    const drift = lerp(1.015, 1, eio(seg(t, 0, 1.3)));
+    this.svg.style.transformOrigin = '540px 960px';
+    this.svg.style.transform = 'scale(' + drift.toFixed(4) + ')';
+    this.sub.style.opacity = 1 - ei(seg(t, 0, 0.45));
+    const h = eo(seg(t, 2.4, 3.0));
+    this.handle.style.opacity = h;
+    this.handle.style.transform = 'translateY(' + lerp(24, 0, h).toFixed(1) + 'px)';
+  },
+});
+})();
+  // build each scene in its own stage
+  var start = 0, cut = SCENES.scenes.map(function (s) {
+    var el = document.createElement("div"); el.className = "stage"; el.hidden = true; root.appendChild(el);
+    var k = Object.assign({}, base, { stage: el, dur: s.dur, start: start }), def = registry[s.id], inst = Object.create(def);
+    if (def.init) def.init.call(inst, k);
+    var c = { id: s.id, a: start, b: start + s.dur, el: el, inst: inst, k: k }; start += s.dur; return c;
+  });
+  var END = start;
+  // ---------- score: the film's original score, synthesised live (off until tapped) ----------
+  var AC = null, events = [], sndOn = false, T0 = {};
+  cut.forEach(function (c) { T0[c.id] = c.a; }); T0.END = END;
+  var S = {
+    tempo: function () {}, master: function () {}, program: function () {},
+    note: function (tr, n, o) { events.push({ t: o.t, kind: "note", tr: tr, notes: [n], dur: o.dur, vel: o.vel }); },
+    chord: function (tr, ns, o) { events.push({ t: o.t, kind: "note", tr: tr, notes: ns, dur: o.dur, vel: o.vel }); },
+    drum: function (name, o) { events.push({ t: o.t, kind: "drum", name: name, vel: o.vel }); },
+    fx: function (name, t, o) { events.push({ t: t, kind: "fx", name: name, dur: (o && o.dur) || 0.4, vel: (o && o.vel) || 50, into: o && o.into }); }
+  };
+  kit.score = function (fn) { fn(S, T0); };
+(function () {
+kit.score(function (S, T) {
+  S.program('pad', 'pad', { rev: 0.7 }); S.program('bass', 'bass', { gain: -2 }); S.program('keys', 'ep', { rev: 0.5 });
+  // The dark: a low hum under the eyes.
+  S.chord('pad', ['A1', 'E2'], { t: 0, dur: 3.2, vel: 26 });
+  S.fx('click', T.eyes + 2.0, { vel: 40 });
+  // The eyes stretch into seams; the ring swells in; the heartbeat lands.
+  S.fx('whoosh', T.reveal + 0.15, { dur: 0.9, vel: 50 });
+  S.fx('revswell', T.reveal + 1.6, { dur: 0.9, vel: 46 });
+  S.chord('pad', ['A2', 'E3', 'C4'], { t: T.reveal + 0.6, dur: 2.6, vel: 40 });
+  S.drum('kick', { t: T.reveal + 2.16, vel: 96 }); S.drum('kick', { t: T.reveal + 2.6, vel: 80 });
+  S.note('bass', 'A1', { t: T.reveal + 2.16, dur: 0.8, vel: 70 });
+  // The wordmark draws in, one soft tick a letter, then the second heartbeat and the full chord.
+  for (let i = 0; i < 7; i++) S.fx('tick', T.logo + 0.7 + i * 0.09, { vel: 30 });
+  S.drum('kick', { t: T.logo + 2.41, vel: 104 }); S.drum('kick', { t: T.logo + 2.86, vel: 86 });
+  S.chord('keys', ['A3', 'C4', 'E4', 'G4'], { t: T.logo + 2.41, dur: 2.4, vel: 58 });
+  S.chord('pad', ['F2', 'C3', 'A3'], { t: T.logo + 2.41, dur: 3.2, vel: 44 });
+  S.note('bass', 'F1', { t: T.logo + 2.41, dur: 1.2, vel: 80 });
+  // Outro: the pull away, one blink, the handle.
+  S.fx('whoosh', T.outro + 1.8, { dur: 1.4, vel: 44, into: 1 });
+  S.fx('click', T.outro + 2.8, { vel: 40 });
+  S.chord('pad', ['A1', 'E2', 'A2'], { t: T.outro + 1.2, dur: 3, vel: 34 });
+  S.fx('chime', T.outro + 2.45, { vel: 46 });
+  S.master({ gain: -6, fadeOut: 1.0 });
+});
+})();
+  events.sort(function (a, b) { return a.t - b.t; });
+  function hz(n) { var m = /([A-G])(#?)(\d)/.exec(n), map = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }; return 440 * Math.pow(2, (map[m[1]] + (m[2] ? 1 : 0) + (parseInt(m[3], 10) + 1) * 12 - 69) / 12); }
+  function play(ev) {
+    var t = AC.currentTime, v = (ev.vel || 60) / 127;
+    function osc(type, f, dur, vol, f2) { var o = AC.createOscillator(), g = AC.createGain(); o.type = type; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + dur); o.connect(g); g.connect(AC.destination); o.start(t); o.stop(t + dur + 0.05); }
+    function noise(dur, vol, hp, sweep) { var n = Math.floor(AC.sampleRate * dur), b = AC.createBuffer(1, n, AC.sampleRate), d = b.getChannelData(0); for (var i = 0; i < n; i++) { var e = sweep ? i / n : 1 - i / n; d[i] = (Math.random() * 2 - 1) * e; } var s = AC.createBufferSource(), g = AC.createGain(), f = AC.createBiquadFilter(); f.type = "highpass"; f.frequency.value = hp; s.buffer = b; g.gain.value = vol; s.connect(f); f.connect(g); g.connect(AC.destination); s.start(t); }
+    if (ev.kind === "note") ev.notes.forEach(function (n) { osc(ev.tr === "bass" ? "triangle" : ev.tr === "keys" ? "sine" : "sawtooth", hz(n), Math.min(ev.dur || 1, 3.5), (ev.tr === "pad" ? 0.05 : 0.12) * v); });
+    else if (ev.kind === "drum") { osc("sine", 120, 0.35, 0.7 * v, 40); }
+    else if (ev.name === "whoosh" || ev.name === "revswell") noise(ev.dur, 0.25 * v, 900, ev.into || ev.name === "revswell");
+    else if (ev.name === "tick" || ev.name === "click") osc("square", 1800, 0.04, 0.08 * v);
+    else if (ev.name === "chime") { osc("sine", 1318, 1.2, 0.12 * v); osc("sine", 1975, 1.0, 0.06 * v); }
+  }
+  // ---------- transport ----------
+  var holder = document.getElementById("holder"), frame = document.getElementById("frame");
+  function fit() { var s = frame.clientWidth / 1080; holder.style.transform = "scale(" + s + ")"; }
+  window.addEventListener("resize", fit); fit();
+  var T = 0, playing = true, last = performance.now(), prev = 0;
+  var hq = /t=([\d.]+)/.exec(location.hash); if (hq) { T = parseFloat(hq[1]); playing = false; }
+  var playBtn = document.getElementById("play"), scrub = document.getElementById("scrub"), tm = document.getElementById("tm"), snd = document.getElementById("snd");
+  scrub.max = END; playBtn.textContent = playing ? "Pause" : "Play";
+  playBtn.addEventListener("click", function () { playing = !playing; playBtn.textContent = playing ? "Pause" : "Play"; if (playing && T >= END) T = 0; });
+  scrub.addEventListener("input", function () { T = +scrub.value; prev = T; });
+  snd.addEventListener("click", function () { sndOn = !sndOn; if (sndOn && !AC) { try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { sndOn = false; } } if (AC && AC.state === "suspended") AC.resume(); snd.setAttribute("aria-pressed", String(sndOn)); snd.textContent = sndOn ? "Sound on" : "Sound off"; });
+  function frameFn(now) {
+    requestAnimationFrame(frameFn);
+    var dt = Math.min(0.05, (now - last) / 1000); last = now;
+    if (playing) { prev = T; T += dt; if (T >= END) { T = 0; prev = 0; } if (sndOn && AC) events.forEach(function (ev) { if (ev.t >= prev && ev.t < T) play(ev); }); }
+    var t = Math.min(T, END - 0.0001);
+    cut.forEach(function (c) { var on = t >= c.a && t < c.b; c.el.hidden = !on; if (on) c.inst.render.call(c.inst, t - c.a, c.k); });
+    scrub.value = T; tm.textContent = T.toFixed(1);
+  }
+  requestAnimationFrame(frameFn);
+})();
+</script>
+</body>
+</html>
+<a class="hl-back" href="./index.html">&larr; HoopLife showcase</a></body></html>
