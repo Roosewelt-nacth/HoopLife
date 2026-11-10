@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HoopLife Funko Ninja</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+  /* Layout: a full-width studio stage with the live figure, a slim control bar under it (pose, mask, view). Single deliberate dark studio look. */
+  :root { --bg: #111215; --line: #2a2b30; --fg: #f3f1ec; --muted: #9c9ea6; --red: #c8161d; --body: "Archivo", system-ui, sans-serif; --mono: "JetBrains Mono", Consolas, monospace; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); }
+  :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .in { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  header .in { padding-block: 22px 12px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 8px 20px; }
+  .label { font: 700 11px var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  h1 { margin: 4px 0 0; font-size: clamp(26px, 4vw, 40px); font-weight: 900; letter-spacing: -.02em; }
+  .stage { position: relative; height: min(78vh, 760px); min-height: 440px; border-block: 1px solid var(--line); overflow: hidden; }
+  .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: grab; }
+  .hint { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); font: 500 11px var(--mono); letter-spacing: .1em; color: var(--muted); background: rgba(0,0,0,.35); padding: 4px 10px; border-radius: 999px; pointer-events: none; white-space: nowrap; }
+  .bar .in { padding-block: 16px 40px; display: flex; flex-wrap: wrap; gap: 14px 28px; }
+  .group { display: grid; gap: 8px; }
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pills button { font: 600 13px var(--body); color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 8px 15px; cursor: pointer; }
+  .pills button[aria-pressed="true"] { border-color: var(--red); background: rgba(200,22,29,.14); }
+  .pills button:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+  body.shot header, body.shot .bar, body.shot .hint { display: none; }
+  body.shot .stage { height: 100vh; border: 0; }
+</style>
+</head>
+<body>
+<header><div class="in"><div><div class="label">HoopLife · Mascot · Draft 5 · athletic</div><h1>Funko Ninja</h1></div><div class="label">Drag to turn · scroll to zoom</div></div></header>
+<section class="stage" id="stage" aria-label="3D Funko-style HoopLife ninja"><div class="hint" id="hint">Drag to turn</div></section>
+<section class="bar"><div class="in">
+  <div class="group"><span class="label">Pose</span><div class="pills" role="group" aria-label="Pose">
+    <button type="button" data-pose="stance" aria-pressed="true">Stance</button>
+    <button type="button" data-pose="spin" aria-pressed="false">Ball spin</button>
+    <button type="button" data-pose="dribble" aria-pressed="false">Dribble</button>
+    <button type="button" data-pose="shot" aria-pressed="false">Jump shot</button>
+    <button type="button" data-pose="vanish" aria-pressed="false">Ninja vanish</button></div></div>
+  <div class="group"><span class="label">View</span><div class="pills" role="group" aria-label="View">
+    <button type="button" data-view="hero" aria-pressed="true">Hero</button>
+    <button type="button" data-view="front" aria-pressed="false">Front</button>
+    <button type="button" data-view="side" aria-pressed="false">Side</button>
+    <button type="button" data-view="back" aria-pressed="false">Back</button></div></div>
+</div></section>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/environments/RoomEnvironment.js"></script>
+<script>
+(function () {
+  "use strict";
+  // Review links: #v=hero|front|side|back&p=stance|spin|dribble|shot|vanish&t=1.2&shot=1 (t freezes time, shot hides the UI)
+  var Q = {}; location.hash.slice(1).split("&").forEach(function (kv) { var p = kv.split("="); if (p[0]) Q[p[0]] = p[1] || "1"; });
+  if (Q.shot) document.body.classList.add("shot");
+  var stage = document.getElementById("stage"), V3 = THREE.Vector3;
+  var renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.74;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  stage.appendChild(renderer.domElement);
+  var scene = new THREE.Scene();
+  scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new THREE.RoomEnvironment(), 0.06).texture;
+  var bgC = document.createElement("canvas"); bgC.width = 8; bgC.height = 512; var bgx = bgC.getContext("2d"), gr = bgx.createRadialGradient(4, 200, 10, 4, 260, 420);
+  gr.addColorStop(0, "#3a3c43"); gr.addColorStop(0.6, "#232429"); gr.addColorStop(1, "#111215"); bgx.fillStyle = gr; bgx.fillRect(0, 0, 8, 512);
+  var bgT = new THREE.CanvasTexture(bgC); bgT.encoding = THREE.sRGBEncoding; scene.background = bgT;
+  var camera = new THREE.PerspectiveCamera(25, 1, 0.1, 100);
+  var controls = new THREE.OrbitControls(camera, renderer.domElement); controls.enableDamping = true; controls.enablePan = false; controls.minDistance = 3; controls.maxDistance = 14; controls.target.set(0, 1.25, 0);
+  var VIEWS = { hero: [3.7, 2.35, 6.7], front: [0, 1.45, 7.8], side: [7.8, 1.45, 0.01], back: [0.01, 1.45, -7.8] };
+  camera.position.fromArray(VIEWS[Q.v] || VIEWS.hero);
+  var key = new THREE.DirectionalLight(0xfff0dc, 2.5); key.position.set(4, 7, 5); key.castShadow = true; key.shadow.mapSize.set(2048, 2048); key.shadow.radius = 5; key.shadow.bias = -0.0003; key.shadow.normalBias = 0.02;
+  Object.assign(key.shadow.camera, { left: -2.5, right: 2.5, top: 4, bottom: -1, near: 1, far: 20 }); scene.add(key);
+  var rimL = new THREE.DirectionalLight(0x9cbcff, 1.5); rimL.position.set(-5, 4, -4); scene.add(rimL);
+  var rimR = new THREE.DirectionalLight(0xffb09a, 0.9); rimR.position.set(5, 3, -4); scene.add(rimR);
+  scene.add(new THREE.HemisphereLight(0xdfe6ff, 0x201c19, 0.16));
+  var floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.ShadowMaterial({ opacity: 0.5 })); floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+
+  // ---------- materials ----------
+  function vinyl(c, o) { return new THREE.MeshPhysicalMaterial(Object.assign({ color: c, roughness: 0.52, clearcoat: 0.3, clearcoatRoughness: 0.4, envMapIntensity: 0.16 }, o || {})); }
+  var M = {
+    suit: vinyl(0x0b0b0d, { roughness: 0.62, clearcoat: 0.22, envMapIntensity: 0.12 }),
+    suit2: vinyl(0x18191c, { roughness: 0.75, clearcoat: 0.05, envMapIntensity: 0.1 }),
+    skin: vinyl(0xd8996f, { roughness: 0.48, clearcoat: 0.15 }),
+    red: vinyl(0xae0d14, { roughness: 0.55, clearcoat: 0.25, side: THREE.DoubleSide }),
+    redDark: vinyl(0x700a0e, { roughness: 0.6 }),
+    eye: vinyl(0x050506, { roughness: 0.06, clearcoat: 1, clearcoatRoughness: 0.04, envMapIntensity: 1.1 }),
+    shine: new THREE.MeshBasicMaterial({ color: 0xffffff }),
+    brow: vinyl(0x1a0f0a, { roughness: 0.7 }),
+    sash: vinyl(0x24201c, { roughness: 0.85, envMapIntensity: 0.08 }),
+    wrap: vinyl(0x24252a, { roughness: 0.85 }),
+    base: vinyl(0x0a0a0b, { roughness: 0.45, clearcoat: 0.4, clearcoatRoughness: 0.5, envMapIntensity: 0.1 }),
+    rimRed: vinyl(0xb3121a, { metalness: 0.2, roughness: 0.35 })
+  };
+  function add(geo, mat, parent, x, y, z) { var m = new THREE.Mesh(geo, mat); m.position.set(x || 0, y || 0, z || 0); m.castShadow = true; m.receiveShadow = true; parent.add(m); return m; }
+  function grp(parent, x, y, z) { var g = new THREE.Group(); g.position.set(x || 0, y || 0, z || 0); parent.add(g); return g; }
+  function lathe(pts, seg) { return new THREE.LatheGeometry(pts.map(function (p) { return new THREE.Vector2(p[0], p[1]); }), seg || 64); }
+
+  // ---------- superellipsoid: the Funko head shape ----------
+  // A unit sphere remapped by sign(t)|t|^E: E < 1 makes a soft rounded cube. Optional face filter cuts holes or keeps bands.
+  var HW = 1.02, HH = 0.9, HD = 0.92, E = 0.55;
+  function superGeo(sx, sy, sz, keep) {
+    var g = new THREE.SphereGeometry(1, 160, 120), p = g.attributes.position, v = new V3();
+    function f(t) { return Math.sign(t) * Math.pow(Math.abs(t), E); }
+    for (var i = 0; i < p.count; i++) { v.fromBufferAttribute(p, i); var jaw = 1 + 0.05 * Math.max(0, -v.y);   // a touch wider at the cheeks
+      p.setXYZ(i, f(v.x) * HW / 2 * sx * jaw, f(v.y) * HH / 2 * sy, f(v.z) * HD / 2 * sz); }
+    if (keep) {
+      var idx = g.index.array, out = [], a = new V3(), b = new V3(), c = new V3();
+      for (var k = 0; k < idx.length; k += 3) { a.fromBufferAttribute(p, idx[k]); b.fromBufferAttribute(p, idx[k + 1]); c.fromBufferAttribute(p, idx[k + 2]); var m = a.clone().add(b).add(c).multiplyScalar(1 / 3); if (keep(m)) out.push(idx[k], idx[k + 1], idx[k + 2]); }
+      g.setIndex(out);
+    }
+    g.computeVertexNormals(); return g;
+  }
+  // front surface depth of the head at (x, y): used to sit the eyes and brows exactly on the skin
+  function frontZ(x, y, s) { s = s || 1; var a = HW / 2 * s * (1 + 0.05 * Math.max(0, -y / (HH / 2))), b = HH / 2 * s, c = HD / 2 * s, q = 2 / E, r = 1 - Math.pow(Math.abs(x / a), q) - Math.pow(Math.abs(y / b), q); return c * Math.pow(Math.max(r, 0), E / 2); }
+  // the eye window: a rounded rectangle across the front of the face
+  var WIN = { x: 0.36, y0: -0.11, y1: 0.12 };
+  function inWindow(m, pad) { pad = pad || 0; if (m.z < 0.15) return false; var cx = Math.abs(m.x) / (WIN.x + pad), cy = (m.y - (WIN.y0 + WIN.y1) / 2) / ((WIN.y1 - WIN.y0) / 2 + pad); return Math.pow(cx, 6) + Math.pow(Math.abs(cy), 4) < 1; }
+
+  // ---------- build the figure ----------
+  var fig = new THREE.Group(); scene.add(fig);
+  // display base
+  var base = grp(fig);
+  add(lathe([[0, 0], [0.64, 0], [0.66, 0.02], [0.66, 0.1], [0.63, 0.125], [0, 0.125]]), M.base, base);
+  add(new THREE.TorusGeometry(0.645, 0.011, 8, 120), M.rimRed, base, 0, 0.122, 0).rotation.x = Math.PI / 2;
+  var HIPY = 0.44;                            // hip height: longer legs for an athletic build
+  var root = grp(fig, 0, 0.125, 0);           // feet level
+  var hips = grp(root, 0, HIPY, 0);
+  var SX = 1.2, SZ = 0.7;                     // torso is wider than deep: an athlete's chest, not a barrel
+
+  // legs: long and toned, slim pants gathered at the ankle, quad and calf shape
+  function leg(s) {
+    var hp = grp(hips, s * 0.085, 0, 0);
+    add(lathe([[0.0, 0.02], [0.08, 0.02], [0.088, -0.04], [0.082, -0.12], [0.06, -0.2], [0.0, -0.2]], 40), M.suit, hp);          // thigh
+    var kn = grp(hp, 0, -0.2, 0);
+    add(new THREE.SphereGeometry(0.058, 24, 16), M.suit, kn).scale.set(1, 0.9, 0.95);                                                // knee, blended into thigh and calf
+    add(lathe([[0.0, 0], [0.056, 0], [0.066, -0.05], [0.06, -0.1], [0.046, -0.16], [0.0, -0.16]], 40), M.suit, kn);                 // calf
+    add(new THREE.CylinderGeometry(0.05, 0.048, 0.04, 28), M.wrap, kn, 0, -0.165, 0);                                                    // ankle wrap
+    var ft = grp(kn, 0, -0.19, 0.0);
+    var shoe = add(new THREE.SphereGeometry(0.07, 40, 24), M.suit, ft, 0, -0.0, 0.035); shoe.scale.set(0.95, 0.6, 1.6);
+    add(new THREE.CylinderGeometry(0.052, 0.058, 0.05, 28), M.suit, ft, 0, 0.025, 0);
+    var toe = add(new THREE.BoxGeometry(0.006, 0.035, 0.045), M.suit2, ft, s * -0.014, -0.005, 0.135); toe.rotation.x = 0.4;
+    add(new THREE.CylinderGeometry(0.07, 0.07, 0.01, 32), M.suit2, ft, 0, -0.04, 0.035).scale.set(0.95, 1, 1.6);                     // sole
+    return { hp: hp, kn: kn, ft: ft };
+  }
+  var LL = leg(1), RL = leg(-1);
+
+  // torso: V-taper from a narrow waist to a broad chest and shoulders
+  var chest = grp(hips, 0, 0, 0);
+  var PROF = [[0.0, 0.0], [0.148, 0.0], [0.152, 0.06], [0.155, 0.14], [0.172, 0.24], [0.198, 0.34], [0.206, 0.41], [0.18, 0.47], [0.1, 0.505], [0.0, 0.51]];
+  var torso = add(lathe(PROF, 72), M.suit, chest); torso.scale.set(SX, 1, SZ);
+  function profR(y) { for (var i = 1; i < PROF.length; i++) if (y <= PROF[i][1]) { var t = (y - PROF[i - 1][1]) / (PROF[i][1] - PROF[i - 1][1]); return PROF[i - 1][0] + (PROF[i][0] - PROF[i - 1][0]) * t; } return 0.1; }
+  function frontBody(x, y) { var r = profR(y), u = x / SX; return SZ * Math.sqrt(Math.max(0, r * r - u * u)); }
+  // chest and back muscle shape under the cloth
+  [-1, 1].forEach(function (s) { var pec = add(new THREE.SphereGeometry(0.1, 32, 20), M.suit, chest, s * 0.085, 0.36, frontBody(s * 0.085, 0.36) - 0.07); pec.scale.set(1.05, 0.72, 0.6); });
+  // crossover gi: raised lapels that follow the chest
+  function lapel(x0, y0, x1, y1) { var pts = []; for (var i = 0; i <= 18; i++) { var t = i / 18, x = x0 + (x1 - x0) * t, y = y0 + (y1 - y0) * t; pts.push(new V3(x, y, frontBody(x, y) + 0.012 + (y > 0.3 ? 0.02 : 0))); }
+    return add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 40, 0.016, 8, false), M.suit2, chest); }
+  lapel(-0.12, 0.48, 0.1, 0.13); lapel(0.12, 0.48, 0.015, 0.31);
+  // sash at the narrow waist, knot, tails and a thin red line
+  add(lathe([[0.158, 0.02], [0.163, 0.05], [0.163, 0.11], [0.158, 0.135]], 72), M.sash, chest).scale.set(SX, 1, SZ);
+  var redLine = add(new THREE.TorusGeometry(0.162, 0.005, 8, 96), M.rimRed, chest, 0, 0.128, 0); redLine.rotation.x = Math.PI / 2; redLine.scale.set(SX, SZ, 1);
+  var knot = add(new THREE.SphereGeometry(0.036, 24, 16), M.sash, chest, 0.07, 0.075, frontBody(0.07, 0.075) + 0.012); knot.scale.set(1.3, 1, 0.7);
+  var sashTails = [grp(chest, 0.06, 0.06, frontBody(0.06, 0.06) + 0.012), grp(chest, 0.09, 0.06, frontBody(0.09, 0.06) + 0.01)];
+  sashTails.forEach(function (j, i) { var t = add(new THREE.CapsuleGeometry(0.017, 0.09 - i * 0.02, 6, 12), M.sash, j, 0, -0.065, 0); t.scale.z = 0.4; });
+
+  // arms: rounded deltoids, toned upper arm and forearm, wrist wraps, compact fists
+  function arm(s) {
+    var sh = grp(chest, s * 0.255, 0.43, 0);
+    add(new THREE.SphereGeometry(0.066, 32, 20), M.suit, sh, 0, -0.005, 0).scale.set(1.12, 0.9, 0.95);                              // deltoid, blended into the shoulder line
+    add(lathe([[0.0, 0.0], [0.058, 0.0], [0.062, -0.06], [0.054, -0.13], [0.046, -0.17], [0.0, -0.17]], 32), M.suit, sh);          // bicep
+    var el = grp(sh, 0, -0.17, 0);
+    add(new THREE.SphereGeometry(0.045, 20, 14), M.suit, el);
+    add(lathe([[0.0, 0.0], [0.048, 0.0], [0.052, -0.04], [0.044, -0.1], [0.036, -0.13], [0.0, -0.13]], 32), M.suit, el);          // forearm
+    add(new THREE.CylinderGeometry(0.042, 0.04, 0.05, 28), M.wrap, el, 0, -0.12, 0);
+    var hand = grp(el, 0, -0.18, 0);
+    var palm = add(new THREE.SphereGeometry(0.05, 32, 20), M.skin, hand); palm.scale.set(0.95, 1.1, 0.85);
+    for (var f = 0; f < 4; f++) { var fg = add(new THREE.CapsuleGeometry(0.013, 0.022, 4, 12), M.skin, hand, s * 0.022, 0.018 - f * 0.02, 0.032); fg.rotation.z = Math.PI / 2; }
+    var th = add(new THREE.CapsuleGeometry(0.014, 0.022, 4, 12), M.skin, hand, s * -0.036, 0.012, 0.026); th.rotation.set(0.4, 0, s * 0.6);
+    return { sh: sh, el: el, hand: hand };
+  }
+  var LA = arm(1), RA = arm(-1);
+  add(new THREE.CylinderGeometry(0.075, 0.1, 0.07, 32), M.suit, chest, 0, 0.525, 0);                // neck
+  add(new THREE.CylinderGeometry(0.11, 0.13, 0.035, 32), M.suit2, chest, 0, 0.5, 0);                 // collar
+
+  // ---------- the big head ----------
+  var head = grp(chest, 0, 0.555 + HH / 2 - 0.03, 0.0);
+  var headPivot = head;
+  add(superGeo(0.985, 0.985, 0.985), M.skin, head);                                                     // skin core
+  // Smooth cuts: the window and the bandana edges are cut per pixel in the shader, so the edges are perfectly clean.
+  function cutMat(base, glsl) {
+    var m = base.clone();
+    m.onBeforeCompile = function (sh) {
+      sh.vertexShader = "varying vec3 vL;\n" + sh.vertexShader.replace("#include <begin_vertex>", "#include <begin_vertex>\nvL = position;");
+      sh.fragmentShader = "varying vec3 vL;\nfloat winF(vec3 p, float pad){ if (p.z < 0.15) return 2.0; float cx = abs(p.x) / (" + WIN.x.toFixed(3) + " + pad); float cy = abs(p.y - (" + ((WIN.y0 + WIN.y1) / 2).toFixed(3) + ")) / (" + ((WIN.y1 - WIN.y0) / 2).toFixed(3) + " + pad); return pow(cx, 6.0) + pow(cy, 4.0); }\n" +
+        sh.fragmentShader.replace("void main() {", "void main() {\n" + glsl);
+    };
+    m.customProgramCacheKey = function () { return glsl; };
+    return m;
+  }
+  var mask = add(superGeo(1, 1, 1), cutMat(M.suit, "if (winF(vL, 0.0) < 1.0) discard;"), head);                       // mask with the eye window cut out
+  var lip = add(superGeo(1.012, 1.012, 1.012), cutMat(M.suit2, "float w0 = winF(vL, 0.0), w1 = winF(vL, 0.032); if (!(w1 < 1.0 && w0 >= 1.0)) discard;"), head);   // soft raised edge round the window
+  // eyes: big glossy Funko ovals on the skin, each with two catch-lights
+  [-1, 1].forEach(function (s) {
+    var x = s * 0.165, y = 0.0, z = frontZ(x, y, 0.985);
+    var e = add(new THREE.SphereGeometry(0.078, 40, 28), M.eye, head, x, y, z - 0.018); e.scale.set(1, 1.08, 0.42);
+    add(new THREE.CircleGeometry(0.018, 20), M.shine, head, x - s * 0.028, y + 0.03, z + 0.015);
+    add(new THREE.CircleGeometry(0.008, 12), M.shine, head, x - s * 0.002, y - 0.032, z + 0.014);
+    // brow: a short angled tube following the skin, low and inward for determination
+    var bp = []; for (var i = 0; i <= 8; i++) { var t = i / 8, bx = s * (0.075 + t * 0.15), by = 0.1 - (1 - t) * 0.028; bp.push(new V3(bx, by, frontZ(bx, by, 0.985) + 0.006)); }
+    add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(bp), 24, 0.011, 8, false), M.brow, head);
+  });
+  // bandana: a band of the head surface itself, just above the eye window, so it wraps perfectly
+  var bandY0 = 0.16, bandY1 = 0.29;
+  var band = add(superGeo(1.03, 1.03, 1.03), cutMat(M.red, "if (vL.y < " + bandY0.toFixed(3) + " || vL.y > " + bandY1.toFixed(3) + ") discard;"), head);
+  [bandY0, bandY1].forEach(function (yy) {                                     // rolled edges top and bottom
+    var pts = []; for (var i = 0; i <= 96; i++) { var a = i / 96 * Math.PI * 2, ca = Math.cos(a), sa = Math.sin(a);
+      var u = Math.pow(Math.abs(yy / (HH / 2 * 1.03)), 1 / E), rr = Math.sqrt(Math.max(0, 1 - u * u));
+      var k = Math.pow(Math.pow(Math.abs(ca), 2 / E) + Math.pow(Math.abs(sa), 2 / E), -E / 2) * Math.pow(rr, E);
+      pts.push(new V3(ca * k * HW / 2 * 1.03, yy, sa * k * HD / 2 * 1.03)); }
+    add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, true), 200, 0.008, 6, true), M.redDark, head);
+  });
+  // knot at the back-right with two loops
+  var kn = grp(head, 0.16, (bandY0 + bandY1) / 2, -HD / 2 * 1.03 - 0.01);
+  add(new THREE.SphereGeometry(0.06, 28, 20), M.red, kn).scale.set(1.3, 1, 0.75);
+  [[-1, 0.7], [1, -0.7]].forEach(function (l) { var tr = add(new THREE.TorusGeometry(0.045, 0.022, 14, 28), M.red, kn, l[0] * 0.06, 0.02, -0.015); tr.rotation.set(0, l[1], l[0] * 0.5); tr.scale.set(1, 0.8, 1); });
+  // tails: tapered, twisting ribbons, rebuilt every frame so they flow
+  function Tail(len, w0, w1, phase, side) {
+    this.n = 40; this.len = len; this.w0 = w0; this.w1 = w1; this.phase = phase; this.side = side;
+    var geo = new THREE.BufferGeometry(); geo.setAttribute("position", new THREE.Float32BufferAttribute(new Float32Array((this.n + 1) * 6), 3));
+    var idx = []; for (var i = 0; i < this.n; i++) { var a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); } geo.setIndex(idx);
+    this.mesh = new THREE.Mesh(geo, M.red); this.mesh.castShadow = true; kn.add(this.mesh);
+  }
+  Tail.prototype.update = function (t, wind) {
+    var p = this.mesh.geometry.attributes.position, pt = new V3(0, 0, 0), dir = new V3();
+    for (var i = 0; i <= this.n; i++) {
+      var s = i / this.n, sway = Math.sin(t * 3.2 + s * 4 + this.phase) * 0.18 * wind * s, lift = Math.sin(t * 2.1 + this.phase) * 0.05 * wind * s;
+      var x = this.side * (0.04 + s * 0.34) + sway * 0.6, y = -s * this.len * (0.75 - 0.25 * wind) + lift, z = -s * this.len * (0.45 + 0.35 * wind) + sway * 0.3;
+      var w = this.w0 + (this.w1 - this.w0) * s, tw = s * 1.4 + Math.sin(t * 2.6 + s * 3 + this.phase) * 0.5 * wind;
+      dir.set(Math.cos(tw) * 0.25, Math.cos(tw), Math.sin(tw)).normalize().multiplyScalar(w);
+      p.setXYZ(i * 2, x - dir.x, y - dir.y, z - dir.z); p.setXYZ(i * 2 + 1, x + dir.x, y + dir.y, z + dir.z);
+    }
+    p.needsUpdate = true; this.mesh.geometry.computeVertexNormals(); this.mesh.geometry.computeBoundingSphere();
+  };
+  var tails = [new Tail(0.66, 0.085, 0.05, 0, 1), new Tail(0.8, 0.078, 0.045, 1.7, 0.45)];
+
+  // ---------- the B1 ball ----------
+  // Regulation 8-panel basketball, painted per pixel on the sphere so every seam curves correctly:
+  // a horizontal great circle, a vertical great circle, and two curved side seams that cross the horizontal seam only.
+  var BWd = 1024, BHt = 512, bc = document.createElement("canvas"); bc.width = BWd; bc.height = BHt; var bx = bc.getContext("2d");
+  var img = bx.createImageData(BWd, BHt), d = img.data, SEAM = 0.022;
+  for (var j = 0; j < BHt; j++) {
+    var th = (j + 0.5) / BHt * Math.PI, st = Math.sin(th), ny = Math.cos(th);
+    for (var i = 0; i < BWd; i++) {
+      var ph = (i + 0.5) / BWd * Math.PI * 2, nx = -Math.cos(ph) * st, nz = Math.sin(ph) * st;
+      var eq = Math.abs(ny), mer = Math.abs(nx);                                   // horizontal seam (normal Y), vertical seam through front and back (normal X)
+      var cy = ny * 1.18, ca = Math.acos(Math.min(1, Math.abs(nx) / Math.sqrt(nx * nx + cy * cy + nz * nz)));   // angle from the left/right axis, so they never touch the vertical seam
+      var side = Math.abs(ca - 0.92);                                              // curved seams: rings round the left and right panels
+      var dist = Math.min(eq, mer, side), k = (j * BWd + i) * 4;
+      var grain = 0.9 + 0.1 * Math.sin(i * 2.7 + j * 1.3) * Math.cos(i * 1.1 - j * 2.9), panel = 0.94 + 0.06 * (Math.abs(nz) + Math.abs(nx)) * 0.5;
+      var r = 191 * grain * panel, g = 82 * grain * panel, b = 27 * grain * panel;
+      if (dist < SEAM) { var e = Math.min(1, (SEAM - dist) / 0.006); r += (24 - r) * e; g += (16 - g) * e; b += (12 - b) * e; }
+      else if (dist < SEAM + 0.01) { var sh = 1 - (dist - SEAM) / 0.01; r *= 1 - 0.25 * sh; g *= 1 - 0.25 * sh; b *= 1 - 0.25 * sh; }   // seams sit in a groove
+      d[k] = r; d[k + 1] = g; d[k + 2] = b; d[k + 3] = 255;
+    }
+  }
+  bx.putImageData(img, 0, 0);
+  for (var pb = 0; pb < 26000; pb++) { bx.fillStyle = "rgba(0,0,0," + (Math.random() * 0.1) + ")"; bx.beginPath(); bx.arc(Math.random() * BWd, Math.random() * BHt, 1.1, 0, 7); bx.fill(); }   // pebbled leather
+  // HoopLife heartbeat replaces the front stretch of the horizontal seam (front = +Z = u 0.25)
+  var cx0 = BWd * 0.25, cy0 = BHt / 2;
+  bx.fillStyle = "#bf521b"; bx.fillRect(cx0 - 64, cy0 - 7, 128, 14); bx.fillRect(cx0 - 8, cy0 - 40, 16, 80);   // the B1 logo: the pulse breaks through both seams at the front
+  bx.strokeStyle = "#ffffff"; bx.lineWidth = 9; bx.lineJoin = "round"; bx.lineCap = "round"; bx.beginPath();
+  [[-62, 0], [-20, 0], [-8, -26], [8, 30], [20, 0], [62, 0]].forEach(function (p, q) { bx[q ? "lineTo" : "moveTo"](cx0 + p[0], cy0 + p[1]); }); bx.stroke();
+  var bt = new THREE.CanvasTexture(bc); bt.encoding = THREE.sRGBEncoding; bt.anisotropy = 8;
+  var ball = add(new THREE.SphereGeometry(0.2, 64, 40), new THREE.MeshPhysicalMaterial({ map: bt, roughness: 0.6, clearcoat: 0.2, envMapIntensity: 0.2 }), fig);
+
+  // ---------- smoke for the vanish ----------
+  var puffs = []; for (var p = 0; p < 44; p++) { var pm = new THREE.Mesh(new THREE.IcosahedronGeometry(0.08, 2), new THREE.MeshStandardMaterial({ color: 0x5f616a, transparent: true, opacity: 0, roughness: 1, depthWrite: false })); scene.add(pm); puffs.push({ m: pm, a: p * 2.399, y: 0.15 + (p % 11) * 0.16, r: 0.18 + (p % 5) * 0.08 }); }
+
+  // ---------- poses ----------
+  function ease(x) { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x); }
+  function seg(t, a, b) { return Math.max(0, Math.min(1, (t - a) / (b - a))); }
+  var pose = Q.p || "stance", t0 = performance.now(), tmp = new V3();
+  function reset() {
+    [LA, RA].forEach(function (a) { a.sh.rotation.set(0, 0, 0); a.el.rotation.set(0, 0, 0); a.hand.rotation.set(0, 0, 0); });
+    [LL, RL].forEach(function (l) { l.hp.rotation.set(0, 0, 0); l.kn.rotation.set(0, 0, 0); l.ft.rotation.set(0, 0, 0); });
+    root.position.set(0, 0.125, 0); root.rotation.set(0, 0, 0); root.scale.setScalar(1); hips.position.y = HIPY; chest.rotation.set(0, 0, 0); head.rotation.set(0, 0, 0);
+  }
+  function handWorld(a) { a.hand.updateWorldMatrix(true, false); return a.hand.getWorldPosition(tmp).clone(); }
+  function animate(t) {
+    reset(); puffs.forEach(function (q) { q.m.material.opacity = 0; }); ball.visible = true;
+    var br = Math.sin(t * 2.0), wind = 0.55;
+    chest.rotation.x = 0.02 * br; head.rotation.z = 0.015 * Math.sin(t * 1.3);
+    if (pose === "stance") {
+      // the reference stance: feet apart, fists down and slightly out, chin a little lowered, ball resting by the feet
+      LL.hp.rotation.z = 0.12; RL.hp.rotation.z = -0.12; LL.ft.rotation.z = -0.12; RL.ft.rotation.z = 0.12;
+      LA.sh.rotation.set(0.05, 0, 0.32); RA.sh.rotation.set(0.05, 0, -0.32); LA.el.rotation.x = -0.25; RA.el.rotation.x = -0.25;
+      head.rotation.x = 0.07; head.rotation.y = Math.sin(t * 0.5) * 0.06;
+      ball.position.set(0.5, 0.325, 0.32); ball.rotation.set(0.12, 0.5, 0);
+    } else if (pose === "spin") {
+      LA.sh.rotation.set(-0.35, 0, 1.35); LA.el.rotation.set(-0.2, 0, 1.5); RA.sh.rotation.set(0.1, 0, -0.3); RA.el.rotation.x = -0.4;
+      LL.hp.rotation.z = 0.08; RL.hp.rotation.z = -0.08; head.rotation.set(-0.12, -0.15, 0);
+      fig.updateMatrixWorld(true); var h = handWorld(LA); ball.position.set(h.x, h.y + 0.25, h.z); ball.rotation.set(0.12, t * 10, 0); wind = 0.7;
+    } else if (pose === "dribble") {
+      var ph = (t * 2.2) % 1, down = Math.sin(ph * Math.PI);
+      hips.position.y = HIPY - 0.05; chest.rotation.x = 0.2; head.rotation.x = -0.18;
+      LL.hp.rotation.set(-0.45, 0, 0.12); LL.kn.rotation.x = 0.6; RL.hp.rotation.set(0.25, 0, -0.12); RL.kn.rotation.x = 0.35;
+      RA.sh.rotation.set(-0.55 + 0.4 * down, 0, -0.3); RA.el.rotation.x = -0.5 + 0.3 * down; LA.sh.rotation.set(-0.9, 0, 0.55); LA.el.rotation.x = -0.9;
+      fig.updateMatrixWorld(true); var hd = handWorld(RA); var top = hd.y - 0.2; ball.position.set(hd.x, 0.33 + (top - 0.33) * (1 - down), hd.z + 0.06); ball.rotation.x = -t * 12; wind = 0.8;
+    } else if (pose === "shot") {
+      var c = t % 2.6, crouch = ease(seg(c, 0, 0.45)) - ease(seg(c, 0.45, 0.65)), rise = ease(seg(c, 0.5, 0.85)) - ease(seg(c, 1.25, 1.6)), lift = ease(seg(c, 0.35, 0.9)), flick = ease(seg(c, 0.9, 1.05));
+      hips.position.y = HIPY - 0.1 * crouch; root.position.y = 0.125 + 0.5 * rise;
+      [LL, RL].forEach(function (l) { l.hp.rotation.x = -0.7 * crouch + 0.15 * rise; l.kn.rotation.x = 1.0 * crouch + 0.25 * rise; });
+      LA.sh.rotation.set(-0.3 - 0.9 * lift, 0, 0.3 + 1.05 * lift); LA.el.rotation.set(-0.5 * lift + 0.5 * flick, 0, 0.9 * lift); RA.sh.rotation.set(-0.3 - 0.7 * lift, 0, -0.35); RA.el.rotation.x = -0.8 * lift; head.rotation.x = -0.1 * lift;   // shooting hand out to the side, so the ball never covers the face
+      fig.updateMatrixWorld(true); var hs = handWorld(LA);
+      if (c < 1.0) ball.position.set(hs.x + 0.04, hs.y + 0.2, hs.z + 0.04); else { var k = seg(c, 1.0, 2.2); ball.position.set(hs.x - 0.2 * k, hs.y + 0.2 + 2.2 * k - 1.2 * k * k, hs.z - 2.4 * k); }
+      ball.rotation.x = -c * 8; wind = 0.4 + rise;
+    } else if (pose === "vanish") {
+      var v = t % 3.6, sp = ease(seg(v, 0, 0.5));
+      LA.sh.rotation.set(-1.35 * sp, 0, 0.5 * sp); RA.sh.rotation.set(-1.35 * sp, 0, -0.5 * sp); LA.el.rotation.x = RA.el.rotation.x = -1.1 * sp;   // hands together: ninja sign
+      LL.hp.rotation.z = 0.22 * sp; RL.hp.rotation.set(-0.3 * sp, 0, -0.1); RL.kn.rotation.x = 0.45 * sp; hips.position.y = HIPY - 0.06 * sp; head.rotation.x = 0.12 * sp;
+      var gone = ease(seg(v, 1.4, 1.65)) - ease(seg(v, 2.5, 2.75)); root.scale.setScalar(Math.max(0.001, 1 - gone));
+      ball.position.set(0.5, 0.325, 0.32); ball.rotation.set(0.12, 0.5, 0);
+      [[1.3, 2.1], [2.35, 3.1]].forEach(function (w) { var k = seg(v, w[0], w[1]); if (k <= 0 || k >= 1) return; puffs.forEach(function (q) { var r = q.r * (0.6 + k * 1.3); q.m.position.set(Math.cos(q.a) * r, q.y + k * 0.35, Math.sin(q.a) * r); q.m.scale.setScalar(0.7 + k * 1.1); q.m.material.opacity = Math.max(q.m.material.opacity, 0.55 * Math.sin(Math.PI * k)); }); });
+      wind = 0.6;
+    }
+    tails.forEach(function (tl) { tl.update(t, wind); });
+    sashTails.forEach(function (j, i) { j.rotation.z = Math.sin(t * 2.5 + i) * 0.08; j.rotation.x = Math.sin(t * 2 + i) * 0.06; });
+  }
+
+  // ---------- UI ----------
+  function press(sel, b) { document.querySelectorAll(sel).forEach(function (o) { o.setAttribute("aria-pressed", String(o === b)); }); }
+  document.querySelectorAll("[data-pose]").forEach(function (b) { b.addEventListener("click", function () { press("[data-pose]", b); pose = b.getAttribute("data-pose"); t0 = performance.now(); }); });
+  var tween = null;
+  document.querySelectorAll("[data-view]").forEach(function (b) { b.addEventListener("click", function () { press("[data-view]", b); tween = { from: camera.position.clone(), to: new V3().fromArray(VIEWS[b.getAttribute("data-view")]), s: performance.now() }; }); });
+  controls.addEventListener("start", function () { document.getElementById("hint").hidden = true; tween = null; });
+  function resize() { var w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.fov = w < 600 ? 34 : 25; camera.updateProjectionMatrix(); }
+  window.addEventListener("resize", resize); resize();
+  var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches, freeze = Q.t !== undefined ? parseFloat(Q.t) : null;
+  function frame(now) {
+    requestAnimationFrame(frame);
+    var t = freeze !== null ? freeze : still ? 1.1 : (now - t0) / 1000;
+    if (tween) { var k = Math.min(1, (now - tween.s) / 800), e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2; camera.position.lerpVectors(tween.from, tween.to, e); if (k >= 1) tween = null; }
+    animate(t); controls.update(); renderer.render(scene, camera);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

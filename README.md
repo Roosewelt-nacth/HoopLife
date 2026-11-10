@@ -90,6 +90,8 @@ Showcase page: *Brick Ninja*. Source: [`02_Merch/brick-ninja`](02_Merch/brick-ni
 
 ## 5. Mascot: the HoopLife Ninja
 
+- **Latest: Funko Ninja, draft 6** (showcase page *Funko Ninja*). Source: [`03_Mascot/funko-ninja/HoopLife-Funko-Ninja.html`](03_Mascot/funko-ninja/HoopLife-Funko-Ninja.html). A big Funko head with a clean eye window and glossy eyes, an athletic V-taper body with toned limbs, a black ninja suit with crossover gi and sash, a wrapped red bandana with flowing tails, a regulation 8-panel B1 basketball, and 5 animated poses (stance, ball spin, dribble, jump shot, ninja vanish). Pose sheet: [`funko-ninja-poses-v6.png`](03_Mascot/funko-ninja/funko-ninja-poses-v6.png)
+
 - **3D figure** (vinyl-toy stand-in with a pointed hood and cowl mask): showcase page *Ninja figure*. Source: [`03_Mascot/HoopLife-Ninja-Figure.html`](03_Mascot/HoopLife-Ninja-Figure.html)
 - **Sculpt package** for the final model by a 3D artist or an image-to-3D tool: [`03_Mascot/sculpt-package`](03_Mascot/sculpt-package): turnaround sheet, [`CHARACTER-BRIEF.md`](03_Mascot/CHARACTER-BRIEF.md) and [`PROMPTS.md`](03_Mascot/sculpt-package/PROMPTS.md).
 - Original character. No real person's likeness, no existing character's mask.

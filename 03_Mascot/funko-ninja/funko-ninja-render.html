@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HoopLife Funko Ninja Render</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #1a1b1f; overflow: hidden; }
+  canvas { display: block; width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/environments/RoomEnvironment.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/geometries/RoundedBoxGeometry.js"></script>
+<script>
+// Render rig for the HoopLife Funko-style ninja concept. Views: #hero (default), #front, #side, #back.
+(function () {
+  var W = innerWidth, H = innerHeight;
+  var renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2)); renderer.setSize(W, H);
+  renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 0.72;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  document.body.appendChild(renderer.domElement);
+  var scene = new THREE.Scene();
+  scene.environment = new THREE.PMREMGenerator(renderer).fromScene(new THREE.RoomEnvironment(), 0.06).texture;
+  // studio backdrop: soft vertical gradient sweep
+  var bgC = document.createElement("canvas"); bgC.width = 4; bgC.height = 512; var bg = bgC.getContext("2d"), gr = bg.createLinearGradient(0, 0, 0, 512);
+  gr.addColorStop(0, "#3b3d44"); gr.addColorStop(0.55, "#2a2b30"); gr.addColorStop(1, "#151518"); bg.fillStyle = gr; bg.fillRect(0, 0, 4, 512);
+  var bgT = new THREE.CanvasTexture(bgC); bgT.encoding = THREE.sRGBEncoding; scene.background = bgT;
+  var camera = new THREE.PerspectiveCamera(26, W / H, 0.1, 100);
+  var V = { hero: [3.6, 2.35, 6.2], front: [0, 1.45, 7.2], side: [7.2, 1.45, 0.01], back: [0.01, 1.45, -7.2] }, view = location.hash.slice(1) || "hero";
+  camera.position.fromArray(V[view] || V.hero); camera.lookAt(0, 1.15, 0);
+  // lights: warm key, cool rim, soft fill
+  var key = new THREE.DirectionalLight(0xfff1e0, 2.4); key.position.set(4, 7, 5); key.castShadow = true; key.shadow.mapSize.set(2048, 2048); key.shadow.radius = 6; key.shadow.bias = -0.0004;
+  Object.assign(key.shadow.camera, { left: -3, right: 3, top: 4, bottom: -1, near: 1, far: 20 }); scene.add(key);
+  var rim = new THREE.DirectionalLight(0x9fc0ff, 1.4); rim.position.set(-5, 4, -5); scene.add(rim);
+  var rim2 = new THREE.DirectionalLight(0xffb3a0, 0.7); rim2.position.set(5, 3, -4); scene.add(rim2);
+  scene.add(new THREE.HemisphereLight(0xdfe6ff, 0x221d1a, 0.15));
+  var floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.ShadowMaterial({ opacity: 0.45 })); floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
+
+  // ---------- materials: matte-satin vinyl ----------
+  function vinyl(c, o) { return new THREE.MeshPhysicalMaterial(Object.assign({ color: c, roughness: 0.5, clearcoat: 0.3, clearcoatRoughness: 0.4, envMapIntensity: 0.18 }, o || {})); }
+  var M = {
+    black: vinyl(0x0a0a0c, { roughness: 0.6, clearcoat: 0.25, envMapIntensity: 0.12 }),
+    black2: vinyl(0x17181b, { roughness: 0.75, clearcoat: 0.05, envMapIntensity: 0.1 }),
+    skin: vinyl(0xd99a70, { roughness: 0.5 }),
+    red: vinyl(0xa80c12, { roughness: 0.55, clearcoat: 0.25 }),
+    redDark: vinyl(0x6e080c, { roughness: 0.6 }),
+    eye: vinyl(0x060607, { roughness: 0.08, clearcoat: 1, clearcoatRoughness: 0.05, envMapIntensity: 1.2 }),
+    white: vinyl(0xffffff, { roughness: 0.2 }),
+    sash: vinyl(0x2a2622, { roughness: 0.8 }),
+    base: vinyl(0x0a0a0b, { roughness: 0.3, clearcoat: 0.6, envMapIntensity: 0.25 }),
+    metalRed: vinyl(0xb3121a, { metalness: 0.2, roughness: 0.35 })
+  };
+  function rbox(w, h, d, r, seg) { return new THREE.RoundedBoxGeometry(w, h, d, seg || 6, r); }
+  function add(geo, mat, parent, x, y, z) { var m = new THREE.Mesh(geo, mat); m.position.set(x || 0, y || 0, z || 0); m.castShadow = true; m.receiveShadow = true; (parent || scene).add(m); return m; }
+  function grp(parent, x, y, z) { var g = new THREE.Group(); g.position.set(x || 0, y || 0, z || 0); (parent || scene).add(g); return g; }
+
+  var fig = grp(scene);
+  // ---------- display base ----------
+  add(new THREE.CylinderGeometry(0.62, 0.66, 0.12, 64), M.base, fig, 0, 0.06, 0);
+  var rimRing = add(new THREE.TorusGeometry(0.64, 0.012, 8, 96), M.metalRed, fig, 0, 0.12, 0); rimRing.rotation.x = Math.PI / 2;
+  // ---------- legs + tabi-style shoes (stubby) ----------
+  [-1, 1].forEach(function (s) {
+    var leg = grp(fig, s * 0.13, 0.12, 0);
+    add(new THREE.CapsuleGeometry(0.1, 0.12, 8, 20), M.black, leg, 0, 0.2, 0);
+    add(new THREE.CylinderGeometry(0.105, 0.1, 0.05, 20), M.black2, leg, 0, 0.1, 0);           // ankle wrap
+    var shoe = add(rbox(0.2, 0.11, 0.3, 0.05), M.black, leg, 0, 0.055, 0.04);
+    add(new THREE.BoxGeometry(0.012, 0.09, 0.08), M.black2, leg, 0, 0.06, 0.18);               // tabi split toe
+  });
+  // ---------- body: small torso with crossover wrap and sash ----------
+  var body = grp(fig, 0, 0.42, 0);
+  add(rbox(0.52, 0.5, 0.36, 0.13), M.black, body, 0, 0.25, 0);
+  // crossover lapels (raised strips)
+  var lapL = add(rbox(0.07, 0.42, 0.03, 0.015), M.black2, body, -0.04, 0.3, 0.178); lapL.rotation.z = 0.55;
+  var lapR = add(rbox(0.07, 0.3, 0.03, 0.015), M.black2, body, 0.07, 0.34, 0.176); lapR.rotation.z = -0.55;
+  // sash with knot and tails
+  add(rbox(0.545, 0.1, 0.385, 0.05), M.sash, body, 0, 0.07, 0);
+  add(new THREE.SphereGeometry(0.055, 20, 14), M.sash, body, 0.11, 0.07, 0.2).scale.set(1.3, 1, 0.8);
+  [[0.09, -0.2], [0.14, 0.15]].forEach(function (t) { var tl = add(rbox(0.05, 0.16, 0.02, 0.01), M.sash, body, t[0], -0.02, 0.2); tl.rotation.z = t[1]; });
+  add(new THREE.BoxGeometry(0.548, 0.012, 0.388), M.metalRed, body, 0, 0.115, 0);              // thin red line on the sash
+  // ---------- arms: short, rounded, black sleeves, wrist wraps, small hands ----------
+  function arm(s, rotZ, rotX) {
+    var sh = grp(body, s * 0.3, 0.42, 0); sh.rotation.set(rotX || 0, 0, rotZ);
+    add(new THREE.SphereGeometry(0.1, 24, 16), M.black, sh);
+    add(new THREE.CapsuleGeometry(0.085, 0.14, 8, 20), M.black, sh, 0, -0.13, 0);
+    add(new THREE.CylinderGeometry(0.09, 0.09, 0.06, 20), M.black2, sh, 0, -0.22, 0);
+    var hand = add(new THREE.SphereGeometry(0.085, 24, 16), M.skin, sh, 0, -0.29, 0); hand.scale.set(1, 1.05, 0.92);
+    return { sh: sh, hand: hand };
+  }
+  var L = arm(1, 0.35, -0.15), R = arm(-1, -0.25, 0.1);
+  // B1 basketball on the hip, under the left hand
+  var bc = document.createElement("canvas"); bc.width = 512; bc.height = 256; var bx = bc.getContext("2d"); bx.fillStyle = "#c2541c"; bx.fillRect(0, 0, 512, 256);
+  for (var i = 0; i < 4000; i++) { bx.fillStyle = "rgba(0,0,0," + Math.random() * 0.14 + ")"; bx.fillRect(Math.random() * 512, Math.random() * 256, 2, 2); }
+  bx.strokeStyle = "#1b1411"; bx.lineWidth = 6; [0, 128, 256, 384].forEach(function (x) { bx.beginPath(); bx.moveTo(x, 0); bx.lineTo(x, 256); bx.stroke(); }); bx.beginPath(); bx.moveTo(0, 128); bx.lineTo(512, 128); bx.stroke();
+  bx.strokeStyle = "#fff"; bx.lineWidth = 7; bx.lineJoin = "round"; bx.beginPath(); [[176, 128], [224, 128], [238, 100], [256, 156], [270, 128], [336, 128]].forEach(function (p, k) { bx[k ? "lineTo" : "moveTo"](p[0], p[1]); }); bx.stroke();
+  var bt = new THREE.CanvasTexture(bc); bt.encoding = THREE.sRGBEncoding; bt.anisotropy = 8;
+  var ball = add(new THREE.SphereGeometry(0.21, 48, 32), new THREE.MeshPhysicalMaterial({ map: bt, roughness: 0.62, clearcoat: 0.2, envMapIntensity: 0.2 }), body, 0.43, 0.13, 0.1); ball.rotation.set(0.2, -1.4, 0.1);
+
+  // ---------- the big head ----------
+  var head = grp(fig, 0, 1.48, 0);
+  var HW = 1.02, HH = 0.9, HD = 0.92, HR = 0.34;
+  add(rbox(HW, HH, HD, HR, 8), M.black, head);                                                   // mask / hood
+  // face window: skin band with a soft inset edge
+  var win = add(rbox(0.74, 0.26, 0.12, 0.1, 6), M.skin, head, 0, 0.02, HD / 2 - 0.045);
+  var winEdge = add(rbox(0.78, 0.3, 0.1, 0.12, 6), M.black2, head, 0, 0.02, HD / 2 - 0.06);
+  // Funko eyes: big glossy black ovals with a catch-light, slightly tilted for attitude
+  [-1, 1].forEach(function (s) {
+    var e = add(new THREE.SphereGeometry(0.075, 32, 24), M.eye, head, s * 0.155, 0.015, HD / 2 + 0.012); e.scale.set(1, 1.12, 0.45);
+    add(new THREE.SphereGeometry(0.018, 12, 10), M.white, head, s * 0.155 - 0.025, 0.05, HD / 2 + 0.045);
+    var brow = add(rbox(0.13, 0.03, 0.03, 0.012), M.black, head, s * 0.155, 0.105, HD / 2 + 0.02); brow.rotation.z = s * 0.32;
+  });
+  // ---------- red bandana: band round the head, knot at the back, two flowing tails ----------
+  (function bandana() {
+    function rr(w, d, r) { var s = new THREE.Shape(), x = -w / 2, z = -d / 2; s.moveTo(x + r, z); s.lineTo(x + w - r, z); s.quadraticCurveTo(x + w, z, x + w, z + r); s.lineTo(x + w, z + d - r); s.quadraticCurveTo(x + w, z + d, x + w - r, z + d); s.lineTo(x + r, z + d); s.quadraticCurveTo(x, z + d, x, z + d - r); s.lineTo(x, z + r); s.quadraticCurveTo(x, z, x + r, z); return s; }
+    var outer = rr(HW + 0.04, HD + 0.04, HR + 0.02), inner = rr(HW - 0.02, HD - 0.02, HR - 0.01);
+    var hole = new THREE.Path(inner.getPoints(24)); outer.holes.push(hole);
+    var g = new THREE.ExtrudeGeometry(outer, { depth: 0.15, bevelEnabled: true, bevelSize: 0.012, bevelThickness: 0.012, bevelSegments: 3, curveSegments: 24 });
+    g.rotateX(Math.PI / 2); var band = add(g, M.red, head, 0, 0.27, 0);      // sits across the forehead, just above the eye window
+    // knot at the back
+    var kn = grp(head, 0.1, 0.2, -HD / 2 - 0.03);
+    add(new THREE.SphereGeometry(0.075, 24, 18), M.red, kn).scale.set(1.25, 1, 0.8);
+    add(new THREE.TorusGeometry(0.05, 0.028, 12, 24), M.redDark, kn, -0.06, 0.02, -0.02).rotation.y = 0.8;
+    add(new THREE.TorusGeometry(0.05, 0.028, 12, 24), M.redDark, kn, 0.07, 0.02, -0.02).rotation.y = -0.8;
+    // tails: tapered ribbons that sweep out and down in a breeze
+    function tail(curvePts, w0, w1) {
+      var curve = new THREE.CatmullRomCurve3(curvePts.map(function (p) { return new THREE.Vector3(p[0], p[1], p[2]); }));
+      var n = 60, pos = [], idx = [], up = new THREE.Vector3(0, 1, 0);
+      for (var i = 0; i <= n; i++) { var t = i / n, p = curve.getPoint(t), tg = curve.getTangent(t), side = new THREE.Vector3().crossVectors(tg, up).normalize(), w = w0 + (w1 - w0) * t, tw = Math.sin(t * Math.PI * 1.2) * 0.6;
+        var nrm = new THREE.Vector3().crossVectors(side, tg).normalize(), dir = side.clone().multiplyScalar(Math.cos(tw)).add(nrm.multiplyScalar(Math.sin(tw)));
+        pos.push(p.x - dir.x * w, p.y - dir.y * w, p.z - dir.z * w, p.x + dir.x * w, p.y + dir.y * w, p.z + dir.z * w);
+        if (i < n) { var a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); } }
+      var geo = new THREE.BufferGeometry(); geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); geo.setIndex(idx); geo.computeVertexNormals();
+      var m = new THREE.Mesh(geo, new THREE.MeshPhysicalMaterial({ color: 0xa80c12, roughness: 0.55, clearcoat: 0.2, side: THREE.DoubleSide, envMapIntensity: 0.18 })); m.castShadow = true; kn.add(m);
+      // a thin rolled edge so the ribbon has thickness
+      var tube = new THREE.Mesh(new THREE.TubeGeometry(curve, 60, 0.012, 6, false), M.redDark); kn.add(tube);
+    }
+    tail([[0, 0, 0], [0.12, -0.08, -0.12], [0.32, -0.18, -0.26], [0.52, -0.36, -0.32], [0.66, -0.58, -0.3]], 0.09, 0.05);
+    tail([[0, 0, 0], [-0.02, -0.1, -0.12], [0.08, -0.26, -0.24], [0.2, -0.48, -0.3], [0.3, -0.72, -0.26]], 0.085, 0.045);
+  })();
+  // neck shadow ring so the head sits on the body like a real figure
+  add(new THREE.CylinderGeometry(0.16, 0.18, 0.08, 24), M.black2, fig, 0, 1.0, 0);
+
+  renderer.render(scene, camera);
+  window.__done = true;
+})();
+</script>
+</body>
+</html>

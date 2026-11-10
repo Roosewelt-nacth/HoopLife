@@ -18,6 +18,7 @@ $pages = [ordered]@{
   "merch-ball-keychain"= "02_Merch\keychain-ball\HoopLife-Ball-Keychain-v2.html"
   "merch-disc-keychain"= "02_Merch\keychain\HoopLife-Keychain.html"
   "merch-brick-ninja"  = "02_Merch\brick-ninja\HoopLife-Brick-Ninja.html"
+  "mascot-funko-ninja" = "03_Mascot\funko-ninja\HoopLife-Funko-Ninja.html"
   "mascot-figure"      = "03_Mascot\HoopLife-Ninja-Figure.html"
   "game-5v5"           = "03_Mascot\HoopLife-Court-5v5.html"
   "game-8bit"          = "03_Mascot\HoopLife-Court-8bit.html"
@@ -36,7 +37,7 @@ foreach ($slug in $pages.Keys) {
 $media = @(
   "01_Logos\CHECKPOINT-v2-Basketball-B1\files\icon-b1-dark.svg", "01_Logos\CHECKPOINT-v2-Basketball-B1\files\icon-b1-light.svg",
   "01_Logos\CHECKPOINT-v2-Basketball-B1\files\word-b1-dark.svg", "01_Logos\CHECKPOINT-v2-Basketball-B1\files\word-b1-light.svg",
-  "02_Merch\keychain-ball\jock-tag\jock-tag-v4.png", "03_Mascot\sculpt-package\turnaround-sheet.png"
+  "02_Merch\keychain-ball\jock-tag\jock-tag-v4.png", "03_Mascot\sculpt-package\turnaround-sheet.png", "03_Mascot\funko-ninja\funko-ninja-poses-v6.png", "03_Mascot\funko-ninja\funko-ninja-athletic-sheet.png"
 )
 foreach ($m in $media) { $p = Join-Path $root $m; if (Test-Path $p) { Copy-Item $p "$docs\media\" -Force } }
 Copy-Item (Join-Path $PSScriptRoot "showcase-index.html") "$docs\index.html" -Force
